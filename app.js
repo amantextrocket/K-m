@@ -16,7 +16,10 @@ const db = firebase.database().ref('products');
 let vornexProducts = [];
 let cart = [];
 let selectedSizesMap = {}; 
-const MY_WHATSAPP_NUMBER = "918269444061"; // Your Updated WhatsApp Number
+let appliedCouponCode = "";
+let couponExtraDiscountPercent = 0; // 5% Extra Coupon Discount
+
+const MY_WHATSAPP_NUMBER = "918269444061"; // Your WhatsApp Number
 
 // Realtime Products Load
 db.on('value', (snapshot) => {
@@ -39,7 +42,6 @@ function renderProducts(products) {
         const isStock = p.inStock !== false;
         const availableSizes = p.sizes || ['M', 'L', 'XL'];
         
-        // Default select first size
         if (!selectedSizesMap[p.id]) {
             selectedSizesMap[p.id] = availableSizes[0];
         }
@@ -78,13 +80,11 @@ function renderProducts(products) {
     });
 }
 
-// Select Size Function
 function selectSize(productId, size) {
     selectedSizesMap[productId] = size;
     renderProducts(vornexProducts);
 }
 
-// Search Logic
 function showQuickCategories(show) {
     document.getElementById('quickCategories').style.display = show ? 'flex' : 'none';
 }
@@ -114,19 +114,29 @@ function directWhatsAppOrder(productId) {
     const p = vornexProducts.find(item => item.id === productId);
     const chosenSize = selectedSizesMap[productId] || "M";
     
-    let finalPrice = p.price;
-    let offerNote = "";
+    let currentPrice = p.price;
+    let offerDetails = [];
+
+    // Auto 20% OFF above 999
     if (p.price >= 999) {
-        finalPrice = Math.round(p.price * 0.8);
-        offerNote = `\n*Offer Applied:* 20% OFF (Original: ₹${p.price})`;
+        currentPrice = Math.round(currentPrice * 0.8);
+        offerDetails.push("Flat 20% OFF (Above ₹999)");
     }
 
-    const message = `Hi VORNEX! I want to buy this product:\n\n*Product:* ${p.name}\n*Size:* ${chosenSize}\n*Price:* ₹${finalPrice}${offerNote}\n*Image:* ${p.image}`;
+    // Extra 5% Coupon OFF
+    if (couponExtraDiscountPercent > 0) {
+        currentPrice = Math.round(currentPrice * ((100 - couponExtraDiscountPercent) / 100));
+        offerDetails.push(`Extra ${couponExtraDiscountPercent}% OFF Coupon (${appliedCouponCode})`);
+    }
+
+    let offerNote = offerDetails.length > 0 ? `\n*Offers Applied:* ${offerDetails.join(" + ")}` : "";
+
+    const message = `Hi VORNEX! I want to buy this product:\n\n*Product:* ${p.name}\n*Size:* ${chosenSize}\n*Original Price:* ₹${p.price}\n*Final Price:* ₹${currentPrice}${offerNote}\n*Image:* ${p.image}`;
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
 }
 
-// Cart Drawer System
+// Cart System
 function toggleCart() {
     document.getElementById('cartSidebar').classList.toggle('active');
 }
@@ -140,17 +150,38 @@ function addToCart(productId) {
     toggleCart();
 }
 
+// 5% Extra Coupon Logic
+function applyCoupon() {
+    const code = document.getElementById('couponInput').value.trim().toUpperCase();
+    const msg = document.getElementById('couponMsg');
+
+    // Available 5% Extra Coupons: VORNEX5, EXTRA5, EDGE5
+    if (code === "VORNEX5" || code === "EXTRA5" || code === "EDGE5") {
+        appliedCouponCode = code;
+        couponExtraDiscountPercent = 5;
+        msg.style.color = "#25D366";
+        msg.innerText = `🎉 Coupon '${code}' Applied! (Extra 5% OFF)`;
+    } else if (code === "") {
+        appliedCouponCode = "";
+        couponExtraDiscountPercent = 0;
+        msg.innerText = "";
+    } else {
+        msg.style.color = "#ff3333";
+        msg.innerText = "❌ Invalid Coupon Code";
+        return;
+    }
+    updateCartUI();
+}
+
 function updateCartUI() {
     document.getElementById('cartCount').innerText = cart.length;
     const list = document.getElementById('cartItemsList');
-    const notice = document.getElementById('discountNotice');
     list.innerHTML = "";
     let subtotal = 0;
 
     if(cart.length === 0) {
         list.innerHTML = "<p style='color:#777;'>Cart is empty.</p>";
         document.getElementById('cartTotal').innerText = "₹0";
-        notice.innerText = "";
         return;
     }
 
@@ -167,13 +198,21 @@ function updateCartUI() {
         `;
     });
 
-    let finalTotal = subtotal;
+    let currentTotal = subtotal;
+
+    // 1. Check Auto 20% Flat Discount above 999
     if (subtotal >= 999) {
-        finalTotal = Math.round(subtotal * 0.8);
-        notice.innerText = "🎉 20% Discount Applied for purchase over ₹999!";
-        document.getElementById('cartTotal').innerHTML = `<span style="text-decoration:line-through; color:#777; font-size:0.8rem;">₹${subtotal}</span> ₹${finalTotal}`;
+        currentTotal = Math.round(currentTotal * 0.8);
+    }
+
+    // 2. Apply Extra 5% Coupon Discount
+    if (couponExtraDiscountPercent > 0) {
+        currentTotal = Math.round(currentTotal * ((100 - couponExtraDiscountPercent) / 100));
+    }
+
+    if (currentTotal < subtotal) {
+        document.getElementById('cartTotal').innerHTML = `<span style="text-decoration:line-through; color:#777; font-size:0.8rem;">₹${subtotal}</span> ₹${currentTotal}`;
     } else {
-        notice.innerText = `Add ₹${999 - subtotal} more to get 20% OFF!`;
         document.getElementById('cartTotal').innerText = "₹" + subtotal;
     }
 }
@@ -189,11 +228,19 @@ function checkoutCartWhatsApp() {
     let subtotal = 0;
     cart.forEach(item => subtotal += item.price);
 
-    let finalTotal = subtotal;
-    let isDiscounted = false;
+    let currentTotal = subtotal;
+    let appliedOffers = [];
+
+    // Auto 20% OFF
     if (subtotal >= 999) {
-        finalTotal = Math.round(subtotal * 0.8);
-        isDiscounted = true;
+        currentTotal = Math.round(currentTotal * 0.8);
+        appliedOffers.push("Flat 20% OFF (Orders >= ₹999)");
+    }
+
+    // Extra 5% OFF Coupon
+    if (couponExtraDiscountPercent > 0) {
+        currentTotal = Math.round(currentTotal * ((100 - couponExtraDiscountPercent) / 100));
+        appliedOffers.push(`Extra 5% Coupon OFF (${appliedCouponCode})`);
     }
     
     let msg = "Hi VORNEX! I want to order the following cart items:\n\n";
@@ -201,15 +248,12 @@ function checkoutCartWhatsApp() {
         msg += `${i+1}. *${item.name}* (Size: ${item.selectedSize}) - ₹${item.price}\n`;
     });
 
-    if (isDiscounted) {
-        msg += `\n*Subtotal:* ₹${subtotal}`;
-        msg += `\n*Discount:* 20% OFF`;
-        msg += `\n*FINAL AMOUNT TO PAY:* ₹${finalTotal}`;
-    } else {
-        msg += `\n*TOTAL AMOUNT:* ₹${finalTotal}`;
+    msg += `\n*Subtotal:* ₹${subtotal}`;
+    if (appliedOffers.length > 0) {
+        msg += `\n*Offers Applied:* ${appliedOffers.join(" + ")}`;
     }
+    msg += `\n*FINAL AMOUNT TO PAY:* ₹${currentTotal}`;
     
     window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
 }
-
 
