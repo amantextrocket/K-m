@@ -128,6 +128,16 @@
     </div>
 
     <script>
+        // Admin Panel Password Protection
+const ADMIN_PASSWORD = "444061";
+
+let userPass = prompt("Admin Panel खोलने के लिए पासवर्ड डालें:");
+if (userPass !== ADMIN_PASSWORD) {
+    alert("गलत पासवर्ड!");
+    document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied! Incorrect Password.</h2>";
+    throw new Error("Unauthorized Access");
+}
+
         const firebaseConfig = {
             apiKey: "AIzaSyDItBcWY7ww6jj73h1HEtaTm7YllIBLQ1c",
             authDomain: "vornex-b7a62.firebaseapp.com",
