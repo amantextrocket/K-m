@@ -3,133 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORNEX | Own Your Edge</title>
-    <link rel="stylesheet" href="style.css">
+    <title>VORNEX | Premium Streetwear</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+        body { background: #0a0a0a; color: #fff; overflow-x: hidden; }
+
+        /* Header */
+        header { background: #000; border-bottom: 1px solid #222; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 3px; color: #fff; text-decoration: none; }
+        .cart-icon { cursor: pointer; position: relative; font-size: 1.2rem; }
+        .cart-count { background: #fff; color: #000; font-size: 0.7rem; font-weight: 900; border-radius: 50%; padding: 2px 6px; position: absolute; top: -8px; right: -10px; }
+
+        /* Top Hero Carousel / Banner */
+        .hero-banner { background: linear-gradient(180deg, #181818 0%, #0a0a0a 100%); padding: 40px 20px; text-align: center; border-bottom: 1px solid #222; }
+        .hero-banner h1 { font-size: 2rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; }
+        .hero-banner p { color: #888; font-size: 0.85rem; letter-spacing: 1px; }
+
+        /* Trust Badges Bar */
+        .trust-bar { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; padding: 15px; background: #111; border-bottom: 1px solid #222; text-align: center; }
+        .trust-item { font-size: 0.75rem; font-weight: 700; color: #ccc; letter-spacing: 0.5px; }
+
+        /* Search Section */
+        .search-container { max-width: 600px; margin: 20px auto; padding: 0 15px; position: relative; }
+        .search-input { width: 100%; padding: 12px 20px; background: #141414; border: 1px solid #333; color: #fff; border-radius: 25px; font-size: 0.9rem; outline: none; }
+        .quick-cats { display: none; background: #141414; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-top: 8px; flex-wrap: wrap; gap: 8px; position: absolute; width: calc(100% - 30px); z-index: 90; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
+        .quick-cats button { background: #222; color: #fff; border: 1px solid #444; padding: 6px 12px; border-radius: 15px; font-size: 0.75rem; cursor: pointer; }
+
+        /* Products Grid */
+        .store-container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        .clothing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+        
+        .product-card { background: #121212; border: 1px solid #222; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; }
+        .product-card:hover { transform: translateY(-3px); border-color: #444; }
+        .product-card img { width: 100%; height: 280px; object-fit: cover; }
+        .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .product-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 5px; }
+        .product-price { font-size: 1rem; font-weight: 900; color: #fff; margin-bottom: 10px; }
+        
+        /* Size Selector Styling */
+        .size-picker { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .size-chip { padding: 4px 8px; background: #222; border: 1px solid #444; font-size: 0.7rem; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .size-chip.active { background: #fff; color: #000; border-color: #fff; }
+
+        /* Badges */
+        .badge-tag { position: absolute; top: 10px; left: 10px; background: #fff; color: #000; padding: 3px 8px; font-size: 0.65rem; font-weight: 900; border-radius: 3px; letter-spacing: 1px; }
+        .sold-out-badge { position: absolute; top: 10px; right: 10px; background: #ff3333; color: #fff; padding: 3px 8px; font-size: 0.65rem; font-weight: 900; border-radius: 3px; }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 8px; flex-direction: column; }
+        .btn-add { background: #fff; color: #000; border: none; padding: 10px; font-weight: 900; font-size: 0.75rem; border-radius: 6px; cursor: pointer; letter-spacing: 1px; }
+        .btn-wa { background: #25D366; color: #000; border: none; padding: 10px; font-weight: 900; font-size: 0.75rem; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; text-decoration: none; }
+        .btn-disabled { background: #333 !important; color: #777 !important; cursor: not-allowed; }
+
+        /* Cart Sidebar */
+        .cart-sidebar { position: fixed; top: 0; right: -350px; width: 320px; height: 100%; background: #121212; border-left: 1px solid #222; z-index: 200; transition: right 0.3s; padding: 20px; display: flex; flex-direction: column; }
+        .cart-sidebar.active { right: 0; }
+        .close-cart { cursor: pointer; font-size: 1.2rem; }
+
+        /* Footer Section */
+        footer { background: #050505; border-top: 1px solid #222; padding: 30px 20px; text-align: center; margin-top: 50px; font-size: 0.8rem; color: #777; }
+        .footer-links { margin: 15px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .footer-links a { color: #aaa; text-decoration: none; font-size: 0.75rem; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-    <!-- Top Offer Bar -->
-    <div class="top-bar">
-        <span>⚡ SPECIAL OFFER: FREE SHIPPING & FLAT 15% OFF ON ORDERS ABOVE ₹999!</span>
-    </div>
-
-    <!-- Header Navigation -->
-    <header class="navbar">
-        <div class="nav-container">
-            <div class="brand-logo">VORNEX</div>
-            <nav class="nav-links">
-                <a href="#" onclick="filterCategory('All')">ALL</a>
-                <a href="#" onclick="filterCategory('Oversized Tees')">OVERSIZED TEES</a>
-                <a href="#" onclick="filterCategory('T-shirts')">T-SHIRTS</a>
-                <a href="#" onclick="filterCategory('Shirts')">SHIRTS</a>
-                <a href="#" onclick="filterCategory('Hoodies')">HOODIES</a>
-                <a href="#" onclick="filterCategory('Sweatshirts')">SWEATSHIRTS</a>
-                <a href="#" onclick="filterCategory('Jeans')">JEANS</a>
-            </nav>
-            <div class="nav-actions">
-                <button class="cart-icon-btn" onclick="toggleCart()">
-                    CART (<span id="cartCount">0</span>)
-                </button>
-            </div>
+    <!-- Header -->
+    <header>
+        <a href="#" class="logo">VORNEX</a>
+        <div class="cart-icon" onclick="toggleCart()">
+            🛒 <span class="cart-count" id="cartCount">0</span>
         </div>
     </header>
-    <!-- Top Search Bar & Quick Categories -->
-<div class="search-container" style="max-width: 100%; padding: 12px 15px; background: #0a0a0a; border-bottom: 1px solid #222; position: relative; z-index: 90;">
-    <div style="max-width: 600px; margin: 0 auto; position: relative;">
-        <input type="text" id="userSearchBar" placeholder="🔍 Search hoodies, tees, jeans..." 
-               onfocus="showQuickCategories(true)" 
-               onkeyup="handleUserSearch()"
-               style="width: 100%; padding: 12px 18px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 25px; font-size: 0.9rem; outline: none;">
-        
-        <!-- Category Popup -->
-        <div id="quickCategories" style="display: none; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-top: 8px; flex-wrap: wrap; gap: 8px; position: absolute; width: 100%; left: 0; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
-            <span style="font-size: 0.75rem; color: #888; width: 100%; display: block; margin-bottom: 5px; font-weight: bold;">POPULAR CATEGORIES:</span>
-            <button onclick="selectQuickCategory('All')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">All</button>
-            <button onclick="selectQuickCategory('Oversized Tees')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Oversized Tees</button>
-            <button onclick="selectQuickCategory('T-shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">T-shirts</button>
-            <button onclick="selectQuickCategory('Shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Shirts</button>
-            <button onclick="selectQuickCategory('Hoodies')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Hoodies</button>
-            <button onclick="selectQuickCategory('Sweatshirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Sweatshirts</button>
-            <button onclick="selectQuickCategory('Jeans')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Jeans</button>
+
+    <!-- Top Hero Banner Carousel Section -->
+    <div class="hero-banner">
+        <h1>NEW DROP '26</h1>
+        <p>PREMIUM HEAVYWEIGHT STREETWEAR</p>
+    </div>
+
+    <!-- Trust Badges Bar -->
+    <div class="trust-bar">
+        <div class="trust-item">🚚 FAST ALL INDIA SHIPPING</div>
+        <div class="trust-item">💯 100% HEAVYWEIGHT COTTON</div>
+        <div class="trust-item">🔄 EASY SIZE REPLACEMENT</div>
+    </div>
+
+    <!-- Search & Quick Categories -->
+    <div class="search-container">
+        <input type="text" id="userSearchBar" class="search-input" placeholder="🔍 Search hoodies, tees, jeans..." onfocus="showQuickCategories(true)" onkeyup="handleUserSearch()">
+        <div id="quickCategories" class="quick-cats">
+            <span style="font-size: 0.7rem; color: #888; width: 100%; display: block; font-weight: bold;">POPULAR CATEGORIES:</span>
+            <button onclick="selectQuickCategory('All')">All</button>
+            <button onclick="selectQuickCategory('Oversized Tees')">Oversized Tees</button>
+            <button onclick="selectQuickCategory('T-shirts')">T-shirts</button>
+            <button onclick="selectQuickCategory('Shirts')">Shirts</button>
+            <button onclick="selectQuickCategory('Hoodies')">Hoodies</button>
+            <button onclick="selectQuickCategory('Sweatshirts')">Sweatshirts</button>
+            <button onclick="selectQuickCategory('Jeans')">Jeans</button>
         </div>
     </div>
-</div>
 
-    <!-- Hero Banner Section -->
-    <section class="hero-section">
-        <div class="hero-content">
-            <span class="hero-subtitle">NEW DROP 2026</span>
-            <h1 class="hero-title">OWN YOUR EDGE</h1>
-            <a href="#shop" class="btn-primary">EXPLORE COLLECTION</a>
-        </div>
-    </section>
-
-    <!-- Category Filter Bar -->
-    <div class="filter-bar" id="shop">
-        <button class="filter-btn active" onclick="filterCategory('All')">ALL</button>
-        <button class="filter-btn" onclick="filterCategory('Oversized Tees')">OVERSIZED TEES</button>
-        <button class="filter-btn" onclick="filterCategory('T-shirts')">T-SHIRTS</button>
-        <button class="filter-btn" onclick="filterCategory('Shirts')">SHIRTS</button>
-        <button class="filter-btn" onclick="filterCategory('Hoodies')">HOODIES</button>
-        <button class="filter-btn" onclick="filterCategory('Sweatshirts')">SWEATSHIRTS</button>
-        <button class="filter-btn" onclick="filterCategory('Jeans')">JEANS</button>
+    <!-- Live Products Store -->
+    <div class="store-container">
+        <div class="clothing-grid" id="productsGrid">Loading store items...</div>
     </div>
-    
-    <!-- Category Chips (Click karne par dikhenge) -->
-    <div id="quickCategories" style="display: none; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-top: 8px; flex-wrap: wrap; gap: 8px;">
-        <span style="font-size: 0.75rem; color: #888; width: 100%; display: block; margin-bottom: 5px; font-weight: bold;">POPULAR CATEGORIES:</span>
-        <button onclick="selectQuickCategory('All')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">All</button>
-        <button onclick="selectQuickCategory('Oversized Tees')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Oversized Tees</button>
-        <button onclick="selectQuickCategory('T-shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">T-shirts</button>
-        <button onclick="selectQuickCategory('Shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Shirts</button>
-        <button onclick="selectQuickCategory('Hoodies')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Hoodies</button>
-        <button onclick="selectQuickCategory('Sweatshirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Sweatshirts</button>
-        <button onclick="selectQuickCategory('Jeans')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Jeans</button>
-    </div>
-</div>
 
-    <!-- Product Grid -->
-    <main class="store-container">
-        <div class="clothing-grid" id="productsGrid"></div>
-    </main>
-
-    <!-- Slide-in Cart Sidebar -->
-    <div id="cartSidebar" class="cart-sidebar">
-        <div class="cart-header">
+    <!-- Cart Drawer -->
+    <div class="cart-sidebar" id="cartSidebar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h3>YOUR CART</h3>
             <span class="close-cart" onclick="toggleCart()">&times;</span>
         </div>
-        <div id="cartItemsList" class="cart-body">
-            <p class="empty-cart-text">Your cart is empty.</p>
-        </div>
-        <div class="cart-footer">
-            <div class="discount-banner" id="discountNote">Add items above ₹999 for Flat 20% OFF!</div>
-            <div class="total-row">
-                <span>SUBTOTAL</span>
-                <strong id="cartSubtotal">₹0</strong>
+        <div id="cartItemsList" style="flex-grow:1; overflow-y:auto;">Your cart is empty.</div>
+        <div style="margin-top:20px; border-top:1px solid #333; padding-top:15px;">
+            <div style="display:flex; justify-content:space-between; font-weight:900; margin-bottom:15px;">
+                <span>TOTAL:</span>
+                <span id="cartTotal">₹0</span>
             </div>
-            <div class="checkout-inputs">
-                <input type="text" id="custName" placeholder="Full Name">
-                <input type="tel" id="custPhone" placeholder="WhatsApp / Phone Number">
-                <textarea id="custAddress" placeholder="Complete Shipping Address"></textarea>
-                <button class="btn-checkout" onclick="checkoutWhatsApp()">PLACE ORDER VIA WHATSAPP</button>
-            </div>
+            <button class="btn-wa" onclick="checkoutCartWhatsApp()" style="width:100%;">ORDER CART VIA WHATSAPP</button>
         </div>
     </div>
 
-    <!-- Backdrop -->
-    <div id="cartBackdrop" class="backdrop" onclick="toggleCart()"></div>
-
+    <!-- Footer Policies Section -->
     <footer>
-        <p>© 2026 VORNEX. OWN YOUR EDGE. ALL RIGHTS RESERVED.</p>
+        <p>© 2026 VORNEX STORE. All rights reserved.</p>
+        <div class="footer-links">
+            <a href="#">Shipping Policy</a>
+            <a href="#">Return & Exchange Policy</a>
+            <a href="#">Contact Us</a>
+        </div>
     </footer>
 
-        <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
 
-</body>
-</html>
