@@ -1,3 +1,4 @@
+// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyDItBcWY7ww6jj73h1HEtaTm7YllIBLQ1c",
     authDomain: "vornex-b7a62.firebaseapp.com",
@@ -14,160 +15,168 @@ const db = firebase.database().ref('products');
 
 let vornexProducts = [];
 let cart = [];
-let selectedSizes = {};
+let selectedSizesMap = {}; 
+const MY_WHATSAPP_NUMBER = "918269444061"; // 👈 Updated with your WhatsApp Number
 
+// Realtime Products Load
 db.on('value', (snapshot) => {
-    const data = snapshot.val();
-    vornexProducts = [];
-    if (data) {
-        Object.keys(data).forEach(key => {
-            vornexProducts.push({ id: key, ...data[key] });
-        });
-    }
+    const data = snapshot.val() || {};
+    vornexProducts = Object.keys(data).map(key => ({ id: key, ...data[key] }));
     renderProducts(vornexProducts);
 });
 
-function renderProducts(items) {
+// Render Store Products
+function renderProducts(products) {
     const grid = document.getElementById('productsGrid');
-    if (!grid) return;
-    if (items.length === 0) {
-        grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; padding: 40px; font-weight: bold;">Loading VORNEX Collection...</p>`;
+    grid.innerHTML = "";
+
+    if (products.length === 0) {
+        grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#777;'>No products available.</p>";
         return;
     }
-    let html = "";
-    items.forEach(item => {
-        const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
-        let sizeBtns = sizes.map(size => `<button class="size-btn ${selectedSizes[item.id] === size ? 'selected' : ''}" onclick="selectSize('${item.id}', '${size}')">${size}</button>`).join('');
-        html += `<div class="product-card">
-            <div class="product-img-box"><span class="badge-tag">${item.tag}</span><img src="${item.image}" alt="${item.name}"></div>
-            <div class="product-info">
-                <div class="product-name">${item.name}</div>
-                <div class="product-price">₹${item.price}</div>
-                <div class="size-selector">${sizeBtns}</div>
-                <button class="btn-add" onclick="addToCart('${item.id}')">ADD TO CART</button>
+
+    products.forEach(p => {
+        const isStock = p.inStock !== false;
+        const availableSizes = p.sizes || ['M', 'L', 'XL'];
+        
+        // Default select first size
+        if (!selectedSizesMap[p.id]) {
+            selectedSizesMap[p.id] = availableSizes[0];
+        }
+
+        let sizesHTML = `<div class="size-picker">`;
+        availableSizes.forEach(size => {
+            const activeClass = selectedSizesMap[p.id] === size ? 'active' : '';
+            sizesHTML += `<span class="size-chip ${activeClass}" onclick="selectSize('${p.id}', '${size}')">${size}</span>`;
+        });
+        sizesHTML += `</div>`;
+
+        grid.innerHTML += `
+            <div class="product-card">
+                ${p.tag ? `<span class="badge-tag">${p.tag}</span>` : ''}
+                ${!isStock ? `<span class="sold-out-badge">SOLD OUT</span>` : ''}
+                <img src="${p.image}" alt="${p.name}">
+                <div class="product-info">
+                    <div>
+                        <div class="product-title">${p.name}</div>
+                        <div class="product-price">₹${p.price}</div>
+                        ${sizesHTML}
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-add ${!isStock ? 'btn-disabled' : ''}" 
+                                onclick="addToCart('${p.id}')" ${!isStock ? 'disabled' : ''}>
+                                ${isStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+                        </button>
+                        <button class="btn-wa ${!isStock ? 'btn-disabled' : ''}" 
+                                onclick="directWhatsAppOrder('${p.id}')" ${!isStock ? 'disabled' : ''}>
+                                BUY VIA WHATSAPP
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>`;
+        `;
     });
-    grid.innerHTML = html;
 }
 
-function selectSize(productId, size) { selectedSizes[productId] = size; renderProducts(vornexProducts); }
-
-function filterCategory(cat) {
-    document.querySelectorAll('.filter-btn').forEach(btn => { 
-        btn.classList.toggle('active', btn.innerText.trim().toUpperCase() === cat.toUpperCase()); 
-    });
-    if (cat === 'All') { renderProducts(vornexProducts); } 
-    else { renderProducts(vornexProducts.filter(p => p.category === cat)); }
+// Select Size Function
+function selectSize(productId, size) {
+    selectedSizesMap[productId] = size;
+    renderProducts(vornexProducts);
 }
 
-function addToCart(productId) {
-    const product = vornexProducts.find(p => p.id === productId);
-    const size = selectedSizes[productId] || 'M';
-    cart.push({ ...product, selectedSize: size });
-    updateCartUI(); 
-    toggleCart(true);
-}
-
-function updateCartUI() {
-    document.getElementById('cartCount').innerText = cart.length;
-    const list = document.getElementById('cartItemsList');
-    const subtotalEl = document.getElementById('cartSubtotal');
-    const discountNote = document.getElementById('discountNote');
-    
-    if (cart.length === 0) {
-        list.innerHTML = '<p class="empty-cart-text">Your cart is empty.</p>';
-        subtotalEl.innerText = '₹0';
-        discountNote.innerText = 'Add items above ₹999 for Flat 20% OFF!';
-        return;
-    }
-    let html = "", rawTotal = 0;
-    cart.forEach((item, index) => {
-        rawTotal += item.price;
-        html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <div><strong>${item.name}</strong><br><small>Size: ${item.selectedSize} | ₹${item.price}</small></div>
-            <button onclick="removeFromCart(${index})" style="border:none; background:none; cursor:pointer; font-weight:bold; font-size:1.1rem;">✕</button>
-        </div>`;
-    });
-    let finalTotal = rawTotal;
-    if (rawTotal > 999) {
-        const discount = Math.round(rawTotal * 0.20);
-        finalTotal = rawTotal - discount;
-        discountNote.innerText = `🎉 FLAT 20% OFF APPLIED! (Saved ₹${discount})`;
-    } else {
-        discountNote.innerText = `Add ₹${1000 - rawTotal} more to get FLAT 20% OFF!`;
-    }
-    list.innerHTML = html;
-    subtotalEl.innerText = `₹${finalTotal}`;
-}
-
-function removeFromCart(index) { cart.splice(index, 1); updateCartUI(); }
-
-function toggleCart(forceOpen = false) {
-    const sidebar = document.getElementById('cartSidebar');
-    const backdrop = document.getElementById('cartBackdrop');
-    if (forceOpen) { sidebar.classList.add('open'); backdrop.classList.add('active'); } 
-    else { sidebar.classList.toggle('open'); backdrop.classList.toggle('active'); }
-}
-
-function checkoutWhatsApp() {
-    if (cart.length === 0) { alert("Cart is empty!"); return; }
-    const name = document.getElementById('custName').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
-    const address = document.getElementById('custAddress').value.trim();
-    if (!name || !phone || !address) { alert("Please fill Name, Phone, and Address!"); return; }
-    
-    let rawTotal = 0, itemsText = "";
-    cart.forEach((item, i) => {
-        rawTotal += item.price;
-        itemsText += `${i+1}. ${item.name} (Size: ${item.selectedSize}) - ₹${item.price}%0A`;
-    });
-    let finalTotal = rawTotal > 999 ? rawTotal - Math.round(rawTotal * 0.20) : rawTotal;
-    let offerApplied = rawTotal > 999 ? `Flat 20% OFF` : "No Offer";
-    
-    let msg = `*🛍️ NEW ORDER FOR VORNEX*%0A%0A`;
-    msg += `*Name:* ${name}%0A`;
-    msg += `*Phone:* ${phone}%0A`;
-    msg += `*Address:* ${address}%0A%0A`;
-    msg += `*Items Ordered:*%0A${itemsText}%0A`;
-    msg += `*Subtotal:* ₹${rawTotal}%0A`;
-    msg += `*Offer:* ${offerApplied}%0A`;
-    msg += `*Final Amount:* ₹${finalTotal}`;
-    
-    window.open(`https://wa.me/918269444061?text=${msg}`, '_blank');
-}
-// Search Bar & Category Popup Logic
+// Search Logic
 function showQuickCategories(show) {
-    const quickCatBox = document.getElementById('quickCategories');
-    if(quickCatBox) {
-        quickCatBox.style.display = show ? 'flex' : 'none';
-    }
+    document.getElementById('quickCategories').style.display = show ? 'flex' : 'none';
 }
 
 function handleUserSearch() {
     const query = document.getElementById('userSearchBar').value.toLowerCase().trim();
-    if (query === "") {
-        renderProducts(vornexProducts);
-        return;
-    }
     const filtered = vornexProducts.filter(p => 
         p.name.toLowerCase().includes(query) || 
-        p.category.toLowerCase().includes(query) ||
-        (p.tag && p.tag.toLowerCase().includes(query))
+        p.category.toLowerCase().includes(query)
     );
     renderProducts(filtered);
 }
 
 function selectQuickCategory(cat) {
     document.getElementById('userSearchBar').value = cat === 'All' ? '' : cat;
-    filterCategory(cat);
+    if(cat === 'All') {
+        renderProducts(vornexProducts);
+    } else {
+        const filtered = vornexProducts.filter(p => p.category === cat);
+        renderProducts(filtered);
+    }
     showQuickCategories(false);
 }
 
-// Tap outside to close categories popup
-document.addEventListener('click', function(e) {
-    const searchContainer = document.querySelector('.search-container');
-    if (searchContainer && !searchContainer.contains(e.target)) {
-        showQuickCategories(false);
+// Single Click Direct WhatsApp Order
+function directWhatsAppOrder(productId) {
+    const p = vornexProducts.find(item => item.id === productId);
+    const chosenSize = selectedSizesMap[productId] || "M";
+    
+    const message = `Hi VORNEX! I want to buy this product:\n\n*Product:* ${p.name}\n*Size:* ${chosenSize}\n*Price:* ₹${p.price}\n*Image:* ${p.image}`;
+    const encoded = encodeURIComponent(message);
+    window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
+}
+
+// Cart Drawer System
+function toggleCart() {
+    document.getElementById('cartSidebar').classList.toggle('active');
+}
+
+function addToCart(productId) {
+    const p = vornexProducts.find(item => item.id === productId);
+    const chosenSize = selectedSizesMap[productId] || "M";
+    
+    cart.push({ ...p, selectedSize: chosenSize });
+    updateCartUI();
+    toggleCart();
+}
+
+function updateCartUI() {
+    document.getElementById('cartCount').innerText = cart.length;
+    const list = document.getElementById('cartItemsList');
+    list.innerHTML = "";
+    let total = 0;
+
+    if(cart.length === 0) {
+        list.innerHTML = "<p style='color:#777;'>Cart is empty.</p>";
+        document.getElementById('cartTotal').innerText = "₹0";
+        return;
     }
-});
+
+    cart.forEach((item, index) => {
+        total += item.price;
+        list.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #222; padding-bottom:8px;">
+                <div>
+                    <strong style="font-size:0.85rem;">${item.name}</strong><br>
+                    <small style="color:#aaa;">Size: ${item.selectedSize} | ₹${item.price}</small>
+                </div>
+                <span onclick="removeFromCart(${index})" style="color:#ff3333; cursor:pointer; font-weight:bold;">&times;</span>
+            </div>
+        `;
+    });
+
+    document.getElementById('cartTotal').innerText = "₹" + total;
+}
+
+function removeFromCart(index) {
+    cart.splice(index, 1);
+    updateCartUI();
+}
+
+function checkoutCartWhatsApp() {
+    if(cart.length === 0) return alert("Your cart is empty!");
+    
+    let msg = "Hi VORNEX! I want to order the following cart items:\n\n";
+    let total = 0;
+    cart.forEach((item, i) => {
+        total += item.price;
+        msg += `${i+1}. *${item.name}* (Size: ${item.selectedSize}) - ₹${item.price}\n`;
+    });
+    msg += `\n*TOTAL AMOUNT:* ₹${total}`;
+    
+    window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
