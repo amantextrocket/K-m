@@ -3,67 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORNEX | Admin Panel</title>
+    <title>VORNEX | Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
-        body { background: #0f0f0f; color: #fff; padding: 20px; }
+        body { background: #0b0b0b; color: #fff; padding: 20px; }
         
-        /* Main Container - Initially Hidden until login */
-        .admin-container { max-width: 850px; margin: 0 auto; display: none; }
-        h1 { text-align: center; margin-bottom: 20px; letter-spacing: 2px; }
-        .card { background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        .card h2 { margin-bottom: 15px; font-size: 1.2rem; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 5px; color: #aaa; }
-        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: #fff; font-size: 0.9rem; border-radius: 4px; }
-        button { width: 100%; padding: 14px; background: #fff; color: #000; font-weight: 900; border: none; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 0.9rem; transition: 0.2s; }
-        button:hover { background: #ccc; }
+        .admin-container { max-width: 900px; margin: 0 auto; display: none; }
+        h1 { text-align: center; margin-bottom: 25px; letter-spacing: 3px; font-weight: 900; }
         
-        /* Search Box */
-        .search-box { width: 100%; padding: 12px; background: #000; border: 1px solid #555; color: #fff; font-size: 0.95rem; border-radius: 4px; margin-bottom: 15px; }
+        /* Analytics Grid */
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .stat-card { background: #141414; border: 1px solid #282828; padding: 20px; border-radius: 12px; text-align: center; }
+        .stat-card h3 { font-size: 0.8rem; color: #888; letter-spacing: 1px; margin-bottom: 8px; }
+        .stat-card .value { font-size: 2rem; font-weight: 900; color: #fff; }
+
+        .card { background: #141414; border: 1px solid #282828; padding: 22px; border-radius: 12px; margin-bottom: 30px; }
+        .card h2 { margin-bottom: 18px; font-size: 1.1rem; letter-spacing: 1px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 6px; color: #aaa; }
+        input, select { width: 100%; padding: 12px 14px; background: #000; border: 1px solid #333; color: #fff; font-size: 0.9rem; border-radius: 6px; outline: none; }
+        input:focus, select:focus { border-color: #666; }
         
-        /* Product Items */
+        /* Checkbox Styling for Sizes */
+        .size-checkboxes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
+        .size-btn { display: flex; align-items: center; gap: 6px; background: #050505; padding: 8px 14px; border: 1px solid #333; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold; }
+        .size-btn input { width: auto; cursor: pointer; }
+
+        button { width: 100%; padding: 14px; background: #fff; color: #000; font-weight: 900; border: none; cursor: pointer; border-radius: 6px; margin-top: 10px; font-size: 0.9rem; transition: 0.2s; letter-spacing: 1px; }
+        button:hover { background: #dcdcdc; }
+        
+        .search-box { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; font-size: 0.95rem; border-radius: 6px; margin-bottom: 18px; }
+        
+        /* Products List */
         .product-list { display: grid; gap: 12px; }
-        .product-item { background: #000; border: 1px solid #333; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; flex-wrap: wrap; gap: 10px; }
-        .product-item img { width: 50px; height: 65px; object-fit: cover; border-radius: 4px; }
+        .product-item { background: #050505; border: 1px solid #222; padding: 14px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; flex-wrap: wrap; gap: 12px; }
+        .product-item img { width: 55px; height: 70px; object-fit: cover; border-radius: 6px; }
         .p-details { flex-grow: 1; display: flex; align-items: center; gap: 15px; }
+        
+        .badge-stock { padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 900; display: inline-block; margin-top: 5px; }
+        .in-stock { background: #0e301d; color: #40c057; border: 1px solid #1b5e34; }
+        .out-stock { background: #3c090d; color: #ff6b6b; border: 1px solid #6b1118; }
         
         .action-btns { display: flex; gap: 8px; }
         .btn-edit { background: #ffaa00; color: #000; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
         .btn-delete { background: #ff3333; color: #fff; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
         
-        /* Edit Modal */
+        /* Modal Popup */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; padding: 20px; z-index: 100; }
-        .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; max-width: 500px; width: 100%; border: 1px solid #444; }
+        .modal-content { background: #141414; padding: 25px; border-radius: 12px; max-width: 500px; width: 100%; border: 1px solid #333; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .close-btn { cursor: pointer; font-size: 1.5rem; font-weight: bold; }
 
-        /* 🔒 Stylish Password Overlay Modal */
-        #authOverlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #050505; display: flex; justify-content: center; align-items: center;
-            z-index: 9999; padding: 20px;
-        }
-        .auth-card {
-            background: #121212; border: 1px solid #282828; border-radius: 16px;
-            padding: 35px 25px; width: 100%; max-width: 380px; text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-        }
+        /* Login Screen */
+        #authOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 20px; }
+        .auth-card { background: #121212; border: 1px solid #282828; border-radius: 16px; padding: 35px 25px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .auth-card .logo { font-size: 1.8rem; font-weight: 900; letter-spacing: 4px; margin-bottom: 5px; color: #fff; }
         .auth-card .sub-title { font-size: 0.8rem; color: #777; margin-bottom: 25px; letter-spacing: 1px; font-weight: 600; }
-        .auth-card input {
-            width: 100%; padding: 14px; background: #080808; border: 1px solid #333;
-            color: #fff; font-size: 1.1rem; border-radius: 8px; text-align: center;
-            letter-spacing: 4px; outline: none; transition: border-color 0.3s;
-        }
-        .auth-card input:focus { border-color: #fff; }
-        .auth-card button {
-            width: 100%; padding: 14px; background: #fff; color: #000;
-            font-weight: 900; border: none; border-radius: 8px; margin-top: 15px;
-            font-size: 0.95rem; cursor: pointer; letter-spacing: 1px;
-        }
-        .auth-card button:hover { background: #ddd; }
+        .auth-card input { width: 100%; padding: 14px; background: #080808; border: 1px solid #333; color: #fff; font-size: 1.1rem; border-radius: 8px; text-align: center; letter-spacing: 4px; outline: none; }
         #authError { color: #ff4d4d; font-size: 0.8rem; margin-top: 12px; font-weight: 600; display: none; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -71,7 +68,7 @@
 </head>
 <body>
 
-    <!-- 🔒 Stylish Login Screen -->
+    <!-- 🔒 Password Login Popup -->
     <div id="authOverlay">
         <div class="auth-card">
             <div class="logo">VORNEX</div>
@@ -84,11 +81,27 @@
         </div>
     </div>
 
-    <!-- Admin Panel Container -->
+    <!-- Main Admin Panel Container -->
     <div class="admin-container" id="mainAdminContent">
-        <h1>VORNEX ADMIN PANEL</h1>
+        <h1>VORNEX DASHBOARD</h1>
         
-        <!-- Add Product Card -->
+        <!-- 📊 Analytics Section -->
+        <div class="analytics-grid">
+            <div class="stat-card">
+                <h3>TOTAL PRODUCTS</h3>
+                <div class="value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>IN STOCK ITEMS</h3>
+                <div class="value" id="statInStock" style="color: #40c057;">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>OUT OF STOCK</h3>
+                <div class="value" id="statOutStock" style="color: #ff6b6b;">0</div>
+            </div>
+        </div>
+
+        <!-- ➕ Add Product Card -->
         <div class="card">
             <h2>➕ Add New Product</h2>
             <form id="addProductForm">
@@ -111,27 +124,49 @@
                     <label>Price (₹)</label>
                     <input type="number" id="pPrice" placeholder="799" required>
                 </div>
+                
+                <!-- Sizes Selector -->
+                <div class="form-group">
+                    <label>Available Sizes</label>
+                    <div class="size-checkboxes">
+                        <label class="size-btn"><input type="checkbox" name="addSize" value="S"> S</label>
+                        <label class="size-btn"><input type="checkbox" name="addSize" value="M" checked> M</label>
+                        <label class="size-btn"><input type="checkbox" name="addSize" value="L" checked> L</label>
+                        <label class="size-btn"><input type="checkbox" name="addSize" value="XL" checked> XL</label>
+                        <label class="size-btn"><input type="checkbox" name="addSize" value="XXL"> XXL</label>
+                    </div>
+                </div>
+
+                <!-- Stock Switch -->
+                <div class="form-group">
+                    <label>Stock Status</label>
+                    <select id="pStock">
+                        <option value="in_stock">In Stock (Available)</option>
+                        <option value="out_of_stock">Out of Stock (Sold Out)</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Tag / Badge</label>
                     <input type="text" id="pTag" placeholder="BESTSELLER / NEW DROP / HOT" required>
                 </div>
                 <div class="form-group">
                     <label>Image URL</label>
-                    <input type="url" id="pImage" placeholder="https://..." required>
+                    <input type="url" id="pImage" placeholder="https://i.ibb.co/..." required>
                 </div>
-                <button type="submit">ADD PRODUCT TO WEBSITE</button>
+                <button type="submit">ADD PRODUCT TO STORE</button>
             </form>
         </div>
 
-        <!-- Manage Products Card -->
+        <!-- 📦 Manage Products Section -->
         <div class="card">
-            <h2>📦 Live Products List</h2>
+            <h2>📦 Live Inventory</h2>
             <input type="text" id="searchBar" class="search-box" placeholder="🔍 Search product by name or category..." onkeyup="filterAdminProducts()">
             <div id="adminProductList" class="product-list">Loading products...</div>
         </div>
     </div>
 
-    <!-- Edit Product Modal -->
+    <!-- Edit Product Modal Popup -->
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -159,6 +194,26 @@
                     <label>Price (₹)</label>
                     <input type="number" id="editPrice" required>
                 </div>
+                
+                <div class="form-group">
+                    <label>Available Sizes</label>
+                    <div class="size-checkboxes">
+                        <label class="size-btn"><input type="checkbox" name="editSize" value="S"> S</label>
+                        <label class="size-btn"><input type="checkbox" name="editSize" value="M"> M</label>
+                        <label class="size-btn"><input type="checkbox" name="editSize" value="L"> L</label>
+                        <label class="size-btn"><input type="checkbox" name="editSize" value="XL"> XL</label>
+                        <label class="size-btn"><input type="checkbox" name="editSize" value="XXL"> XXL</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Stock Status</label>
+                    <select id="editStock">
+                        <option value="in_stock">In Stock</option>
+                        <option value="out_of_stock">Out of Stock</option>
+                    </select>
+                </div>
+
                 <div class="form-group">
                     <label>Tag / Badge</label>
                     <input type="text" id="editTag" required>
@@ -173,24 +228,20 @@
     </div>
 
     <script>
-        // Password Check Logic
         const ADMIN_PASSWORD = "444061";
 
         function verifyPassword(event) {
             event.preventDefault();
             const inputVal = document.getElementById('passInput').value;
-            const errorEl = document.getElementById('authError');
-
             if (inputVal === ADMIN_PASSWORD) {
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('mainAdminContent').style.display = 'block';
             } else {
-                errorEl.style.display = 'block';
+                document.getElementById('authError').style.display = 'block';
                 document.getElementById('passInput').value = '';
             }
         }
 
-        // Firebase Setup
         const firebaseConfig = {
             apiKey: "AIzaSyDItBcWY7ww6jj73h1HEtaTm7YllIBLQ1c",
             authDomain: "vornex-b7a62.firebaseapp.com",
@@ -206,16 +257,30 @@
         const db = firebase.database().ref('products');
         let allProducts = {};
 
+        function getSelectedSizes(name) {
+            const boxes = document.querySelectorAll(`input[name="${name}"]:checked`);
+            return Array.from(boxes).map(cb => cb.value);
+        }
+
         // Add Product
         document.getElementById('addProductForm').addEventListener('submit', (e) => {
             e.preventDefault();
+            const selectedSizes = getSelectedSizes('addSize');
+            if(selectedSizes.length === 0) {
+                alert("कृपया कम से कम एक साइज चुनें!");
+                return;
+            }
+
             const newProd = {
                 name: document.getElementById('pName').value,
                 category: document.getElementById('pCategory').value,
                 price: parseInt(document.getElementById('pPrice').value),
+                sizes: selectedSizes,
+                inStock: document.getElementById('pStock').value === 'in_stock',
                 tag: document.getElementById('pTag').value,
                 image: document.getElementById('pImage').value
             };
+
             db.push(newProd, (err) => {
                 if(!err) {
                     alert('Product Added Successfully!');
@@ -226,29 +291,57 @@
             });
         });
 
-        // Fetch & Render Products
+        // Realtime Data Fetch
         db.on('value', (snapshot) => {
             allProducts = snapshot.val() || {};
+            updateAnalytics(allProducts);
             renderAdminProducts(allProducts);
         });
 
+        // Update Analytics Dashboard
+        function updateAnalytics(data) {
+            const keys = Object.keys(data);
+            let total = keys.length;
+            let inStockCount = 0;
+            let outStockCount = 0;
+
+            keys.forEach(key => {
+                if(data[key].inStock !== false) {
+                    inStockCount++;
+                } else {
+                    outStockCount++;
+                }
+            });
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statInStock').innerText = inStockCount;
+            document.getElementById('statOutStock').innerText = outStockCount;
+        }
+
+        // Render Product List
         function renderAdminProducts(data) {
             const listEl = document.getElementById('adminProductList');
             listEl.innerHTML = "";
             const keys = Object.keys(data);
             if(keys.length === 0) {
-                listEl.innerHTML = "<p>No products found.</p>";
+                listEl.innerHTML = "<p style='color:#777; text-align:center;'>No products found in database.</p>";
                 return;
             }
             keys.forEach(key => {
                 const p = data[key];
+                const sizesStr = p.sizes ? p.sizes.join(', ') : 'M, L, XL';
+                const isStock = p.inStock !== false;
+
                 listEl.innerHTML += `
                     <div class="product-item">
                         <div class="p-details">
                             <img src="${p.image}" alt="">
                             <div>
                                 <strong>${p.name}</strong><br>
-                                <small>₹${p.price} | ${p.category} | ${p.tag}</small>
+                                <small style="color:#aaa;">₹${p.price} | ${p.category} | Sizes: [${sizesStr}]</small><br>
+                                <span class="badge-stock ${isStock ? 'in-stock' : 'out-stock'}">
+                                    ${isStock ? 'IN STOCK' : 'OUT OF STOCK'}
+                                </span>
                             </div>
                         </div>
                         <div class="action-btns">
@@ -260,7 +353,6 @@
             });
         }
 
-        // Search Filter
         function filterAdminProducts() {
             const query = document.getElementById('searchBar').value.toLowerCase();
             const filtered = {};
@@ -273,22 +365,27 @@
             renderAdminProducts(filtered);
         }
 
-        // Delete Product
         function deleteProduct(key) {
             if(confirm("Are you sure you want to delete this product?")) {
                 db.child(key).remove();
             }
         }
 
-        // Open Edit Modal
         function openEditModal(key) {
             const p = allProducts[key];
             document.getElementById('editKey').value = key;
             document.getElementById('editName').value = p.name;
             document.getElementById('editCategory').value = p.category;
             document.getElementById('editPrice').value = p.price;
+            document.getElementById('editStock').value = (p.inStock !== false) ? 'in_stock' : 'out_of_stock';
             document.getElementById('editTag').value = p.tag;
             document.getElementById('editImage').value = p.image;
+
+            const currentSizes = p.sizes || ['M', 'L', 'XL'];
+            document.querySelectorAll('input[name="editSize"]').forEach(cb => {
+                cb.checked = currentSizes.includes(cb.value);
+            });
+
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -296,17 +393,26 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
-        // Submit Edit Form
         document.getElementById('editProductForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const key = document.getElementById('editKey').value;
+            const selectedSizes = getSelectedSizes('editSize');
+            
+            if(selectedSizes.length === 0) {
+                alert("Please select at least one size!");
+                return;
+            }
+
             const updatedData = {
                 name: document.getElementById('editName').value,
                 category: document.getElementById('editCategory').value,
                 price: parseInt(document.getElementById('editPrice').value),
+                sizes: selectedSizes,
+                inStock: document.getElementById('editStock').value === 'in_stock',
                 tag: document.getElementById('editTag').value,
                 image: document.getElementById('editImage').value
             };
+
             db.child(key).update(updatedData, (err) => {
                 if(!err) {
                     alert('Product Updated Successfully!');
@@ -319,4 +425,3 @@
     </script>
 </body>
 </html>
-
