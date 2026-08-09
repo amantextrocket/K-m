@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VORNEX | Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+        body { background: #0f0f0f; color: #fff; padding: 20px; }
+        .admin-container { max-width: 850px; margin: 0 auto; }
+        h1 { text-align: center; margin-bottom: 20px; letter-spacing: 2px; }
+        .card { background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+        .card h2 { margin-bottom: 15px; font-size: 1.2rem; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 5px; color: #aaa; }
+        input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: #fff; font-size: 0.9rem; border-radius: 4px; }
+        button { width: 100%; padding: 14px; background: #fff; color: #000; font-weight: 900; border: none; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 0.9rem; }
+        button:hover { background: #ccc; }
+        
+        /* Search Bar Style */
+        .search-box { width: 100%; padding: 12px; background: #000; border: 1px solid #555; color: #fff; font-size: 0.95rem; border-radius: 4px; margin-bottom: 15px; }
+        
+        .product-list { display: grid; gap: 12px; }
+        .product-item { background: #000; border: 1px solid #333; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; flex-wrap: wrap; gap: 10px; }
+        .product-item img { width: 50px; height: 65px; object-fit: cover; border-radius: 4px; }
+        .p-details { flex-grow: 1; display: flex; align-items: center; gap: 15px; }
+        
+        .action-btns { display: flex; gap: 8px; }
+        .btn-edit { background: #ffaa00; color: #000; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
+        .btn-delete { background: #ff3333; color: #fff; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
+        
+        /* Modal Popup for Editing */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; padding: 20px; z-index: 100; }
+        .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; max-width: 500px; width: 100%; border: 1px solid #444; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .close-btn { cursor: pointer; font-size: 1.5rem; font-weight: bold; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>VORNEX ADMIN PANEL</h1>
+        
+        <!-- Add Product Card -->
+        <div class="card">
+            <h2>➕ Add New Product</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="pName" placeholder="e.g. VORNEX HEAVYWEIGHT TEE" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="pCategory">
+                        <option value="Oversized Tees">Oversized Tees</option>
+                        <option value="T-shirts">T-shirts</option>
+                        <option value="Shirts">Shirts</option>
+                        <option value="Hoodies">Hoodies</option>
+                        <option value="Sweatshirts">Sweatshirts</option>
+                        <option value="Jeans">Jeans</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="pPrice" placeholder="799" required>
+                </div>
+                <div class="form-group">
+                    <label>Tag / Badge</label>
+                    <input type="text" id="pTag" placeholder="BESTSELLER / NEW DROP / HOT" required>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="pImage" placeholder="https://..." required>
+                </div>
+                <button type="submit">ADD PRODUCT TO WEBSITE</button>
+            </form>
+        </div>
+
+        <!-- Manage Products Card -->
+        <div class="card">
+            <h2>📦 Live Products List</h2>
+            <input type="text" id="searchBar" class="search-box" placeholder="🔍 Search product by name or category..." onkeyup="filterAdminProducts()">
+            <div id="adminProductList" class="product-list">Loading products...</div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>✏️ Edit Product</h3>
+                <span class="close-btn" onclick="closeEditModal()">&times;</span>
+            </div>
+            <form id="editProductForm">
+                <input type="hidden" id="editKey">
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="editCategory">
+                        <option value="Oversized Tees">Oversized Tees</option>
+                        <option value="T-shirts">T-shirts</option>
+                        <option value="Shirts">Shirts</option>
+                        <option value="Hoodies">Hoodies</option>
+                        <option value="Sweatshirts">Sweatshirts</option>
+                        <option value="Jeans">Jeans</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="editPrice" required>
+                </div>
+                <div class="form-group">
+                    <label>Tag / Badge</label>
+                    <input type="text" id="editTag" required>
+                </div>
+                <div class="form-group">
+                    <label>Image URL</label>
+                    <input type="url" id="editImage" required>
+                </div>
+                <button type="submit" style="background:#ffaa00;">UPDATE PRODUCT</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDItBcWY7ww6jj73h1HEtaTm7YllIBLQ1c",
+            authDomain: "vornex-b7a62.firebaseapp.com",
+            databaseURL: "https://vornex-b7a62-default-rtdb.firebaseio.com",
+            projectId: "vornex-b7a62",
+            storageBucket: "vornex-b7a62.firebasestorage.app",
+            messagingSenderId: "60746200967",
+            appId: "1:60746200967:web:29bf4cb533b14db3080522",
+            measurementId: "G-RBG15BDSG0"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database().ref('products');
+        let allProducts = {};
+
+        // Add Product
+        document.getElementById('addProductForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newProd = {
+                name: document.getElementById('pName').value,
+                category: document.getElementById('pCategory').value,
+                price: parseInt(document.getElementById('pPrice').value),
+                tag: document.getElementById('pTag').value,
+                image: document.getElementById('pImage').value
+            };
+            db.push(newProd, (err) => {
+                if(!err) {
+                    alert('Product Added Successfully!');
+                    document.getElementById('addProductForm').reset();
+                } else {
+                    alert('Error: ' + err.message);
+                }
+            });
+        });
+
+        // Fetch & Render Products
+        db.on('value', (snapshot) => {
+            allProducts = snapshot.val() || {};
+            renderAdminProducts(allProducts);
+        });
+
+        function renderAdminProducts(data) {
+            const listEl = document.getElementById('adminProductList');
+            listEl.innerHTML = "";
+            const keys = Object.keys(data);
+            if(keys.length === 0) {
+                listEl.innerHTML = "<p>No products found.</p>";
+                return;
+            }
+            keys.forEach(key => {
+                const p = data[key];
+                listEl.innerHTML += `
+                    <div class="product-item">
+                        <div class="p-details">
+                            <img src="${p.image}" alt="">
+                            <div>
+                                <strong>${p.name}</strong><br>
+                                <small>₹${p.price} | ${p.category} | ${p.tag}</small>
+                            </div>
+                        </div>
+                        <div class="action-btns">
+                            <button class="btn-edit" onclick="openEditModal('${key}')">EDIT</button>
+                            <button class="btn-delete" onclick="deleteProduct('${key}')">DELETE</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Search Filter
+        function filterAdminProducts() {
+            const query = document.getElementById('searchBar').value.toLowerCase();
+            const filtered = {};
+            Object.keys(allProducts).forEach(key => {
+                const p = allProducts[key];
+                if (p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query)) {
+                    filtered[key] = p;
+                }
+            });
+            renderAdminProducts(filtered);
+        }
+
+        // Delete Product
+        function deleteProduct(key) {
+            if(confirm("Are you sure you want to delete this product?")) {
+                db.child(key).remove();
+            }
+        }
+
+        // Open Edit Modal
+        function openEditModal(key) {
+            const p = allProducts[key];
+            document.getElementById('editKey').value = key;
+            document.getElementById('editName').value = p.name;
+            document.getElementById('editCategory').value = p.category;
+            document.getElementById('editPrice').value = p.price;
+            document.getElementById('editTag').value = p.tag;
+            document.getElementById('editImage').value = p.image;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Submit Edit Form
+        document.getElementById('editProductForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const key = document.getElementById('editKey').value;
+            const updatedData = {
+                name: document.getElementById('editName').value,
+                category: document.getElementById('editCategory').value,
+                price: parseInt(document.getElementById('editPrice').value),
+                tag: document.getElementById('editTag').value,
+                image: document.getElementById('editImage').value
+            };
+            db.child(key).update(updatedData, (err) => {
+                if(!err) {
+                    alert('Product Updated Successfully!');
+                    closeEditModal();
+                } else {
+                    alert('Error updating: ' + err.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
