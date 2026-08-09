@@ -136,3 +136,38 @@ function checkoutWhatsApp() {
     
     window.open(`https://wa.me/918269444061?text=${msg}`, '_blank');
 }
+// Search Bar & Category Popup Logic
+function showQuickCategories(show) {
+    const quickCatBox = document.getElementById('quickCategories');
+    if(quickCatBox) {
+        quickCatBox.style.display = show ? 'flex' : 'none';
+    }
+}
+
+function handleUserSearch() {
+    const query = document.getElementById('userSearchBar').value.toLowerCase().trim();
+    if (query === "") {
+        renderProducts(vornexProducts);
+        return;
+    }
+    const filtered = vornexProducts.filter(p => 
+        p.name.toLowerCase().includes(query) || 
+        p.category.toLowerCase().includes(query) ||
+        (p.tag && p.tag.toLowerCase().includes(query))
+    );
+    renderProducts(filtered);
+}
+
+function selectQuickCategory(cat) {
+    document.getElementById('userSearchBar').value = cat === 'All' ? '' : cat;
+    filterCategory(cat);
+    showQuickCategories(false);
+}
+
+// Tap outside to close categories popup
+document.addEventListener('click', function(e) {
+    const searchContainer = document.querySelector('.search-container');
+    if (searchContainer && !searchContainer.contains(e.target)) {
+        showQuickCategories(false);
+    }
+});
