@@ -14,14 +14,30 @@
         .admin-container { max-width: 900px; margin: 0 auto; display: none; }
         h1 { text-align: center; margin-bottom: 25px; letter-spacing: 3px; font-weight: 900; }
         
-        /* Analytics Grid */
-        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        /* Analytics Grid - Main Dashboard */
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .stat-card { background: #141414; border: 1px solid #282828; padding: 20px; border-radius: 12px; text-align: center; }
         .stat-card h3 { font-size: 0.75rem; color: #888; letter-spacing: 1px; margin-bottom: 8px; }
         .stat-card .value { font-size: 1.8rem; font-weight: 900; color: #fff; }
 
-        .card { background: #141414; border: 1px solid #282828; padding: 22px; border-radius: 12px; margin-bottom: 25px; }
-        .card h2 { margin-bottom: 18px; font-size: 1.1rem; letter-spacing: 1px; }
+        /* Section Navigation Tabs */
+        .section-nav { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
+        .nav-tab { flex: 1; min-width: 200px; padding: 14px 18px; background: #141414; border: 1px solid #282828; color: #888; font-weight: 800; font-size: 0.85rem; border-radius: 10px; cursor: pointer; text-align: center; transition: all 0.2s ease; letter-spacing: 1px; }
+        .nav-tab:hover { background: #1f1f1f; color: #fff; border-color: #444; }
+        .nav-tab.active { background: #fff; color: #000; border-color: #fff; box-shadow: 0 4px 15px rgba(255,255,255,0.15); }
+
+        /* Content Sections */
+        .admin-section { display: none; }
+        .admin-section.active-section { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card { background: #141414; border: 1px solid #282828; padding: 25px; border-radius: 12px; margin-bottom: 25px; }
+        .card h2 { margin-bottom: 20px; font-size: 1.2rem; letter-spacing: 1px; border-bottom: 1px solid #222; padding-bottom: 12px; }
+        
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 6px; color: #aaa; }
         input, select { width: 100%; padding: 12px 14px; background: #000; border: 1px solid #333; color: #fff; font-size: 0.9rem; border-radius: 6px; outline: none; }
@@ -62,8 +78,8 @@
         #authError { color: #ff4d4d; font-size: 0.8rem; margin-top: 12px; font-weight: 600; display: none; }
 
         /* Daily Views Log List */
-        .views-log-list { max-height: 200px; overflow-y: auto; background: #050505; border: 1px solid #222; border-radius: 8px; padding: 10px 15px; font-size: 0.85rem; }
-        .views-log-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
+        .views-log-list { max-height: 220px; overflow-y: auto; background: #050505; border: 1px solid #222; border-radius: 8px; padding: 10px 15px; font-size: 0.85rem; }
+        .views-log-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1a1a; }
         .views-log-item:last-child { border-bottom: none; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -88,7 +104,7 @@
     <div class="admin-container" id="mainAdminContent">
         <h1>VORNEX DASHBOARD</h1>
         
-        <!-- 📊 Analytics Section -->
+        <!-- 📊 Main Top Overview Metrics -->
         <div class="analytics-grid">
             <div class="stat-card">
                 <h3>TODAY'S VIEWS</h3>
@@ -108,80 +124,100 @@
             </div>
         </div>
 
-        <!-- 📈 Traffic Graph & Logs Section -->
-        <div class="card">
-            <h2>📈 Website Traffic Analytics</h2>
-            <div style="position: relative; height: 260px; margin-bottom: 20px;">
-                <canvas id="viewsChart"></canvas>
+        <!-- 🔘 Section Navigation Buttons (3 Points) -->
+        <div class="section-nav">
+            <div class="nav-tab active" onclick="switchSection('trafficSection', this)">
+                📈 TRAFFIC ANALYTICS
             </div>
-            
-            <h3 style="font-size: 0.85rem; color: #888; margin-bottom: 10px; letter-spacing: 1px;">📅 DAILY LOGS HISTORY</h3>
-            <div id="dailyViewsList" class="views-log-list">
-                <p style="color:#666; text-align:center;">Loading traffic data...</p>
+            <div class="nav-tab" onclick="switchSection('addProductSection', this)">
+                ➕ ADD NEW PRODUCT
+            </div>
+            <div class="nav-tab" onclick="switchSection('inventorySection', this)">
+                📦 LIVE INVENTORY
             </div>
         </div>
 
-        <!-- ➕ Add Product Card -->
-        <div class="card">
-            <h2>➕ Add New Product</h2>
-            <form id="addProductForm">
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input type="text" id="pName" placeholder="e.g. VORNEX HEAVYWEIGHT TEE" required>
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="pCategory">
-                        <option value="Oversized Tees">Oversized Tees</option>
-                        <option value="T-shirts">T-shirts</option>
-                        <option value="Shirts">Shirts</option>
-                        <option value="Hoodies">Hoodies</option>
-                        <option value="Sweatshirts">Sweatshirts</option>
-                        <option value="Jeans">Jeans</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Price (₹)</label>
-                    <input type="number" id="pPrice" placeholder="799" required min="1">
+        <!-- ================= SECTION 1: TRAFFIC ANALYTICS ================= -->
+        <div id="trafficSection" class="admin-section active-section">
+            <div class="card">
+                <h2>📈 Website Traffic Analytics</h2>
+                <div style="position: relative; height: 260px; margin-bottom: 25px;">
+                    <canvas id="viewsChart"></canvas>
                 </div>
                 
-                <div class="form-group">
-                    <label>Available Sizes</label>
-                    <div class="size-checkboxes">
-                        <label class="size-btn"><input type="checkbox" name="addSize" value="S"> S</label>
-                        <label class="size-btn"><input type="checkbox" name="addSize" value="M" checked> M</label>
-                        <label class="size-btn"><input type="checkbox" name="addSize" value="L" checked> L</label>
-                        <label class="size-btn"><input type="checkbox" name="addSize" value="XL" checked> XL</label>
-                        <label class="size-btn"><input type="checkbox" name="addSize" value="XXL"> XXL</label>
+                <h3 style="font-size: 0.85rem; color: #888; margin-bottom: 12px; letter-spacing: 1px;">📅 DAILY LOGS HISTORY</h3>
+                <div id="dailyViewsList" class="views-log-list">
+                    <p style="color:#666; text-align:center;">Loading traffic data...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 2: ADD PRODUCT ================= -->
+        <div id="addProductSection" class="admin-section">
+            <div class="card">
+                <h2>➕ Add New Product</h2>
+                <form id="addProductForm">
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="pName" placeholder="e.g. VORNEX HEAVYWEIGHT TEE" required>
                     </div>
-                </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="pCategory">
+                            <option value="Oversized Tees">Oversized Tees</option>
+                            <option value="T-shirts">T-shirts</option>
+                            <option value="Shirts">Shirts</option>
+                            <option value="Hoodies">Hoodies</option>
+                            <option value="Sweatshirts">Sweatshirts</option>
+                            <option value="Jeans">Jeans</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="pPrice" placeholder="799" required min="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Available Sizes</label>
+                        <div class="size-checkboxes">
+                            <label class="size-btn"><input type="checkbox" name="addSize" value="S"> S</label>
+                            <label class="size-btn"><input type="checkbox" name="addSize" value="M" checked> M</label>
+                            <label class="size-btn"><input type="checkbox" name="addSize" value="L" checked> L</label>
+                            <label class="size-btn"><input type="checkbox" name="addSize" value="XL" checked> XL</label>
+                            <label class="size-btn"><input type="checkbox" name="addSize" value="XXL"> XXL</label>
+                        </div>
+                    </div>
 
-                <div class="form-group">
-                    <label>Stock Status</label>
-                    <select id="pStock">
-                        <option value="in_stock">In Stock (Available)</option>
-                        <option value="out_of_stock">Out of Stock (Sold Out)</option>
-                    </select>
-                </div>
+                    <div class="form-group">
+                        <label>Stock Status</label>
+                        <select id="pStock">
+                            <option value="in_stock">In Stock (Available)</option>
+                            <option value="out_of_stock">Out of Stock (Sold Out)</option>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <label>Tag / Badge</label>
-                    <input type="text" id="pTag" placeholder="BESTSELLER / NEW DROP / HOT" required>
-                </div>
-                <div class="form-group">
-                    <label>Image URL</label>
-                    <input type="url" id="pImage" placeholder="https://i.ibb.co/..." required>
-                </div>
-                <button type="submit">ADD PRODUCT TO STORE</button>
-            </form>
+                    <div class="form-group">
+                        <label>Tag / Badge</label>
+                        <input type="text" id="pTag" placeholder="BESTSELLER / NEW DROP / HOT" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="url" id="pImage" placeholder="https://i.ibb.co/..." required>
+                    </div>
+                    <button type="submit">ADD PRODUCT TO STORE</button>
+                </form>
+            </div>
         </div>
 
-        <!-- 📦 Manage Products Section -->
-        <div class="card">
-            <h2>📦 Live Inventory</h2>
-            <input type="text" id="searchBar" class="search-box" placeholder="🔍 Search product by name or category..." onkeyup="filterAdminProducts()">
-            <div id="adminProductList" class="product-list">Loading products...</div>
+        <!-- ================= SECTION 3: LIVE INVENTORY ================= -->
+        <div id="inventorySection" class="admin-section">
+            <div class="card">
+                <h2>📦 Live Inventory</h2>
+                <input type="text" id="searchBar" class="search-box" placeholder="🔍 Search product by name or category..." onkeyup="filterAdminProducts()">
+                <div id="adminProductList" class="product-list">Loading products...</div>
+            </div>
         </div>
+
     </div>
 
     <!-- Edit Modal -->
@@ -264,6 +300,23 @@
                 document.getElementById('authError').style.display = 'block';
                 document.getElementById('passInput').value = '';
             }
+        }
+
+        // 🔄 Section Switcher Function
+        function switchSection(sectionId, btnElement) {
+            // Hide all sections
+            document.querySelectorAll('.admin-section').forEach(sec => {
+                sec.classList.remove('active-section');
+            });
+            // Remove active class from all tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active-section');
+            // Highlight selected tab button
+            btnElement.classList.add('active');
         }
 
         const firebaseConfig = {
@@ -552,4 +605,5 @@
     </script>
 </body>
 </html>
+
 
