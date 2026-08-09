@@ -34,6 +34,27 @@
             </div>
         </div>
     </header>
+    <!-- Top Search Bar & Quick Categories -->
+<div class="search-container" style="max-width: 100%; padding: 12px 15px; background: #0a0a0a; border-bottom: 1px solid #222; position: relative; z-index: 90;">
+    <div style="max-width: 600px; margin: 0 auto; position: relative;">
+        <input type="text" id="userSearchBar" placeholder="🔍 Search hoodies, tees, jeans..." 
+               onfocus="showQuickCategories(true)" 
+               onkeyup="handleUserSearch()"
+               style="width: 100%; padding: 12px 18px; background: #181818; border: 1px solid #333; color: #fff; border-radius: 25px; font-size: 0.9rem; outline: none;">
+        
+        <!-- Category Popup -->
+        <div id="quickCategories" style="display: none; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-top: 8px; flex-wrap: wrap; gap: 8px; position: absolute; width: 100%; left: 0; box-shadow: 0 10px 20px rgba(0,0,0,0.5);">
+            <span style="font-size: 0.75rem; color: #888; width: 100%; display: block; margin-bottom: 5px; font-weight: bold;">POPULAR CATEGORIES:</span>
+            <button onclick="selectQuickCategory('All')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">All</button>
+            <button onclick="selectQuickCategory('Oversized Tees')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Oversized Tees</button>
+            <button onclick="selectQuickCategory('T-shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">T-shirts</button>
+            <button onclick="selectQuickCategory('Shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Shirts</button>
+            <button onclick="selectQuickCategory('Hoodies')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Hoodies</button>
+            <button onclick="selectQuickCategory('Sweatshirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Sweatshirts</button>
+            <button onclick="selectQuickCategory('Jeans')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Jeans</button>
+        </div>
+    </div>
+</div>
 
     <!-- Hero Banner Section -->
     <section class="hero-section">
