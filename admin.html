@@ -1,99 +1,26 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabir Mobile — Admin Panel</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Firebase Compatibility SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-</head>
-<body class="admin-body">
+<!-- HEADER HERE -->
+<header class="main-header">
+    ...
+</header>
 
-    <header class="main-header admin-header">
-        <div class="header-container">
-            <div class="logo">
-                <span class="logo-badge">🔴</span>
-                <span class="logo-text">KM ADMIN PANEL</span>
-            </div>
-            <a href="index.html" class="back-to-site">🌐 Open Store</a>
-        </div>
-    </header>
-
-    <div class="container admin-container">
-        <!-- Add Product Form Card -->
-        <div class="admin-card">
-            <h3>➕ Add New Mobile to Inventory</h3>
-            <form id="addMobileForm" onsubmit="event.preventDefault(); addMobileToFirebase();">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Mobile Model Name</label>
-                        <input type="text" id="pName" placeholder="e.g. iPhone 13 Pro" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Brand</label>
-                        <select id="pBrand" required>
-                            <option value="iPhone">iPhone</option>
-                            <option value="Samsung">Samsung</option>
-                            <option value="Vivo">Vivo</option>
-                            <option value="Oppo">Oppo</option>
-                            <option value="OnePlus">OnePlus</option>
-                            <option value="Motorola">Motorola</option>
-                            <option value="Redmi">Redmi</option>
-                            <option value="Realme">Realme</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Price (₹)</label>
-                        <input type="number" id="pPrice" placeholder="e.g. 45000" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>RAM & Storage</label>
-                        <input type="text" id="pSpecs" placeholder="e.g. 128GB Storage / 6GB RAM" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Battery Health / Capacity</label>
-                        <input type="text" id="pBattery" placeholder="e.g. 88% Battery Health / 5000 mAh" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Condition</label>
-                        <input type="text" id="pCondition" placeholder="e.g. Mint Condition (9/10)" required>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <label>Image URL (Direct Link to Photo)</label>
-                        <input type="url" id="pImg" placeholder="https://images.unsplash.com/..." required>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn-submit-product">➕ Save & Publish Product</button>
-            </form>
-        </div>
-
-        <!-- Inventory List Card -->
-        <div class="admin-card">
-            <h3>📦 Current Live Inventory</h3>
-            <div id="adminProductList" class="admin-inventory-list">
-                <!-- Admin products list will load here -->
-            </div>
-        </div>
+<!-- 1. Running Offer Ticker (यहाँ चिपकाएँ) -->
+<div class="ticker-wrap">
+    <div class="ticker-title">🔥 OFFERS</div>
+    <div class="ticker-content">
+        <div class="ticker-item">🚚 Best Quality Certified Second Hand Smartphones with Cash on Delivery Available!</div>
+        <div class="ticker-item">🛡️ Exclusive Members: Enjoy FREE screen guard replacement up to 5 times a month!</div>
     </div>
+</div>
 
-    <script src="app.js"></script>
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            if (typeof loadAdminProducts === 'function') {
-                loadAdminProducts();
-            }
-        });
-    </script>
-</body>
-</html>
+<!-- 2. Banner Carousel Slider (यहाँ चिपकाएँ) -->
+<section class="banner-slider-container">
+    <div class="banner-slider" id="bannerSlider">
+        ... (3 स्लाइड बैनर)
+    </div>
+</section>
+
+<!-- MAIN PRODUCTS CONTAINER HERE -->
+<main class="container">
+    ...
+</main>
+
