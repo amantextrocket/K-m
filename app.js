@@ -1,24 +1,5 @@
 // Kabir Mobile — JS Logic
 
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "kabir-mobile.firebaseapp.com",
-    projectId: "kabir-mobile",
-    storageBucket: "kabir-mobile.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abc123def456"
-};
-
-let db = null;
-if (typeof firebase !== 'undefined' && firebase.apps.length === 0) {
-    try {
-        firebase.initializeApp(firebaseConfig);
-        db = firebase.firestore();
-    } catch(e) {
-        console.log("Running in Demo Mode.");
-    }
-}
-
 let localProducts = [
     {
         id: "1",
@@ -54,7 +35,50 @@ let localProducts = [
 
 let cart = [];
 let currentFilter = 'All';
+let currentSlide = 0;
+let slideInterval;
 
+// Carousel Banner Logic
+function showSlide(index) {
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot');
+    if (slides.length === 0) return;
+
+    if (index >= slides.length) currentSlide = 0;
+    else if (index < 0) currentSlide = slides.length - 1;
+    else currentSlide = index;
+
+    slides.forEach((slide, i) => {
+        slide.classList.toggle('active', i === currentSlide);
+    });
+
+    dots.forEach((dot, i) => {
+        dot.classList.toggle('active', i === currentSlide);
+    });
+}
+
+function moveSlide(direction) {
+    showSlide(currentSlide + direction);
+    resetSliderTimer();
+}
+
+function setSlide(index) {
+    showSlide(index);
+    resetSliderTimer();
+}
+
+function startSliderTimer() {
+    slideInterval = setInterval(() => {
+        showSlide(currentSlide + 1);
+    }, 4000); // 4 seconds auto slide
+}
+
+function resetSliderTimer() {
+    clearInterval(slideInterval);
+    startSliderTimer();
+}
+
+// Product Display & Filters Logic
 function renderProducts(productsToRender) {
     const container = document.getElementById('productsContainer');
     if (!container) return;
@@ -183,59 +207,13 @@ function checkoutWhatsApp() {
 
     message += `%0A*Total Amount:* ₹${total.toLocaleString('en-IN')}`;
 
-    const targetPhone = "919876543210"; 
+    const targetPhone = "919876543210"; // Replace with your original number
     window.open(`https://wa.me/${targetPhone}?text=${message}`, '_blank');
-}
-
-function loadAdminProducts() {
-    const adminList = document.getElementById('adminProductList');
-    if (!adminList) return;
-
-    let html = "";
-    localProducts.forEach((p, idx) => {
-        html += `
-            <div class="admin-item-row">
-                <div>
-                    <strong>${p.name}</strong> (${p.brand}) — <span style="color:#e60000; font-weight:bold;">₹${p.price}</span><br>
-                    <small>💾 ${p.specs} | 🔋 ${p.battery} | ⭐ ${p.condition}</small>
-                </div>
-                <button class="btn-delete" onclick="deleteAdminProduct(${idx})">🗑️ Delete</button>
-            </div>
-        `;
-    });
-    adminList.innerHTML = html;
-}
-
-function addMobileToFirebase() {
-    const name = document.getElementById('pName').value;
-    const brand = document.getElementById('pBrand').value;
-    const price = Number(document.getElementById('pPrice').value);
-    const specs = document.getElementById('pSpecs').value;
-    const battery = document.getElementById('pBattery').value;
-    const condition = document.getElementById('pCondition').value;
-    const image = document.getElementById('pImg').value;
-
-    const newProd = { id: Date.now().toString(), name, brand, price, specs, battery, condition, image };
-    localProducts.unshift(newProd);
-
-    alert(`✅ "${name}" Naya product add ho gaya hai!`);
-    document.getElementById('addMobileForm').reset();
-    
-    loadAdminProducts();
-    if (document.getElementById('productsContainer')) {
-        renderProducts(localProducts);
-    }
-}
-
-function deleteAdminProduct(index) {
-    if (confirm("Kya aap is mobile ko inventory se hatana chahte hain?")) {
-        localProducts.splice(index, 1);
-        loadAdminProducts();
-    }
 }
 
 window.addEventListener('DOMContentLoaded', () => {
     if (document.getElementById('productsContainer')) {
         renderProducts(localProducts);
     }
+    startSliderTimer();
 });
