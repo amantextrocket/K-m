@@ -1,102 +1,94 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kabir Mobile — Premium Second Hand Store</title>
+    <title>VORNEX | Own Your Edge</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Firebase Compatibility SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Header Section -->
-    <header class="main-header">
-        <div class="header-container">
-            <div class="logo">
-                <span class="logo-badge">🔴</span>
-                <span class="logo-text">KABIR MOBILE</span>
-            </div>
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Search iPhone, Samsung, Vivo..." onkeyup="searchMobiles()">
-            </div>
-            <div class="header-actions">
-                <button class="cart-btn" onclick="toggleCart()">
-                    🛒 <span class="cart-label">Cart</span>
-                    <span id="cartCount" class="cart-badge">0</span>
+    <!-- Top Offer Bar -->
+    <div class="top-bar">
+        <span>⚡ SPECIAL OFFER: FREE SHIPPING & FLAT 20% OFF ON ORDERS ABOVE ₹999!</span>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="brand-logo">VORNEX</div>
+            <nav class="nav-links">
+                <a href="#" onclick="filterCategory('All')">ALL</a>
+                <a href="#" onclick="filterCategory('Oversized Tees')">OVERSIZED TEES</a>
+                <a href="#" onclick="filterCategory('T-shirts')">T-SHIRTS</a>
+                <a href="#" onclick="filterCategory('Shirts')">SHIRTS</a>
+                <a href="#" onclick="filterCategory('Hoodies')">HOODIES</a>
+                <a href="#" onclick="filterCategory('Sweatshirts')">SWEATSHIRTS</a>
+                <a href="#" onclick="filterCategory('Jeans')">JEANS</a>
+            </nav>
+            <div class="nav-actions">
+                <button class="cart-icon-btn" onclick="toggleCart()">
+                    CART (<span id="cartCount">0</span>)
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Banner Announcement -->
-    <section class="top-banner">
-        <p>🔥 Best Quality Certified Second Hand Smartphones | Cash on Delivery Available 🚚</p>
+    <!-- Hero Banner Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <span class="hero-subtitle">NEW DROP 2026</span>
+            <h1 class="hero-title">OWN YOUR EDGE</h1>
+            <a href="#shop" class="btn-primary">EXPLORE COLLECTION</a>
+        </div>
     </section>
 
-    <!-- Category Filters -->
-    <nav class="categories-bar">
-        <button class="cat-chip active" onclick="filterBrand('All')">All</button>
-        <button class="cat-chip" onclick="filterBrand('iPhone')"> iPhone</button>
-        <button class="cat-chip" onclick="filterBrand('Samsung')">Samsung</button>
-        <button class="cat-chip" onclick="filterBrand('Vivo')">Vivo</button>
-        <button class="cat-chip" onclick="filterBrand('Oppo')">Oppo</button>
-        <button class="cat-chip" onclick="filterBrand('OnePlus')">OnePlus</button>
-        <button class="cat-chip" onclick="filterBrand('Motorola')">Motorola</button>
-        <button class="cat-chip" onclick="filterBrand('Redmi')">Redmi</button>
-        <button class="cat-chip" onclick="filterBrand('Realme')">Realme</button>
-        <button class="cat-chip" onclick="filterBrand('Other')">Other</button>
-    </nav>
+    <!-- Category Filter Bar -->
+    <div class="filter-bar" id="shop">
+        <button class="filter-btn active" onclick="filterCategory('All')">ALL</button>
+        <button class="filter-btn" onclick="filterCategory('Oversized Tees')">OVERSIZED TEES</button>
+        <button class="filter-btn" onclick="filterCategory('T-shirts')">T-SHIRTS</button>
+        <button class="filter-btn" onclick="filterCategory('Shirts')">SHIRTS</button>
+        <button class="filter-btn" onclick="filterCategory('Hoodies')">HOODIES</button>
+        <button class="filter-btn" onclick="filterCategory('Sweatshirts')">SWEATSHIRTS</button>
+        <button class="filter-btn" onclick="filterCategory('Jeans')">JEANS</button>
+    </div>
 
-    <!-- Products Main Container -->
-    <main class="container">
-        <div class="section-title">
-            <h2>Available Mobiles</h2>
-            <span class="live-indicator">🟢 Live Stock</span>
-        </div>
-
-        <div class="products-grid" id="productsContainer">
-            <!-- Products will be loaded dynamically or from demo data -->
-        </div>
+    <!-- Product Grid -->
+    <main class="store-container">
+        <div class="clothing-grid" id="productsGrid"></div>
     </main>
 
-    <!-- Cart Modal Overlay -->
-    <div id="cartModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>🛒 Shopping Cart</h3>
-                <span class="close-btn" onclick="toggleCart()">&times;</span>
+    <!-- Slide-in Cart Sidebar -->
+    <div id="cartSidebar" class="cart-sidebar">
+        <div class="cart-header">
+            <h3>YOUR CART</h3>
+            <span class="close-cart" onclick="toggleCart()">&times;</span>
+        </div>
+        <div id="cartItemsList" class="cart-body">
+            <p class="empty-cart-text">Your cart is empty.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="discount-banner" id="discountNote">Add items above ₹999 for Flat 20% OFF!</div>
+            <div class="total-row">
+                <span>SUBTOTAL</span>
+                <strong id="cartSubtotal">₹0</strong>
             </div>
-            <div id="cartItems" class="cart-items-list">
-                <p class="empty-msg">Your cart is empty.</p>
-            </div>
-            <div class="cart-footer">
-                <div class="total-price-box">
-                    <span>Total:</span>
-                    <strong id="cartTotal">₹0</strong>
-                </div>
-                <div class="checkout-form">
-                    <input type="text" id="custName" placeholder="Your Full Name">
-                    <input type="tel" id="custPhone" placeholder="WhatsApp / Phone Number">
-                    <textarea id="custAddress" placeholder="Delivery Address"></textarea>
-                    <button class="btn-whatsapp-checkout" onclick="checkoutWhatsApp()">
-                        💬 Order via WhatsApp (Cash On Delivery)
-                    </button>
-                </div>
+            <div class="checkout-inputs">
+                <input type="text" id="custName" placeholder="Full Name">
+                <input type="tel" id="custPhone" placeholder="WhatsApp / Phone Number">
+                <textarea id="custAddress" placeholder="Complete Shipping Address"></textarea>
+                <button class="btn-checkout" onclick="checkoutWhatsApp()">PLACE ORDER VIA WHATSAPP</button>
             </div>
         </div>
     </div>
 
-    <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/919876543210" class="float-wa" target="_blank" title="Contact Us on WhatsApp">
-        💬
-    </a>
+    <!-- Backdrop -->
+    <div id="cartBackdrop" class="backdrop" onclick="toggleCart()"></div>
 
-    <!-- Footer -->
     <footer>
-        <p>© 2026 Kabir Mobile — Premium Second Hand Store. All rights reserved.</p>
+        <p>© 2026 VORNEX. OWN YOUR EDGE. ALL RIGHTS RESERVED.</p>
     </footer>
 
     <script src="app.js"></script>
