@@ -16,7 +16,7 @@ const db = firebase.database().ref('products');
 let vornexProducts = [];
 let cart = [];
 let selectedSizesMap = {}; 
-const MY_WHATSAPP_NUMBER = "918269444061"; // 👈 Updated with your WhatsApp Number
+const MY_WHATSAPP_NUMBER = "918269444061"; // Your Updated WhatsApp Number
 
 // Realtime Products Load
 db.on('value', (snapshot) => {
@@ -114,7 +114,14 @@ function directWhatsAppOrder(productId) {
     const p = vornexProducts.find(item => item.id === productId);
     const chosenSize = selectedSizesMap[productId] || "M";
     
-    const message = `Hi VORNEX! I want to buy this product:\n\n*Product:* ${p.name}\n*Size:* ${chosenSize}\n*Price:* ₹${p.price}\n*Image:* ${p.image}`;
+    let finalPrice = p.price;
+    let offerNote = "";
+    if (p.price >= 999) {
+        finalPrice = Math.round(p.price * 0.8);
+        offerNote = `\n*Offer Applied:* 20% OFF (Original: ₹${p.price})`;
+    }
+
+    const message = `Hi VORNEX! I want to buy this product:\n\n*Product:* ${p.name}\n*Size:* ${chosenSize}\n*Price:* ₹${finalPrice}${offerNote}\n*Image:* ${p.image}`;
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
 }
@@ -136,17 +143,19 @@ function addToCart(productId) {
 function updateCartUI() {
     document.getElementById('cartCount').innerText = cart.length;
     const list = document.getElementById('cartItemsList');
+    const notice = document.getElementById('discountNotice');
     list.innerHTML = "";
-    let total = 0;
+    let subtotal = 0;
 
     if(cart.length === 0) {
         list.innerHTML = "<p style='color:#777;'>Cart is empty.</p>";
         document.getElementById('cartTotal').innerText = "₹0";
+        notice.innerText = "";
         return;
     }
 
     cart.forEach((item, index) => {
-        total += item.price;
+        subtotal += item.price;
         list.innerHTML += `
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #222; padding-bottom:8px;">
                 <div>
@@ -158,7 +167,15 @@ function updateCartUI() {
         `;
     });
 
-    document.getElementById('cartTotal').innerText = "₹" + total;
+    let finalTotal = subtotal;
+    if (subtotal >= 999) {
+        finalTotal = Math.round(subtotal * 0.8);
+        notice.innerText = "🎉 20% Discount Applied for purchase over ₹999!";
+        document.getElementById('cartTotal').innerHTML = `<span style="text-decoration:line-through; color:#777; font-size:0.8rem;">₹${subtotal}</span> ₹${finalTotal}`;
+    } else {
+        notice.innerText = `Add ₹${999 - subtotal} more to get 20% OFF!`;
+        document.getElementById('cartTotal').innerText = "₹" + subtotal;
+    }
 }
 
 function removeFromCart(index) {
@@ -169,14 +186,30 @@ function removeFromCart(index) {
 function checkoutCartWhatsApp() {
     if(cart.length === 0) return alert("Your cart is empty!");
     
+    let subtotal = 0;
+    cart.forEach(item => subtotal += item.price);
+
+    let finalTotal = subtotal;
+    let isDiscounted = false;
+    if (subtotal >= 999) {
+        finalTotal = Math.round(subtotal * 0.8);
+        isDiscounted = true;
+    }
+    
     let msg = "Hi VORNEX! I want to order the following cart items:\n\n";
-    let total = 0;
     cart.forEach((item, i) => {
-        total += item.price;
         msg += `${i+1}. *${item.name}* (Size: ${item.selectedSize}) - ₹${item.price}\n`;
     });
-    msg += `\n*TOTAL AMOUNT:* ₹${total}`;
+
+    if (isDiscounted) {
+        msg += `\n*Subtotal:* ₹${subtotal}`;
+        msg += `\n*Discount:* 20% OFF`;
+        msg += `\n*FINAL AMOUNT TO PAY:* ₹${finalTotal}`;
+    } else {
+        msg += `\n*TOTAL AMOUNT:* ₹${finalTotal}`;
+    }
     
     window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
 }
+
 
