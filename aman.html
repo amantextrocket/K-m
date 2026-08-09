@@ -8,19 +8,22 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: #0f0f0f; color: #fff; padding: 20px; }
-        .admin-container { max-width: 850px; margin: 0 auto; }
+        
+        /* Main Container - Initially Hidden until login */
+        .admin-container { max-width: 850px; margin: 0 auto; display: none; }
         h1 { text-align: center; margin-bottom: 20px; letter-spacing: 2px; }
         .card { background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
         .card h2 { margin-bottom: 15px; font-size: 1.2rem; }
         .form-group { margin-bottom: 12px; }
         label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 5px; color: #aaa; }
         input, select { width: 100%; padding: 12px; background: #000; border: 1px solid #444; color: #fff; font-size: 0.9rem; border-radius: 4px; }
-        button { width: 100%; padding: 14px; background: #fff; color: #000; font-weight: 900; border: none; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 0.9rem; }
+        button { width: 100%; padding: 14px; background: #fff; color: #000; font-weight: 900; border: none; cursor: pointer; border-radius: 4px; margin-top: 10px; font-size: 0.9rem; transition: 0.2s; }
         button:hover { background: #ccc; }
         
-        /* Search Bar Style */
+        /* Search Box */
         .search-box { width: 100%; padding: 12px; background: #000; border: 1px solid #555; color: #fff; font-size: 0.95rem; border-radius: 4px; margin-bottom: 15px; }
         
+        /* Product Items */
         .product-list { display: grid; gap: 12px; }
         .product-item { background: #000; border: 1px solid #333; padding: 12px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; flex-wrap: wrap; gap: 10px; }
         .product-item img { width: 50px; height: 65px; object-fit: cover; border-radius: 4px; }
@@ -30,17 +33,59 @@
         .btn-edit { background: #ffaa00; color: #000; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
         .btn-delete { background: #ff3333; color: #fff; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
         
-        /* Modal Popup for Editing */
+        /* Edit Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; padding: 20px; z-index: 100; }
         .modal-content { background: #1a1a1a; padding: 25px; border-radius: 8px; max-width: 500px; width: 100%; border: 1px solid #444; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .close-btn { cursor: pointer; font-size: 1.5rem; font-weight: bold; }
+
+        /* 🔒 Stylish Password Overlay Modal */
+        #authOverlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #050505; display: flex; justify-content: center; align-items: center;
+            z-index: 9999; padding: 20px;
+        }
+        .auth-card {
+            background: #121212; border: 1px solid #282828; border-radius: 16px;
+            padding: 35px 25px; width: 100%; max-width: 380px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .auth-card .logo { font-size: 1.8rem; font-weight: 900; letter-spacing: 4px; margin-bottom: 5px; color: #fff; }
+        .auth-card .sub-title { font-size: 0.8rem; color: #777; margin-bottom: 25px; letter-spacing: 1px; font-weight: 600; }
+        .auth-card input {
+            width: 100%; padding: 14px; background: #080808; border: 1px solid #333;
+            color: #fff; font-size: 1.1rem; border-radius: 8px; text-align: center;
+            letter-spacing: 4px; outline: none; transition: border-color 0.3s;
+        }
+        .auth-card input:focus { border-color: #fff; }
+        .auth-card button {
+            width: 100%; padding: 14px; background: #fff; color: #000;
+            font-weight: 900; border: none; border-radius: 8px; margin-top: 15px;
+            font-size: 0.95rem; cursor: pointer; letter-spacing: 1px;
+        }
+        .auth-card button:hover { background: #ddd; }
+        #authError { color: #ff4d4d; font-size: 0.8rem; margin-top: 12px; font-weight: 600; display: none; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
-    <div class="admin-container">
+
+    <!-- 🔒 Stylish Login Screen -->
+    <div id="authOverlay">
+        <div class="auth-card">
+            <div class="logo">VORNEX</div>
+            <div class="sub-title">ADMIN CONTROL PANEL</div>
+            <form id="authForm" onsubmit="verifyPassword(event)">
+                <input type="password" id="passInput" placeholder="ENTER PASSWORD" autofocus required>
+                <button type="submit">LOGIN</button>
+            </form>
+            <div id="authError">⚠️ Access Denied: Incorrect Password</div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Container -->
+    <div class="admin-container" id="mainAdminContent">
         <h1>VORNEX ADMIN PANEL</h1>
         
         <!-- Add Product Card -->
@@ -128,16 +173,24 @@
     </div>
 
     <script>
-        // Admin Panel Password Protection
-const ADMIN_PASSWORD = "444061";
+        // Password Check Logic
+        const ADMIN_PASSWORD = "444061";
 
-let userPass = prompt("VORNEX STORE खोलने के लिए पासवर्ड डालें:");
-if (userPass !== ADMIN_PASSWORD) {
-    alert("गलत पासवर्ड!");
-    document.body.innerHTML = "<h2 style='color:red; text-align:center; margin-top:50px;'>Access Denied! Incorrect Password.</h2>";
-    throw new Error("Unauthorized Access");
-}
+        function verifyPassword(event) {
+            event.preventDefault();
+            const inputVal = document.getElementById('passInput').value;
+            const errorEl = document.getElementById('authError');
 
+            if (inputVal === ADMIN_PASSWORD) {
+                document.getElementById('authOverlay').style.display = 'none';
+                document.getElementById('mainAdminContent').style.display = 'block';
+            } else {
+                errorEl.style.display = 'block';
+                document.getElementById('passInput').value = '';
+            }
+        }
+
+        // Firebase Setup
         const firebaseConfig = {
             apiKey: "AIzaSyDItBcWY7ww6jj73h1HEtaTm7YllIBLQ1c",
             authDomain: "vornex-b7a62.firebaseapp.com",
@@ -266,3 +319,4 @@ if (userPass !== ADMIN_PASSWORD) {
     </script>
 </body>
 </html>
+
