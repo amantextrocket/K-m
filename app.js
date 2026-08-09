@@ -1,173 +1,157 @@
-// Kabir Mobile — JS Logic
-
-let localProducts = [
+// Vornex Products Catalog (Prices ranging ₹399 - ₹1499)
+const vornexProducts = [
     {
-        id: "1",
-        name: "iPhone 13 Pro",
-        brand: "iPhone",
-        price: 52000,
-        specs: "128GB / Graphite",
-        battery: "88% Health",
-        condition: "Mint Condition",
-        image: "https://images.unsplash.com/photo-1632661674596-df8be070a5c5?w=500&auto=format&fit=crop&q=60"
+        id: "v1",
+        name: "VORNEX HEAVYWEIGHT OVERSIZED TEE",
+        category: "Oversized Tees",
+        price: 799,
+        tag: "BESTSELLER",
+        image: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80"
     },
     {
-        id: "2",
-        name: "Samsung Galaxy S22 Ultra",
-        brand: "Samsung",
-        price: 48500,
-        specs: "256GB / 12GB RAM",
-        battery: "5000 mAh",
-        condition: "Like New (9/10)",
-        image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500&auto=format&fit=crop&q=60"
+        id: "v2",
+        name: "VORNEX ACID WASH HOODIE",
+        category: "Hoodies",
+        price: 1499,
+        tag: "NEW DROP",
+        image: "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=600&auto=format&fit=crop&q=80"
     },
     {
-        id: "3",
-        name: "OnePlus 11 5G",
-        brand: "OnePlus",
-        price: 38000,
-        specs: "256GB / 16GB RAM",
-        battery: "5000 mAh",
-        condition: "Very Good",
-        image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=500&auto=format&fit=crop&q=60"
+        id: "v3",
+        name: "VORNEX MINIMALIST BASIC T-SHIRT",
+        category: "T-shirts",
+        price: 399,
+        tag: "ESSENTIAL",
+        image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "v4",
+        name: "VORNEX CASUAL OVERSIZED SHIRT",
+        category: "Shirts",
+        price: 999,
+        tag: "HOT",
+        image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "v5",
+        name: "VORNEX RELAXED SWEATSHIRT",
+        category: "Sweatshirts",
+        price: 1199,
+        tag: "TRENDING",
+        image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&auto=format&fit=crop&q=80"
+    },
+    {
+        id: "v6",
+        name: "VORNEX BAGGY DENIM JEANS",
+        category: "Jeans",
+        price: 1399,
+        tag: "NEW",
+        image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=600&auto=format&fit=crop&q=80"
     }
 ];
 
 let cart = [];
-let currentFilter = 'All';
-let currentSlide = 0;
-let slideInterval;
+let selectedSizes = {};
 
-// Carousel Banner Logic
-function showSlide(index) {
-    const slides = document.querySelectorAll('.slide');
-    const dots = document.querySelectorAll('.dot');
-    if (slides.length === 0) return;
-
-    if (index >= slides.length) currentSlide = 0;
-    else if (index < 0) currentSlide = slides.length - 1;
-    else currentSlide = index;
-
-    slides.forEach((slide, i) => {
-        slide.classList.toggle('active', i === currentSlide);
-    });
-
-    dots.forEach((dot, i) => {
-        dot.classList.toggle('active', i === currentSlide);
-    });
-}
-
-function moveSlide(direction) {
-    showSlide(currentSlide + direction);
-    resetSliderTimer();
-}
-
-function setSlide(index) {
-    showSlide(index);
-    resetSliderTimer();
-}
-
-function startSliderTimer() {
-    slideInterval = setInterval(() => {
-        showSlide(currentSlide + 1);
-    }, 4000); // 4 seconds auto slide
-}
-
-function resetSliderTimer() {
-    clearInterval(slideInterval);
-    startSliderTimer();
-}
-
-// Product Display & Filters Logic
-function renderProducts(productsToRender) {
-    const container = document.getElementById('productsContainer');
-    if (!container) return;
-
-    if (productsToRender.length === 0) {
-        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #777;">Is category me koi mobile nahi mila.</p>';
-        return;
-    }
+function renderProducts(items) {
+    const grid = document.getElementById('productsGrid');
+    if (!grid) return;
 
     let html = "";
-    productsToRender.forEach(p => {
+    items.forEach(item => {
+        const sizes = ['S', 'M', 'L', 'XL', 'XXL'];
+        let sizeBtns = sizes.map(size => `
+            <button class="size-btn ${selectedSizes[item.id] === size ? 'selected' : ''}" 
+                    onclick="selectSize('${item.id}', '${size}')">${size}</button>
+        `).join('');
+
         html += `
-            <div class="card">
-                <div class="card-img-wrap">
-                    <img src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/200x200?text=No+Image'">
+            <div class="product-card">
+                <div class="product-img-box">
+                    <span class="badge-tag">${item.tag}</span>
+                    <img src="${item.image}" alt="${item.name}">
                 </div>
-                <div>
-                    <div class="card-badges">
-                        <span class="badge-cond">⭐ ${p.condition}</span>
-                        <span class="badge-spec">🔋 ${p.battery}</span>
+                <div class="product-info">
+                    <div class="product-name">${item.name}</div>
+                    <div class="product-price">₹${item.price}</div>
+                    <div class="size-selector">
+                        ${sizeBtns}
                     </div>
-                    <div class="card-title">${p.name}</div>
-                    <div style="font-size: 0.8rem; color: #666; margin-bottom: 6px;">💾 ${p.specs}</div>
-                    <div class="card-price">₹${p.price.toLocaleString('en-IN')}</div>
+                    <button class="btn-add" onclick="addToCart('${item.id}')">ADD TO CART</button>
                 </div>
-                <button class="btn-add-cart" onclick="addToCart('${p.name}', ${p.price})">🛒 Add to Cart</button>
             </div>
         `;
     });
-    container.innerHTML = html;
+    grid.innerHTML = html;
 }
 
-function searchMobiles() {
-    const query = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = localProducts.filter(p => 
-        (currentFilter === 'All' || p.brand === currentFilter) &&
-        (p.name.toLowerCase().includes(query) || p.brand.toLowerCase().includes(query))
-    );
-    renderProducts(filtered);
+function selectSize(productId, size) {
+    selectedSizes[productId] = size;
+    renderProducts(vornexProducts);
 }
 
-function filterBrand(brand) {
-    currentFilter = brand;
-    document.querySelectorAll('.cat-chip').forEach(chip => {
-        chip.classList.toggle('active', chip.innerText.includes(brand));
+function filterCategory(cat) {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.innerText.trim().toUpperCase() === cat.toUpperCase());
     });
 
-    const filtered = brand === 'All' ? localProducts : localProducts.filter(p => p.brand === brand);
-    renderProducts(filtered);
+    if (cat === 'All') {
+        renderProducts(vornexProducts);
+    } else {
+        const filtered = vornexProducts.filter(p => p.category === cat);
+        renderProducts(filtered);
+    }
 }
 
-function addToCart(name, price) {
-    cart.push({ name, price });
+function addToCart(productId) {
+    const product = vornexProducts.find(p => p.id === productId);
+    const size = selectedSizes[productId] || 'M';
+
+    cart.push({ ...product, selectedSize: size });
     updateCartUI();
-    alert(`✅ "${name}" Cart me add ho gaya hai!`);
+    toggleCart(true);
 }
 
 function updateCartUI() {
-    const cartCountEl = document.getElementById('cartCount');
-    if (cartCountEl) cartCountEl.innerText = cart.length;
-
-    const cartItemsEl = document.getElementById('cartItems');
-    const cartTotalEl = document.getElementById('cartTotal');
-
-    if (!cartItemsEl) return;
+    document.getElementById('cartCount').innerText = cart.length;
+    const list = document.getElementById('cartItemsList');
+    const subtotalEl = document.getElementById('cartSubtotal');
+    const discountNote = document.getElementById('discountNote');
 
     if (cart.length === 0) {
-        cartItemsEl.innerHTML = '<p class="empty-msg">Your cart is empty.</p>';
-        cartTotalEl.innerText = '₹0';
+        list.innerHTML = '<p class="empty-cart-text">Your cart is empty.</p>';
+        subtotalEl.innerText = '₹0';
+        discountNote.innerText = 'Add items above ₹999 for Flat 20% OFF!';
         return;
     }
 
     let html = "";
-    let total = 0;
+    let rawTotal = 0;
+
     cart.forEach((item, index) => {
-        total += item.price;
+        rawTotal += item.price;
         html += `
-            <div class="cart-item-row">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
                 <div>
-                    <strong>${item.name}</strong><br>
-                    <small>₹${item.price.toLocaleString('en-IN')}</small>
+                    <strong style="font-size:0.85rem">${item.name}</strong><br>
+                    <small>Size: ${item.selectedSize} | ₹${item.price}</small>
                 </div>
-                <button onclick="removeFromCart(${index})" style="background:none; border:none; color:red; cursor:pointer;">❌</button>
+                <button onclick="removeFromCart(${index})" style="border:none; background:none; cursor:pointer; font-weight:bold; font-size:1.1rem;">✕</button>
             </div>
         `;
     });
 
-    cartItemsEl.innerHTML = html;
-    cartTotalEl.innerText = `₹${total.toLocaleString('en-IN')}`;
+    let finalTotal = rawTotal;
+    if (rawTotal > 999) {
+        const discount = Math.round(rawTotal * 0.20);
+        finalTotal = rawTotal - discount;
+        discountNote.innerText = `🎉 FLAT 20% OFF APPLIED! (Saved ₹${discount})`;
+    } else {
+        discountNote.innerText = `Add ₹${1000 - rawTotal} more to get FLAT 20% OFF!`;
+    }
+
+    list.innerHTML = html;
+    subtotalEl.innerText = `₹${finalTotal}`;
 }
 
 function removeFromCart(index) {
@@ -175,14 +159,22 @@ function removeFromCart(index) {
     updateCartUI();
 }
 
-function toggleCart() {
-    const modal = document.getElementById('cartModal');
-    if (modal) modal.classList.toggle('active');
+function toggleCart(forceOpen = false) {
+    const sidebar = document.getElementById('cartSidebar');
+    const backdrop = document.getElementById('cartBackdrop');
+
+    if (forceOpen) {
+        sidebar.classList.add('open');
+        backdrop.classList.add('active');
+    } else {
+        sidebar.classList.toggle('open');
+        backdrop.classList.toggle('active');
+    }
 }
 
 function checkoutWhatsApp() {
     if (cart.length === 0) {
-        alert("Aapka cart khali hai!");
+        alert("Cart is empty!");
         return;
     }
 
@@ -191,29 +183,40 @@ function checkoutWhatsApp() {
     const address = document.getElementById('custAddress').value.trim();
 
     if (!name || !phone || !address) {
-        alert("Kripya apna Naam, Phone Number aur Delivery Address bharen!");
+        alert("Please fill Name, Phone, and Address!");
         return;
     }
 
-    let message = `*🔴 NEW ORDER - KABIR MOBILE*%0A%0A`;
-    message += `*Customer Details:*%0A👤 Name: ${name}%0A📞 Phone: ${phone}%0A🏠 Address: ${address}%0A%0A`;
-    message += `*Ordered Mobiles (Cash on Delivery):*%0A`;
+    let rawTotal = 0;
+    let itemsText = "";
 
-    let total = 0;
-    cart.forEach((item, idx) => {
-        total += item.price;
-        message += `${idx + 1}. ${item.name} — ₹${item.price.toLocaleString('en-IN')}%0A`;
+    cart.forEach((item, i) => {
+        rawTotal += item.price;
+        itemsText += `${i+1}. ${item.name} (Size: ${item.selectedSize}) - ₹${item.price}%0A`;
     });
 
-    message += `%0A*Total Amount:* ₹${total.toLocaleString('en-IN')}`;
+    let finalTotal = rawTotal;
+    let offerApplied = "No Offer";
 
-    const targetPhone = "919876543210"; // Replace with your original number
-    window.open(`https://wa.me/${targetPhone}?text=${message}`, '_blank');
+    if (rawTotal > 999) {
+        const discount = Math.round(rawTotal * 0.20);
+        finalTotal = rawTotal - discount;
+        offerApplied = `Flat 20% OFF (-₹${discount})`;
+    }
+
+    let msg = `*🛍️ NEW ORDER FOR VORNEX*%0A%0A`;
+    msg += `*Name:* ${name}%0A`;
+    msg += `*Phone:* ${phone}%0A`;
+    msg += `*Address:* ${address}%0A%0A`;
+    msg += `*Items Ordered:*%0A${itemsText}%0A`;
+    msg += `*Subtotal:* ₹${rawTotal}%0A`;
+    msg += `*Offer:* ${offerApplied}%0A`;
+    msg += `*Final Amount:* ₹${finalTotal}`;
+
+    const targetPhone = "918269444061";
+    window.open(`https://wa.me/${targetPhone}?text=${msg}`, '_blank');
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    if (document.getElementById('productsContainer')) {
-        renderProducts(localProducts);
-    }
-    startSliderTimer();
+    renderProducts(vornexProducts);
 });
