@@ -54,6 +54,25 @@
         <button class="filter-btn" onclick="filterCategory('Sweatshirts')">SWEATSHIRTS</button>
         <button class="filter-btn" onclick="filterCategory('Jeans')">JEANS</button>
     </div>
+<!-- Search & Quick Category Popup -->
+<div class="search-container" style="max-width: 600px; margin: 20px auto; padding: 0 15px; position: relative;">
+    <input type="text" id="userSearchBar" placeholder="🔍 Search hoodies, tees, jeans..." 
+           onfocus="showQuickCategories(true)" 
+           onkeyup="handleUserSearch()"
+           style="width: 100%; padding: 14px 20px; background: #111; border: 1px solid #333; color: #fff; border-radius: 25px; font-size: 0.95rem; outline: none;">
+    
+    <!-- Category Chips (Click karne par dikhenge) -->
+    <div id="quickCategories" style="display: none; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-top: 8px; flex-wrap: wrap; gap: 8px;">
+        <span style="font-size: 0.75rem; color: #888; width: 100%; display: block; margin-bottom: 5px; font-weight: bold;">POPULAR CATEGORIES:</span>
+        <button onclick="selectQuickCategory('All')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">All</button>
+        <button onclick="selectQuickCategory('Oversized Tees')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Oversized Tees</button>
+        <button onclick="selectQuickCategory('T-shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">T-shirts</button>
+        <button onclick="selectQuickCategory('Shirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Shirts</button>
+        <button onclick="selectQuickCategory('Hoodies')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Hoodies</button>
+        <button onclick="selectQuickCategory('Sweatshirts')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Sweatshirts</button>
+        <button onclick="selectQuickCategory('Jeans')" style="background:#222; color:#fff; border:1px solid #444; padding:6px 12px; border-radius:15px; font-size:0.8rem; cursor:pointer;">Jeans</button>
+    </div>
+</div>
 
     <!-- Product Grid -->
     <main class="store-container">
