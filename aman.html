@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VORNEX | Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <!-- Chart.js Library for Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
         body { background: #0b0b0b; color: #fff; padding: 20px; }
@@ -13,19 +15,18 @@
         h1 { text-align: center; margin-bottom: 25px; letter-spacing: 3px; font-weight: 900; }
         
         /* Analytics Grid */
-        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
         .stat-card { background: #141414; border: 1px solid #282828; padding: 20px; border-radius: 12px; text-align: center; }
-        .stat-card h3 { font-size: 0.8rem; color: #888; letter-spacing: 1px; margin-bottom: 8px; }
-        .stat-card .value { font-size: 2rem; font-weight: 900; color: #fff; }
+        .stat-card h3 { font-size: 0.75rem; color: #888; letter-spacing: 1px; margin-bottom: 8px; }
+        .stat-card .value { font-size: 1.8rem; font-weight: 900; color: #fff; }
 
-        .card { background: #141414; border: 1px solid #282828; padding: 22px; border-radius: 12px; margin-bottom: 30px; }
+        .card { background: #141414; border: 1px solid #282828; padding: 22px; border-radius: 12px; margin-bottom: 25px; }
         .card h2 { margin-bottom: 18px; font-size: 1.1rem; letter-spacing: 1px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 6px; color: #aaa; }
         input, select { width: 100%; padding: 12px 14px; background: #000; border: 1px solid #333; color: #fff; font-size: 0.9rem; border-radius: 6px; outline: none; }
         input:focus, select:focus { border-color: #666; }
         
-        /* Checkbox Styling for Sizes */
         .size-checkboxes { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
         .size-btn { display: flex; align-items: center; gap: 6px; background: #050505; padding: 8px 14px; border: 1px solid #333; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-weight: bold; }
         .size-btn input { width: auto; cursor: pointer; }
@@ -35,10 +36,9 @@
         
         .search-box { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: #fff; font-size: 0.95rem; border-radius: 6px; margin-bottom: 18px; }
         
-        /* Products List */
         .product-list { display: grid; gap: 12px; }
         .product-item { background: #050505; border: 1px solid #222; padding: 14px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; flex-wrap: wrap; gap: 12px; }
-        .product-item img { width: 55px; height: 70px; object-fit: cover; border-radius: 6px; }
+        .product-item img { width: 55px; height: 70px; object-fit: cover; border-radius: 6px; background: #222; }
         .p-details { flex-grow: 1; display: flex; align-items: center; gap: 15px; }
         
         .badge-stock { padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: 900; display: inline-block; margin-top: 5px; }
@@ -49,19 +49,22 @@
         .btn-edit { background: #ffaa00; color: #000; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
         .btn-delete { background: #ff3333; color: #fff; width: auto; padding: 8px 14px; font-size: 0.75rem; margin: 0; font-weight: bold; }
         
-        /* Modal Popup */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; padding: 20px; z-index: 100; }
         .modal-content { background: #141414; padding: 25px; border-radius: 12px; max-width: 500px; width: 100%; border: 1px solid #333; max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .close-btn { cursor: pointer; font-size: 1.5rem; font-weight: bold; }
 
-        /* Login Screen */
         #authOverlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #050505; display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 20px; }
         .auth-card { background: #121212; border: 1px solid #282828; border-radius: 16px; padding: 35px 25px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         .auth-card .logo { font-size: 1.8rem; font-weight: 900; letter-spacing: 4px; margin-bottom: 5px; color: #fff; }
         .auth-card .sub-title { font-size: 0.8rem; color: #777; margin-bottom: 25px; letter-spacing: 1px; font-weight: 600; }
         .auth-card input { width: 100%; padding: 14px; background: #080808; border: 1px solid #333; color: #fff; font-size: 1.1rem; border-radius: 8px; text-align: center; letter-spacing: 4px; outline: none; }
         #authError { color: #ff4d4d; font-size: 0.8rem; margin-top: 12px; font-weight: 600; display: none; }
+
+        /* Daily Views Log List */
+        .views-log-list { max-height: 200px; overflow-y: auto; background: #050505; border: 1px solid #222; border-radius: 8px; padding: 10px 15px; font-size: 0.85rem; }
+        .views-log-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; }
+        .views-log-item:last-child { border-bottom: none; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -88,6 +91,10 @@
         <!-- 📊 Analytics Section -->
         <div class="analytics-grid">
             <div class="stat-card">
+                <h3>TODAY'S VIEWS</h3>
+                <div class="value" id="statTodayViews" style="color: #3b82f6;">0</div>
+            </div>
+            <div class="stat-card">
                 <h3>TOTAL PRODUCTS</h3>
                 <div class="value" id="statTotal">0</div>
             </div>
@@ -98,6 +105,19 @@
             <div class="stat-card">
                 <h3>OUT OF STOCK</h3>
                 <div class="value" id="statOutStock" style="color: #ff6b6b;">0</div>
+            </div>
+        </div>
+
+        <!-- 📈 Traffic Graph & Logs Section -->
+        <div class="card">
+            <h2>📈 Website Traffic Analytics</h2>
+            <div style="position: relative; height: 260px; margin-bottom: 20px;">
+                <canvas id="viewsChart"></canvas>
+            </div>
+            
+            <h3 style="font-size: 0.85rem; color: #888; margin-bottom: 10px; letter-spacing: 1px;">📅 DAILY LOGS HISTORY</h3>
+            <div id="dailyViewsList" class="views-log-list">
+                <p style="color:#666; text-align:center;">Loading traffic data...</p>
             </div>
         </div>
 
@@ -122,10 +142,9 @@
                 </div>
                 <div class="form-group">
                     <label>Price (₹)</label>
-                    <input type="number" id="pPrice" placeholder="799" required>
+                    <input type="number" id="pPrice" placeholder="799" required min="1">
                 </div>
                 
-                <!-- Sizes Selector -->
                 <div class="form-group">
                     <label>Available Sizes</label>
                     <div class="size-checkboxes">
@@ -137,7 +156,6 @@
                     </div>
                 </div>
 
-                <!-- Stock Switch -->
                 <div class="form-group">
                     <label>Stock Status</label>
                     <select id="pStock">
@@ -166,8 +184,8 @@
         </div>
     </div>
 
-    <!-- Edit Product Modal Popup -->
-    <div id="editModal" class="modal">
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal" onclick="closeModalOnBg(event)">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>✏️ Edit Product</h3>
@@ -192,7 +210,7 @@
                 </div>
                 <div class="form-group">
                     <label>Price (₹)</label>
-                    <input type="number" id="editPrice" required>
+                    <input type="number" id="editPrice" required min="1">
                 </div>
                 
                 <div class="form-group">
@@ -230,10 +248,16 @@
     <script>
         const ADMIN_PASSWORD = "444061";
 
+        if (sessionStorage.getItem('vornex_admin_auth') === 'true') {
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('mainAdminContent').style.display = 'block';
+        }
+
         function verifyPassword(event) {
             event.preventDefault();
             const inputVal = document.getElementById('passInput').value;
             if (inputVal === ADMIN_PASSWORD) {
+                sessionStorage.setItem('vornex_admin_auth', 'true');
                 document.getElementById('authOverlay').style.display = 'none';
                 document.getElementById('mainAdminContent').style.display = 'block';
             } else {
@@ -254,34 +278,127 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database().ref('products');
-        let allProducts = {};
+        const db = firebase.database();
+        const productsRef = db.ref('products');
+        const analyticsRef = db.ref('analytics/daily_views');
 
+        let allProducts = {};
+        let viewsChartInstance = null;
+
+        // 📊 Fetch Daily Views Realtime
+        analyticsRef.on('value', (snapshot) => {
+            const viewsData = snapshot.val() || {};
+            renderTrafficAnalytics(viewsData);
+        });
+
+        function renderTrafficAnalytics(data) {
+            const sortedDates = Object.keys(data).sort(); // Sort YYYY-MM-DD
+            const labels = [];
+            const chartValues = [];
+            const listEl = document.getElementById('dailyViewsList');
+            let listHtml = "";
+
+            if (sortedDates.length === 0) {
+                listEl.innerHTML = "<p style='color:#666; text-align:center;'>No traffic data yet.</p>";
+                document.getElementById('statTodayViews').innerText = "0";
+                return;
+            }
+
+            // Get Today's ISO Date String
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+            document.getElementById('statTodayViews').innerText = data[todayStr] || 0;
+
+            // Render Daily List (Newest Date First)
+            for (let i = sortedDates.length - 1; i >= 0; i--) {
+                const dateKey = sortedDates[i];
+                const formattedDate = formatDateDisplay(dateKey); // e.g. 10/AUG/2026
+                const count = data[dateKey];
+
+                listHtml += `
+                    <div class="views-log-item">
+                        <span>📅 ${formattedDate}</span>
+                        <strong style="color: #40c057;">${count} view${count > 1 ? 's' : ''}</strong>
+                    </div>
+                `;
+            }
+            listEl.innerHTML = listHtml;
+
+            // Prepare Chart Data
+            sortedDates.forEach(dateKey => {
+                labels.push(formatDateDisplay(dateKey));
+                chartValues.push(data[dateKey]);
+            });
+
+            // Draw/Update Chart
+            const ctx = document.getElementById('viewsChart').getContext('2d');
+            if (viewsChartInstance) {
+                viewsChartInstance.destroy();
+            }
+
+            viewsChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Visitors',
+                        data: chartValues,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.15)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#3b82f6',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#888' }, grid: { color: '#1a1a1a' } },
+                        y: { ticks: { color: '#888' }, grid: { color: '#1a1a1a' }, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#fff', font: { family: 'Montserrat' } } }
+                    }
+                }
+            });
+        }
+
+        function formatDateDisplay(isoStr) {
+            // Converts "YYYY-MM-DD" -> "10/AUG/2026"
+            const parts = isoStr.split('-');
+            if (parts.length !== 3) return isoStr;
+            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            const monthIdx = parseInt(parts[1], 10) - 1;
+            return `${parts[2]}/${months[monthIdx] || 'MON'}/${parts[0]}`;
+        }
+
+        // Product Management JS
         function getSelectedSizes(name) {
             const boxes = document.querySelectorAll(`input[name="${name}"]:checked`);
             return Array.from(boxes).map(cb => cb.value);
         }
 
-        // Add Product
         document.getElementById('addProductForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const selectedSizes = getSelectedSizes('addSize');
             if(selectedSizes.length === 0) {
-                alert("कृपया कम से कम एक साइज चुनें!");
+                alert("Please select at least one size!");
                 return;
             }
 
             const newProd = {
-                name: document.getElementById('pName').value,
+                name: document.getElementById('pName').value.trim(),
                 category: document.getElementById('pCategory').value,
                 price: parseInt(document.getElementById('pPrice').value),
                 sizes: selectedSizes,
                 inStock: document.getElementById('pStock').value === 'in_stock',
-                tag: document.getElementById('pTag').value,
-                image: document.getElementById('pImage').value
+                tag: document.getElementById('pTag').value.trim(),
+                image: document.getElementById('pImage').value.trim()
             };
 
-            db.push(newProd, (err) => {
+            productsRef.push(newProd, (err) => {
                 if(!err) {
                     alert('Product Added Successfully!');
                     document.getElementById('addProductForm').reset();
@@ -291,14 +408,12 @@
             });
         });
 
-        // Realtime Data Fetch
-        db.on('value', (snapshot) => {
+        productsRef.on('value', (snapshot) => {
             allProducts = snapshot.val() || {};
             updateAnalytics(allProducts);
             renderAdminProducts(allProducts);
         });
 
-        // Update Analytics Dashboard
         function updateAnalytics(data) {
             const keys = Object.keys(data);
             let total = keys.length;
@@ -318,7 +433,6 @@
             document.getElementById('statOutStock').innerText = outStockCount;
         }
 
-        // Render Product List
         function renderAdminProducts(data) {
             const listEl = document.getElementById('adminProductList');
             listEl.innerHTML = "";
@@ -327,17 +441,19 @@
                 listEl.innerHTML = "<p style='color:#777; text-align:center;'>No products found in database.</p>";
                 return;
             }
+
+            let htmlBuffer = "";
             keys.forEach(key => {
                 const p = data[key];
                 const sizesStr = p.sizes ? p.sizes.join(', ') : 'M, L, XL';
                 const isStock = p.inStock !== false;
 
-                listEl.innerHTML += `
+                htmlBuffer += `
                     <div class="product-item">
                         <div class="p-details">
-                            <img src="${p.image}" alt="">
+                            <img src="${p.image}" alt="Product" onerror="this.src='https://via.placeholder.com/55x70?text=No+Img'">
                             <div>
-                                <strong>${p.name}</strong><br>
+                                <strong>${escapeHtml(p.name)}</strong><br>
                                 <small style="color:#aaa;">₹${p.price} | ${p.category} | Sizes: [${sizesStr}]</small><br>
                                 <span class="badge-stock ${isStock ? 'in-stock' : 'out-stock'}">
                                     ${isStock ? 'IN STOCK' : 'OUT OF STOCK'}
@@ -351,10 +467,15 @@
                     </div>
                 `;
             });
+            listEl.innerHTML = htmlBuffer;
+        }
+
+        function escapeHtml(text) {
+            return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
         }
 
         function filterAdminProducts() {
-            const query = document.getElementById('searchBar').value.toLowerCase();
+            const query = document.getElementById('searchBar').value.toLowerCase().trim();
             const filtered = {};
             Object.keys(allProducts).forEach(key => {
                 const p = allProducts[key];
@@ -367,7 +488,7 @@
 
         function deleteProduct(key) {
             if(confirm("Are you sure you want to delete this product?")) {
-                db.child(key).remove();
+                productsRef.child(key).remove();
             }
         }
 
@@ -378,7 +499,7 @@
             document.getElementById('editCategory').value = p.category;
             document.getElementById('editPrice').value = p.price;
             document.getElementById('editStock').value = (p.inStock !== false) ? 'in_stock' : 'out_of_stock';
-            document.getElementById('editTag').value = p.tag;
+            document.getElementById('editTag').value = p.tag || '';
             document.getElementById('editImage').value = p.image;
 
             const currentSizes = p.sizes || ['M', 'L', 'XL'];
@@ -393,6 +514,12 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
+        function closeModalOnBg(e) {
+            if (e.target.id === 'editModal') {
+                closeEditModal();
+            }
+        }
+
         document.getElementById('editProductForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const key = document.getElementById('editKey').value;
@@ -404,16 +531,16 @@
             }
 
             const updatedData = {
-                name: document.getElementById('editName').value,
+                name: document.getElementById('editName').value.trim(),
                 category: document.getElementById('editCategory').value,
                 price: parseInt(document.getElementById('editPrice').value),
                 sizes: selectedSizes,
                 inStock: document.getElementById('editStock').value === 'in_stock',
-                tag: document.getElementById('editTag').value,
-                image: document.getElementById('editImage').value
+                tag: document.getElementById('editTag').value.trim(),
+                image: document.getElementById('editImage').value.trim()
             };
 
-            db.child(key).update(updatedData, (err) => {
+            productsRef.child(key).update(updatedData, (err) => {
                 if(!err) {
                     alert('Product Updated Successfully!');
                     closeEditModal();
@@ -425,3 +552,4 @@
     </script>
 </body>
 </html>
+
