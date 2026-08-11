@@ -1,4 +1,33 @@
-// Firebase Config
+// ==========================================================================
+// VORNEX STORE - FRONTEND APPLICATION SCRIPT (2026)
+// ==========================================================================
+
+// 🔔 Custom Toast Helper Function
+function showToast(message, type = "success") {
+    let bgColor = "#10b981"; // Green
+    if (type === "error") bgColor = "#ef4444"; // Red
+    if (type === "info") bgColor = "#3b82f6"; // Blue
+
+    Toastify({
+        text: message,
+        duration: 2500,
+        gravity: "bottom",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+            background: "#141414",
+            color: "#ffffff",
+            border: `1px solid ${bgColor}`,
+            borderRadius: "8px",
+            fontFamily: "'Montserrat', sans-serif",
+            fontWeight: "600",
+            fontSize: "0.82rem",
+            boxShadow: "0 10px 25px rgba(0,0,0,0.6)"
+        }
+    }).showToast();
+}
+
+// 🔌 Firebase Initialization
 const firebaseConfig = {
     apiKey: "AIzaSyDItBcWY7ww6jj73h1HEtaTm7YllIBLQ1c",
     authDomain: "vornex-b7a62.firebaseapp.com",
@@ -10,264 +39,384 @@ const firebaseConfig = {
     measurementId: "G-RBG15BDSG0"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database().ref('products');
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+const productsRef = db.ref('products');
+const analyticsRef = db.ref('analytics/daily_views');
 
-// 📈 Visitor Track Code
-(function trackVisitor() {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const dateKey = `${year}-${month}-${day}`;
+// 📊 Global App State
+let allProducts = {};
+let selectedCategory = 'ALL';
+let cart = JSON.parse(localStorage.getItem('vornex_cart')) || [];
+let wishlist = JSON.parse(localStorage.getItem('vornex_wishlist')) || [];
+let selectedSizes = {}; 
+let appliedDiscount = 0;
 
-    firebase.database().ref('analytics/daily_views/' + dateKey).transaction((currentViews) => {
+// 📈 Record Daily Traffic Views
+function recordTrafficView() {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    
+    analyticsRef.child(todayStr).transaction((currentViews) => {
         return (currentViews || 0) + 1;
     });
-})();
+}
+recordTrafficView();
 
-
-let vornexProducts = [];
-let cart = [];
-let selectedSizesMap = {}; 
-let appliedCouponCode = "";
-let couponExtraDiscountPercent = 0; // 5% Extra Coupon Discount
-
-const MY_WHATSAPP_NUMBER = "918269444061"; // Your WhatsApp Number
-
-// Realtime Products Load
-db.on('value', (snapshot) => {
-    const data = snapshot.val() || {};
-    vornexProducts = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-    renderProducts(vornexProducts);
+// 📥 Realtime Firebase Products Fetch
+productsRef.on('value', (snapshot) => {
+    allProducts = snapshot.val() || {};
+    renderProducts();
+    updateBadges();
 });
 
-// Render Store Products
-function renderProducts(products) {
-    const grid = document.getElementById('productsGrid');
-    grid.innerHTML = "";
+// 🖼️ Render Product Grid
+function renderProducts() {
+    const gridEl = document.getElementById('productGrid');
+    const keys = Object.keys(allProducts);
 
-    if (products.length === 0) {
-        grid.innerHTML = "<p style='grid-column:1/-1; text-align:center; color:#777;'>No products available.</p>";
+    if (keys.length === 0) {
+        gridEl.innerHTML = `<div class="loading-spinner">No products currently available in store.</div>`;
         return;
     }
 
-    products.forEach(p => {
-        const isStock = p.inStock !== false;
-        const availableSizes = p.sizes || ['M', 'L', 'XL'];
+    let html = "";
+    let matchesCount = 0;
+
+    keys.forEach(key => {
+        const p = allProducts[key];
         
-        if (!selectedSizesMap[p.id]) {
-            selectedSizesMap[p.id] = availableSizes[0];
-        }
+        // Category Filter Check
+        if (selectedCategory !== 'ALL' && p.category !== selectedCategory) return;
 
-        let sizesHTML = `<div class="size-picker">`;
-        availableSizes.forEach(size => {
-            const activeClass = selectedSizesMap[p.id] === size ? 'active' : '';
-            sizesHTML += `<span class="size-chip ${activeClass}" onclick="selectSize('${p.id}', '${size}')">${size}</span>`;
-        });
-        sizesHTML += `</div>`;
+        matchesCount++;
+        const isWishlisted = wishlist.includes(key);
+        const stocks = p.sizeStocks || { S:5, M:10, L:10, XL:5, XXL:0 };
+        const totalStock = Object.values(stocks).reduce((a, b) => a + b, 0);
+        const isOutOfStock = totalStock === 0;
 
-        grid.innerHTML += `
+        const defaultSelectedSize = selectedSizes[key] || getFirstAvailableSize(stocks) || 'M';
+
+        html += `
             <div class="product-card">
-                ${p.tag ? `<span class="badge-tag">${p.tag}</span>` : ''}
-                ${!isStock ? `<span class="sold-out-badge">SOLD OUT</span>` : ''}
-                <img src="${p.image}" alt="${p.name}">
-                <div class="product-info">
-                    <div>
-                        <div class="product-title">${p.name}</div>
-                        <div class="product-price">₹${p.price}</div>
-                        ${sizesHTML}
+                <div class="card-img-wrapper">
+                    ${p.tag ? `<span class="tag-badge">${p.tag.toUpperCase()}</span>` : ''}
+                    <button class="wishlist-btn-icon ${isWishlisted ? 'active' : ''}" onclick="toggleWishlist('${key}')">
+                        <i class="fa-${isWishlisted ? 'solid' : 'regular'} fa-heart"></i>
+                    </button>
+                    <img src="${p.image}" class="img-primary ${p.imageBack ? '' : 'single-img'}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x375?text=VORNEX'">
+                    ${p.imageBack ? `<img src="${p.imageBack}" class="img-back" alt="${p.name} Back View">` : ''}
+                </div>
+
+                <div class="card-info">
+                    <span class="card-category">${p.category.toUpperCase()}</span>
+                    <h3 class="card-title">${escapeHtml(p.name)}</h3>
+                    
+                    <div class="card-price-row">
+                        <span class="price-current">₹${p.price}</span>
                     </div>
-                    <div class="btn-group">
-                        <button class="btn-add ${!isStock ? 'btn-disabled' : ''}" 
-                                onclick="addToCart('${p.id}')" ${!isStock ? 'disabled' : ''}>
-                                ${isStock ? 'ADD TO CART' : 'OUT OF STOCK'}
+
+                    <div class="size-selector">
+                        ${['S', 'M', 'L', 'XL', 'XXL'].map(sz => {
+                            const qty = stocks[sz] || 0;
+                            const isSelected = defaultSelectedSize === sz;
+                            const isSzOut = qty === 0;
+                            return `
+                                <div class="size-chip ${isSelected ? 'selected' : ''} ${isSzOut ? 'out-of-stock' : ''}" 
+                                     onclick="${isSzOut ? '' : `selectSize('${key}', '${sz}')`}">
+                                    ${sz}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+
+                    <div class="card-action-btns">
+                        <button class="add-cart-btn" onclick="addToCart('${key}')" ${isOutOfStock ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                            ${isOutOfStock ? 'SOLD OUT' : 'ADD TO BAG'}
                         </button>
-                        <button class="btn-wa ${!isStock ? 'btn-disabled' : ''}" 
-                                onclick="directWhatsAppOrder('${p.id}')" ${!isStock ? 'disabled' : ''}>
-                                BUY VIA WHATSAPP
+                        <button class="size-guide-link" onclick="openModal('sizeChartModal')" title="Size Chart">
+                            <i class="fa-solid fa-ruler"></i>
                         </button>
                     </div>
                 </div>
             </div>
         `;
     });
-}
 
-function selectSize(productId, size) {
-    selectedSizesMap[productId] = size;
-    renderProducts(vornexProducts);
-}
-
-function showQuickCategories(show) {
-    document.getElementById('quickCategories').style.display = show ? 'flex' : 'none';
-}
-
-function handleUserSearch() {
-    const query = document.getElementById('userSearchBar').value.toLowerCase().trim();
-    const filtered = vornexProducts.filter(p => 
-        p.name.toLowerCase().includes(query) || 
-        p.category.toLowerCase().includes(query)
-    );
-    renderProducts(filtered);
-}
-
-function selectQuickCategory(cat) {
-    document.getElementById('userSearchBar').value = cat === 'All' ? '' : cat;
-    if(cat === 'All') {
-        renderProducts(vornexProducts);
+    if (matchesCount === 0) {
+        gridEl.innerHTML = `<div class="loading-spinner">No products found in this category.</div>`;
     } else {
-        const filtered = vornexProducts.filter(p => p.category === cat);
-        renderProducts(filtered);
+        gridEl.innerHTML = html;
     }
-    showQuickCategories(false);
 }
 
-// Single Click Direct WhatsApp Order
-function directWhatsAppOrder(productId) {
-    const p = vornexProducts.find(item => item.id === productId);
-    const chosenSize = selectedSizesMap[productId] || "M";
-    
-    let currentPrice = p.price;
-    let offerDetails = [];
+function getFirstAvailableSize(stocks) {
+    for (let sz of ['S', 'M', 'L', 'XL', 'XXL']) {
+        if ((stocks[sz] || 0) > 0) return sz;
+    }
+    return null;
+}
 
-    // Auto 20% OFF above 999
-    if (p.price >= 999) {
-        currentPrice = Math.round(currentPrice * 0.8);
-        offerDetails.push("Flat 20% OFF (Above ₹999)");
+function selectSize(prodKey, size) {
+    selectedSizes[prodKey] = size;
+    renderProducts();
+}
+
+function filterCategory(catName, btnEl) {
+    selectedCategory = catName;
+    document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
+    btnEl.classList.add('active');
+    renderProducts();
+}
+
+function searchProducts() {
+    const query = document.getElementById('storeSearch').value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.product-card');
+    cards.forEach(card => {
+        const title = card.querySelector('.card-title').innerText.toLowerCase();
+        const cat = card.querySelector('.card-category').innerText.toLowerCase();
+        if (title.includes(query) || cat.includes(query)) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// 🛍️ Cart Management
+function addToCart(prodKey) {
+    const p = allProducts[prodKey];
+    if (!p) return;
+
+    const size = selectedSizes[prodKey] || getFirstAvailableSize(p.sizeStocks) || 'M';
+    const cartItemId = `${prodKey}_${size}`;
+    const existingIndex = cart.findIndex(item => item.id === cartItemId);
+
+    if (existingIndex > -1) {
+        cart[existingIndex].qty += 1;
+    } else {
+        cart.push({
+            id: cartItemId,
+            prodKey: prodKey,
+            name: p.name,
+            price: p.price,
+            image: p.image,
+            size: size,
+            qty: 1
+        });
     }
 
-    // Extra 5% Coupon OFF
-    if (couponExtraDiscountPercent > 0) {
-        currentPrice = Math.round(currentPrice * ((100 - couponExtraDiscountPercent) / 100));
-        offerDetails.push(`Extra ${couponExtraDiscountPercent}% OFF Coupon (${appliedCouponCode})`);
+    saveCart();
+    showToast(`🛍️ Added ${p.name} (${size}) to Bag!`, "success");
+    toggleCartDrawer(true);
+}
+
+function updateCartQty(cartItemId, delta) {
+    const index = cart.findIndex(item => item.id === cartItemId);
+    if (index > -1) {
+        cart[index].qty += delta;
+        if (cart[index].qty <= 0) {
+            cart.splice(index, 1);
+            showToast("Item removed from cart", "info");
+        }
+        saveCart();
+    }
+}
+
+function saveCart() {
+    localStorage.setItem('vornex_cart', JSON.stringify(cart));
+    renderCart();
+    updateBadges();
+}
+
+function renderCart() {
+    const listEl = document.getElementById('cartItemsList');
+    if (cart.length === 0) {
+        listEl.innerHTML = `<p class="empty-cart-text">Your cart is currently empty.</p>`;
+        document.getElementById('cartSubtotal').innerText = '₹0';
+        document.getElementById('cartDiscount').innerText = '-₹0';
+        document.getElementById('cartGrandTotal').innerText = '₹0';
+        document.getElementById('cartTotalItems').innerText = '0';
+        return;
     }
 
-    let offerNote = offerDetails.length > 0 ? `\n*Offers Applied:* ${offerDetails.join(" + ")}` : "";
+    let subtotal = 0;
+    let totalItems = 0;
+    let html = "";
 
-    const message = `Hi VORNEX! I want to buy this product:\n\n*Product:* ${p.name}\n*Size:* ${chosenSize}\n*Original Price:* ₹${p.price}\n*Final Price:* ₹${currentPrice}${offerNote}\n*Image:* ${p.image}`;
-    const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encoded}`, '_blank');
+    cart.forEach(item => {
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+        totalItems += item.qty;
+
+        html += `
+            <div class="cart-item">
+                <img src="${item.image}" alt="${item.name}">
+                <div class="cart-item-details">
+                    <div class="cart-item-title">${escapeHtml(item.name)}</div>
+                    <div class="cart-item-meta">Size: <strong>${item.size}</strong> | ₹${item.price}</div>
+                    <div class="cart-qty-ctrl">
+                        <button class="qty-btn" onclick="updateCartQty('${item.id}', -1)">-</button>
+                        <span style="font-size:0.8rem; font-weight:bold;">${item.qty}</span>
+                        <button class="qty-btn" onclick="updateCartQty('${item.id}', 1)">+</button>
+                    </div>
+                </div>
+                <div style="font-weight:900; font-size:0.85rem;">₹${itemTotal}</div>
+            </div>
+        `;
+    });
+
+    listEl.innerHTML = html;
+    const discountAmount = Math.round(subtotal * appliedDiscount);
+    const grandTotal = subtotal - discountAmount;
+
+    document.getElementById('cartSubtotal').innerText = `₹${subtotal}`;
+    document.getElementById('cartDiscount').innerText = `-₹${discountAmount}`;
+    document.getElementById('cartGrandTotal').innerText = `₹${grandTotal}`;
+    document.getElementById('cartTotalItems').innerText = totalItems;
 }
 
-// Cart System
-function toggleCart() {
-    document.getElementById('cartSidebar').classList.toggle('active');
-}
-
-function addToCart(productId) {
-    const p = vornexProducts.find(item => item.id === productId);
-    const chosenSize = selectedSizesMap[productId] || "M";
-    
-    cart.push({ ...p, selectedSize: chosenSize });
-    updateCartUI();
-    toggleCart();
-}
-
-// 5% Extra Coupon Logic
 function applyCoupon() {
-    const code = document.getElementById('couponInput').value.trim().toUpperCase();
-    const msg = document.getElementById('couponMsg');
+    const input = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+    const msgEl = document.getElementById('couponDiscountText');
 
-    // Available 5% Extra Coupons: VORNEX5, EXTRA5, EDGE5
-    if (code === "VORNEX5" || code === "EXTRA5" || code === "EDGE5") {
-        appliedCouponCode = code;
-        couponExtraDiscountPercent = 5;
-        msg.style.color = "#25D366";
-        msg.innerText = `🎉 Coupon '${code}' Applied! (Extra 5% OFF)`;
-    } else if (code === "") {
-        appliedCouponCode = "";
-        couponExtraDiscountPercent = 0;
-        msg.innerText = "";
+    if (input === 'VORNEX10') {
+        appliedDiscount = 0.10; // 10% Off
+        msgEl.innerText = "✅ Promo Code 'VORNEX10' Applied (10% OFF)";
+        showToast("🎉 10% Discount Applied!", "success");
     } else {
-        msg.style.color = "#ff3333";
-        msg.innerText = "❌ Invalid Coupon Code";
+        appliedDiscount = 0;
+        msgEl.innerText = "⚠️ Invalid Promo Code";
+        showToast("Invalid Promo Code", "error");
+    }
+    renderCart();
+}
+
+function toggleCartDrawer(forceOpen = false) {
+    const drawer = document.getElementById('cartDrawer');
+    const overlay = document.getElementById('cartOverlay');
+    
+    if (forceOpen || !drawer.classList.contains('open')) {
+        drawer.classList.add('open');
+        overlay.classList.add('open');
+        renderCart();
+    } else {
+        drawer.classList.remove('open');
+        overlay.classList.remove('open');
+    }
+}
+
+// ❤️ Wishlist Management
+function toggleWishlist(prodKey) {
+    const index = wishlist.indexOf(prodKey);
+    if (index > -1) {
+        wishlist.splice(index, 1);
+        showToast("Removed from Wishlist", "info");
+    } else {
+        wishlist.push(prodKey);
+        showToast("❤️ Saved to Wishlist!", "success");
+    }
+    localStorage.setItem('vornex_wishlist', JSON.stringify(wishlist));
+    renderProducts();
+    updateBadges();
+}
+
+function openWishlistModal() {
+    const listEl = document.getElementById('wishlistItemsList');
+    if (wishlist.length === 0) {
+        listEl.innerHTML = `<p style="color:#888; text-align:center; padding: 20px;">Your wishlist is empty.</p>`;
+    } else {
+        let html = "";
+        wishlist.forEach(key => {
+            const p = allProducts[key];
+            if (p) {
+                html += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1a1a1a; padding:12px 0;">
+                        <div style="display:flex; gap:12px; align-items:center;">
+                            <img src="${p.image}" style="width:45px; height:55px; object-fit:cover; border-radius:4px;">
+                            <div>
+                                <strong style="font-size:0.85rem; color:#fff;">${escapeHtml(p.name)}</strong><br>
+                                <span style="font-size:0.75rem; color:#888;">₹${p.price}</span>
+                            </div>
+                        </div>
+                        <button onclick="addToCart('${key}')" style="background:#fff; color:#000; border:none; padding:6px 12px; font-weight:bold; font-size:0.7rem; border-radius:4px; cursor:pointer;">
+                            ADD TO BAG
+                        </button>
+                    </div>
+                `;
+            }
+        });
+        listEl.innerHTML = html;
+    }
+    openModal('wishlistModal');
+}
+
+function updateBadges() {
+    const totalCartCount = cart.reduce((sum, item) => sum + item.qty, 0);
+    document.getElementById('cartCount').innerText = totalCartCount;
+    document.getElementById('wishlistCount').innerText = wishlist.length;
+}
+
+// 📦 Checkout & WhatsApp Order Generation
+function openCheckoutModal() {
+    if (cart.length === 0) {
+        showToast("⚠️ Your cart is empty!", "error");
         return;
     }
-    updateCartUI();
+    toggleCartDrawer(false);
+    openModal('checkoutModal');
 }
 
-function updateCartUI() {
-    document.getElementById('cartCount').innerText = cart.length;
-    const list = document.getElementById('cartItemsList');
-    list.innerHTML = "";
+function submitOrder(e) {
+    e.preventDefault();
+    const name = document.getElementById('custName').value.trim();
+    const phone = document.getElementById('custPhone').value.trim();
+    const address = document.getElementById('custAddress').value.trim();
+
     let subtotal = 0;
+    let orderDetails = "";
 
-    if(cart.length === 0) {
-        list.innerHTML = "<p style='color:#777;'>Cart is empty.</p>";
-        document.getElementById('cartTotal').innerText = "₹0";
-        return;
-    }
-
-    cart.forEach((item, index) => {
-        subtotal += item.price;
-        list.innerHTML += `
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #222; padding-bottom:8px;">
-                <div>
-                    <strong style="font-size:0.85rem;">${item.name}</strong><br>
-                    <small style="color:#aaa;">Size: ${item.selectedSize} | ₹${item.price}</small>
-                </div>
-                <span onclick="removeFromCart(${index})" style="color:#ff3333; cursor:pointer; font-weight:bold;">&times;</span>
-            </div>
-        `;
-    });
-
-    let currentTotal = subtotal;
-
-    // 1. Check Auto 20% Flat Discount above 999
-    if (subtotal >= 999) {
-        currentTotal = Math.round(currentTotal * 0.8);
-    }
-
-    // 2. Apply Extra 5% Coupon Discount
-    if (couponExtraDiscountPercent > 0) {
-        currentTotal = Math.round(currentTotal * ((100 - couponExtraDiscountPercent) / 100));
-    }
-
-    if (currentTotal < subtotal) {
-        document.getElementById('cartTotal').innerHTML = `<span style="text-decoration:line-through; color:#777; font-size:0.8rem;">₹${subtotal}</span> ₹${currentTotal}`;
-    } else {
-        document.getElementById('cartTotal').innerText = "₹" + subtotal;
-    }
-}
-
-function removeFromCart(index) {
-    cart.splice(index, 1);
-    updateCartUI();
-}
-
-function checkoutCartWhatsApp() {
-    if(cart.length === 0) return alert("Your cart is empty!");
-    
-    let subtotal = 0;
-    cart.forEach(item => subtotal += item.price);
-
-    let currentTotal = subtotal;
-    let appliedOffers = [];
-
-    // Auto 20% OFF
-    if (subtotal >= 999) {
-        currentTotal = Math.round(currentTotal * 0.8);
-        appliedOffers.push("Flat 20% OFF (Orders >= ₹999)");
-    }
-
-    // Extra 5% OFF Coupon
-    if (couponExtraDiscountPercent > 0) {
-        currentTotal = Math.round(currentTotal * ((100 - couponExtraDiscountPercent) / 100));
-        appliedOffers.push(`Extra 5% Coupon OFF (${appliedCouponCode})`);
-    }
-    
-    let msg = "Hi VORNEX! I want to order the following cart items:\n\n";
     cart.forEach((item, i) => {
-        msg += `${i+1}. *${item.name}* (Size: ${item.selectedSize}) - ₹${item.price}\n`;
+        const itemTotal = item.price * item.qty;
+        subtotal += itemTotal;
+        orderDetails += `${i+1}. *${item.name}*\n   • Size: ${item.size}\n   • Qty: ${item.qty}\n   • Price: ₹${itemTotal}\n`;
     });
 
-    msg += `\n*Subtotal:* ₹${subtotal}`;
-    if (appliedOffers.length > 0) {
-        msg += `\n*Offers Applied:* ${appliedOffers.join(" + ")}`;
-    }
-    msg += `\n*FINAL AMOUNT TO PAY:* ₹${currentTotal}`;
-    
-    window.open(`https://wa.me/${MY_WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+    const discountAmount = Math.round(subtotal * appliedDiscount);
+    const finalTotal = subtotal - discountAmount;
+
+    let msg = `*🔥 NEW ORDER - VORNEX STORE 🔥*\n\n`;
+    msg += `*Customer Details:*\n`;
+    msg += `👤 Name: ${name}\n`;
+    msg += `📞 Phone: ${phone}\n`;
+    msg += `📍 Address: ${address}\n\n`;
+    msg += `*Order Items:*\n${orderDetails}\n`;
+    if (discountAmount > 0) msg += `💰 Discount: -₹${discountAmount}\n`;
+    msg += `*TOTAL AMOUNT: ₹${finalTotal}*\n\n`;
+    msg += `Please confirm my order and share payment details!`;
+
+    const whatsappNumber = "919024220557"; // Store Owner WhatsApp
+    const encodedUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
+
+    // Clear Cart
+    cart = [];
+    localStorage.removeItem('vornex_cart');
+    saveCart();
+    closeModal('checkoutModal');
+
+    showToast("🚀 Redirecting to WhatsApp...", "success");
+    setTimeout(() => {
+        window.open(encodedUrl, '_blank');
+    }, 1000);
 }
 
+// 🔳 Modal Helpers
+function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+function closeModalOnBg(e, modalId) { if (e.target.id === modalId) closeModal(modalId); }
+
+function escapeHtml(text) {
+    return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
+}
