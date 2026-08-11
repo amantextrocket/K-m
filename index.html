@@ -3,150 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORNEX | Own Your Edge</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
-        body { background: #0a0a0a; color: #fff; overflow-x: hidden; }
+    <title>VORNEX | Premium Streetwear</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Toastify CSS & JS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-        /* Header */
-        header { background: #000; border-bottom: 1px solid #222; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .logo-box { display: flex; flex-direction: column; text-decoration: none; }
-        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: 3px; color: #fff; }
-        .tagline { font-size: 0.55rem; color: #888; letter-spacing: 2px; font-weight: 700; margin-top: -2px; }
-        .cart-icon { cursor: pointer; position: relative; font-size: 1.2rem; }
-        .cart-count { background: #fff; color: #000; font-size: 0.7rem; font-weight: 900; border-radius: 50%; padding: 2px 6px; position: absolute; top: -8px; right: -10px; }
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        /* Top Hero Carousel / Banner */
-        .hero-banner { background: linear-gradient(180deg, #181818 0%, #0a0a0a 100%); padding: 35px 20px; text-align: center; border-bottom: 1px solid #222; }
-        .hero-banner h1 { font-size: 2rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 4px; }
-        .hero-banner .sub-tagline { font-size: 0.85rem; color: #aaa; font-weight: 700; letter-spacing: 3px; margin-bottom: 12px; }
-        .offer-badge { display: inline-block; background: #fff; color: #000; font-weight: 900; font-size: 0.75rem; padding: 6px 14px; border-radius: 20px; letter-spacing: 1px; }
+    <!-- CSS Link -->
+    <link rel="stylesheet" href="style.css">
 
-        /* Trust Badges Bar */
-        .trust-bar { display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px; padding: 12px; background: #111; border-bottom: 1px solid #222; text-align: center; }
-        .trust-item { font-size: 0.75rem; font-weight: 700; color: #ccc; letter-spacing: 0.5px; }
-
-        /* Search Section */
-        .search-container { max-width: 600px; margin: 20px auto; padding: 0 15px; position: relative; }
-        .search-input { width: 100%; padding: 12px 20px; background: #141414; border: 1px solid #333; color: #fff; border-radius: 25px; font-size: 0.9rem; outline: none; }
-        .quick-cats { display: none; background: #141414; border: 1px solid #333; border-radius: 12px; padding: 12px; margin-top: 8px; flex-wrap: wrap; gap: 8px; position: absolute; width: calc(100% - 30px); z-index: 90; box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
-        .quick-cats button { background: #222; color: #fff; border: 1px solid #444; padding: 6px 12px; border-radius: 15px; font-size: 0.75rem; cursor: pointer; }
-
-        /* Products Grid */
-        .store-container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        .clothing-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        
-        .product-card { background: #121212; border: 1px solid #222; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; }
-        .product-card:hover { transform: translateY(-3px); border-color: #444; }
-        .product-card img { width: 100%; height: 280px; object-fit: cover; }
-        .product-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        .product-title { font-size: 0.9rem; font-weight: 800; margin-bottom: 5px; }
-        .product-price { font-size: 1rem; font-weight: 900; color: #fff; margin-bottom: 10px; }
-        
-        /* Size Selector Styling */
-        .size-picker { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
-        .size-chip { padding: 4px 8px; background: #222; border: 1px solid #444; font-size: 0.7rem; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .size-chip.active { background: #fff; color: #000; border-color: #fff; }
-
-        /* Badges */
-        .badge-tag { position: absolute; top: 10px; left: 10px; background: #fff; color: #000; padding: 3px 8px; font-size: 0.65rem; font-weight: 900; border-radius: 3px; letter-spacing: 1px; }
-        .sold-out-badge { position: absolute; top: 10px; right: 10px; background: #ff3333; color: #fff; padding: 3px 8px; font-size: 0.65rem; font-weight: 900; border-radius: 3px; }
-
-        /* Buttons */
-        .btn-group { display: flex; gap: 8px; flex-direction: column; }
-        .btn-add { background: #fff; color: #000; border: none; padding: 10px; font-weight: 900; font-size: 0.75rem; border-radius: 6px; cursor: pointer; letter-spacing: 1px; }
-        .btn-wa { background: #25D366; color: #000; border: none; padding: 10px; font-weight: 900; font-size: 0.75rem; border-radius: 6px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 5px; text-decoration: none; }
-        .btn-disabled { background: #333 !important; color: #777 !important; cursor: not-allowed; }
-
-        /* Cart Sidebar */
-        .cart-sidebar { position: fixed; top: 0; right: -350px; width: 320px; height: 100%; background: #121212; border-left: 1px solid #222; z-index: 200; transition: right 0.3s; padding: 20px; display: flex; flex-direction: column; }
-        .cart-sidebar.active { right: 0; }
-        .close-cart { cursor: pointer; font-size: 1.2rem; }
-
-        /* Footer Section */
-        footer { background: #050505; border-top: 1px solid #222; padding: 30px 20px; text-align: center; margin-top: 50px; font-size: 0.8rem; color: #777; }
-        .footer-links { margin: 15px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .footer-links a { color: #aaa; text-decoration: none; font-size: 0.75rem; }
-    </style>
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
 
-    <!-- Header with Tagline -->
-    <header>
-        <a href="#" class="logo-box">
-            <span class="logo">VORNEX</span>
-            <span class="tagline">OWN YOUR EDGE</span>
-        </a>
-        <div class="cart-icon" onclick="toggleCart()">
-            🛒 <span class="cart-count" id="cartCount">0</span>
-        </div>
-    </header>
-
-    <!-- Top Hero Banner Carousel Section with Offer -->
-    <div class="hero-banner">
-        <h1>NEW DROP '26</h1>
-        <div class="sub-tagline">OWN YOUR EDGE</div>
-        <div class="offer-badge">🔥 FLAT 20% OFF ON ORDERS ABOVE ₹999</div>
+    <!-- 🚀 Announcement Bar -->
+    <div class="announcement-bar">
+        ⚡ FREE SHIPPING ON ALL ORDERS ABOVE ₹999 | USE CODE: <strong>VORNEX10</strong> FOR 10% OFF ⚡
     </div>
 
-    <!-- Trust Badges Bar -->
-    <div class="trust-bar">
-        <div class="trust-item">🚚 FAST ALL INDIA SHIPPING</div>
-        <div class="trust-item">💯 100% HEAVYWEIGHT COTTON</div>
-        <div class="trust-item">🔄 EASY SIZE REPLACEMENT</div>
-    </div>
-
-    <!-- Search & Quick Categories -->
-    <div class="search-container">
-        <input type="text" id="userSearchBar" class="search-input" placeholder="🔍 Search hoodies, tees, jeans..." onfocus="showQuickCategories(true)" onkeyup="handleUserSearch()">
-        <div id="quickCategories" class="quick-cats">
-            <span style="font-size: 0.7rem; color: #888; width: 100%; display: block; font-weight: bold;">POPULAR CATEGORIES:</span>
-            <button onclick="selectQuickCategory('All')">All</button>
-            <button onclick="selectQuickCategory('Oversized Tees')">Oversized Tees</button>
-            <button onclick="selectQuickCategory('T-shirts')">T-shirts</button>
-            <button onclick="selectQuickCategory('Shirts')">Shirts</button>
-            <button onclick="selectQuickCategory('Hoodies')">Hoodies</button>
-            <button onclick="selectQuickCategory('Sweatshirts')">Sweatshirts</button>
-            <button onclick="selectQuickCategory('Jeans')">Jeans</button>
-        </div>
-    </div>
-
-    <!-- Live Products Store -->
-    <div class="store-container">
-        <div class="clothing-grid" id="productsGrid">Loading store items...</div>
-    </div>
-
-    <!-- Cart Drawer with Automatic Offer Logic -->
-    <div class="cart-sidebar" id="cartSidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3>YOUR CART</h3>
-            <span class="close-cart" onclick="toggleCart()">&times;</span>
-        </div>
-        <div id="cartItemsList" style="flex-grow:1; overflow-y:auto;">Your cart is empty.</div>
-        <div style="margin-top:20px; border-top:1px solid #333; padding-top:15px;">
-            <div id="discountNotice" style="font-size:0.75rem; color:#25D366; font-weight:bold; margin-bottom:8px;"></div>
-            <div style="display:flex; justify-content:space-between; font-weight:900; margin-bottom:15px;">
-                <span>TOTAL:</span>
-                <span id="cartTotal">₹0</span>
+    <!--  NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand-logo">VORNEX</a>
+            
+            <div class="nav-icons">
+                <button class="nav-icon-btn" onclick="openWishlistModal()" title="Wishlist">
+                    <i class="fa-solid fa-heart"></i>
+                    <span id="wishlistCount" class="badge">0</span>
+                </button>
+                <button class="nav-icon-btn" onclick="toggleCartDrawer()" title="Cart">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    <span id="cartCount" class="badge">0</span>
+                </button>
             </div>
-            <button class="btn-wa" onclick="checkoutCartWhatsApp()" style="width:100%;">ORDER CART VIA WHATSAPP</button>
+        </div>
+    </nav>
+
+    <!-- 🖤 HERO BANNER SECTION -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-tag">NEW DROP 2026</span>
+            <h1 class="hero-title">REDEFINE YOUR STREETWEAR</h1>
+            <p class="hero-subtitle">Heavyweight Fabrics. Unmatched Aesthetics.</p>
+            <a href="#storeSection" class="hero-btn">EXPLORE COLLECTION</a>
+        </div>
+    </section>
+
+    <!-- 🛒 MAIN STORE SECTION -->
+    <section id="storeSection" class="store-container">
+        
+        <!-- Category Filter & Search Bar -->
+        <div class="filter-bar">
+            <div class="categories-scroll">
+                <button class="cat-btn active" onclick="filterCategory('ALL', this)">ALL</button>
+                <button class="cat-btn" onclick="filterCategory('Oversized Tees', this)">OVERSIZED</button>
+                <button class="cat-btn" onclick="filterCategory('T-shirts', this)">T-SHIRTS</button>
+                <button class="cat-btn" onclick="filterCategory('Hoodies', this)">HOODIES</button>
+                <button class="cat-btn" onclick="filterCategory('Shirts', this)">SHIRTS</button>
+            </div>
+            <div class="search-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="storeSearch" placeholder="Search apparel..." onkeyup="searchProducts()">
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="productGrid" class="product-grid">
+            <div class="loading-spinner">Loading VORNEX Drops...</div>
+        </div>
+    </section>
+
+    <!-- 🛍️ CART DRAWER (SLIDE IN) -->
+    <div id="cartDrawer" class="cart-drawer">
+        <div class="cart-header">
+            <h3>YOUR CART (<span id="cartTotalItems">0</span>)</h3>
+            <span class="close-drawer" onclick="toggleCartDrawer()">&times;</span>
+        </div>
+        
+        <div id="cartItemsList" class="cart-body">
+            <p class="empty-cart-text">Your cart is currently empty.</p>
+        </div>
+
+        <div class="cart-footer">
+            <!-- Coupon Input -->
+            <div class="coupon-box">
+                <input type="text" id="couponCodeInput" placeholder="PROMO CODE (e.g. VORNEX10)">
+                <button onclick="applyCoupon()">APPLY</button>
+            </div>
+            <div id="couponDiscountText" class="discount-text"></div>
+
+            <div class="price-row">
+                <span>Subtotal</span>
+                <span id="cartSubtotal">₹0</span>
+            </div>
+            <div class="price-row">
+                <span>Discount</span>
+                <span id="cartDiscount" style="color: #40c057;">-₹0</span>
+            </div>
+            <div class="price-row total-row">
+                <span>Total</span>
+                <span id="cartGrandTotal">₹0</span>
+            </div>
+
+            <button class="checkout-btn" onclick="openCheckoutModal()">PROCEED TO CHECKOUT</button>
+        </div>
+    </div>
+    <div id="cartOverlay" class="drawer-overlay" onclick="toggleCartDrawer()"></div>
+
+    <!-- ❤️ WISHLIST MODAL -->
+    <div id="wishlistModal" class="custom-modal" onclick="closeModalOnBg(event, 'wishlistModal')">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>❤️ YOUR WISHLIST</h3>
+                <span class="close-modal" onclick="closeModal('wishlistModal')">&times;</span>
+            </div>
+            <div id="wishlistItemsList" class="wishlist-body">
+                <p style="color:#888; text-align:center;">No wishlist items saved yet.</p>
+            </div>
         </div>
     </div>
 
-    <!-- Footer Policies Section -->
-    <footer>
-        <p>© 2026 VORNEX STORE. All rights reserved.</p>
-        <div class="footer-links">
-            <a href="#">Shipping Policy</a>
-            <a href="#">Return & Exchange Policy</a>
-            <a href="#">Contact Us</a>
+    <!-- 📏 SIZE CHART MODAL -->
+    <div id="sizeChartModal" class="custom-modal" onclick="closeModalOnBg(event, 'sizeChartModal')">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📏 SIZE GUIDE (INCHES)</h3>
+                <span class="close-modal" onclick="closeModal('sizeChartModal')">&times;</span>
+            </div>
+            <div class="size-table-wrapper">
+                <table class="size-table">
+                    <thead>
+                        <tr>
+                            <th>SIZE</th>
+                            <th>CHEST</th>
+                            <th>LENGTH</th>
+                            <th>SHOULDER</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>S</td><td>42"</td><td>28"</td><td>21"</td></tr>
+                        <tr><td>M</td><td>44"</td><td>29"</td><td>22"</td></tr>
+                        <tr><td>L</td><td>46"</td><td>30"</td><td>23"</td></tr>
+                        <tr><td>XL</td><td>48"</td><td>31"</td><td>24"</td></tr>
+                        <tr><td>XXL</td><td>50"</td><td>32"</td><td>25"</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="font-size: 0.75rem; color: #888; margin-top: 12px; text-align: center;">
+                *Measurements are for Oversized Fit Streetwear Tees.
+            </p>
+        </div>
+    </div>
+
+    <!-- 📦 CHECKOUT MODAL -->
+    <div id="checkoutModal" class="custom-modal" onclick="closeModalOnBg(event, 'checkoutModal')">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📦 SHIPPING DETAILS</h3>
+                <span class="close-modal" onclick="closeModal('checkoutModal')">&times;</span>
+            </div>
+            <form id="checkoutForm" onsubmit="submitOrder(event)">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="custName" placeholder="Enter your full name" required>
+                </div>
+                <div class="input-group">
+                    <label>WhatsApp Number</label>
+                    <input type="tel" id="custPhone" placeholder="10 Digit WhatsApp Number" required pattern="[0-9]{10}">
+                </div>
+                <div class="input-group">
+                    <label>Complete Shipping Address</label>
+                    <textarea id="custAddress" placeholder="House/Flat No, Street, Landmark, Pincode" required rows="3"></textarea>
+                </div>
+                <button type="submit" class="checkout-btn">PLACE ORDER VIA WHATSAPP</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 👣 FOOTER -->
+    <footer class="footer">
+        <div class="footer-logo">VORNEX</div>
+        <p>© 2026 VORNEX STORE. ALL RIGHTS RESERVED.</p>
+        <div class="social-links">
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
     </footer>
 
-    <script src="app.js"></script>
+    <!-- JavaScript File Link -->
+    <script src="script.js"></script>
 </body>
 </html>
-
