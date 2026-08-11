@@ -31,88 +31,87 @@
 
     <!-- 🧭 NAVBAR -->
     <header class="vornex-header">
-    <div class="logo">VORNEX</div>
-    <!-- 3-Line Menu Icon -->
-    <button class="hamburger-btn" onclick="toggleMenuDrawer(true)">
-        <i class="fa-solid fa-bars-staggered"></i>
-    </button>
-</header>
+        <div class="logo">VORNEX</div>
+        <!-- 3-Line Menu Icon -->
+        <button class="hamburger-btn" onclick="toggleMenuDrawer(true)">
+            <i class="fa-solid fa-bars-staggered"></i>
+        </button>
+    </header>
 
-<!-- 📱 iOS Style Animated Side Drawer -->
-<div id="iosMenuDrawer" class="ios-drawer">
-    <div class="drawer-header">
-        <h3>VORNEX MENU</h3>
-        <button onclick="toggleMenuDrawer(false)" class="close-drawer">&times;</button>
-    </div>
-    
-    <div class="drawer-content">
-        <!-- 1. Login Section -->
-        <div class="accordion-item">
-            <button class="acc-btn" onclick="toggleAccordion('loginAcc')">
-                <span><i class="fa-solid fa-user-lock"></i> Login / Register</span>
-                <i class="fa-solid fa-chevron-right"></i>
+    <!-- 📱 iOS Style Animated Side Drawer -->
+    <div id="iosMenuDrawer" class="ios-drawer">
+        <div class="drawer-header">
+            <h3>VORNEX MENU</h3>
+            <button onclick="toggleMenuDrawer(false)" class="close-drawer">&times;</button>
+        </div>
+        
+        <div class="drawer-content">
+            <!-- 1. Login Section -->
+            <div class="accordion-item">
+                <button class="acc-btn" onclick="toggleAccordion('loginAcc')">
+                    <span><i class="fa-solid fa-user-lock"></i> Login / Register</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <div id="loginAcc" class="acc-body" style="display: none;">
+                    <button class="menu-sub-btn" onclick="loginViaPhone()"><i class="fa-solid fa-phone"></i> Login via Phone Number</button>
+                    <button class="menu-sub-btn" onclick="loginViaGoogle()"><i class="fa-brands fa-google"></i> Login via Google</button>
+                </div>
+            </div>
+
+            <!-- 2. Account -->
+            <button class="menu-item-btn" onclick="showAccountDetails()">
+                <i class="fa-solid fa-id-card"></i> Account
             </button>
-            <div id="loginAcc" class="acc-body">
-                <button class="menu-sub-btn" onclick="loginViaPhone()"><i class="fa-solid fa-phone"></i> Login via Phone Number</button>
-                <button class="menu-sub-btn" onclick="loginViaGoogle()"><i class="fa-brands fa-google"></i> Login via Google</button>
+
+            <!-- 3. Your Order -->
+            <div class="accordion-item">
+                <button class="acc-btn" onclick="toggleAccordion('orderAcc')">
+                    <span><i class="fa-solid fa-box"></i> Your Orders</span>
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <div id="orderAcc" class="acc-body" style="display: none;">
+                    <button class="menu-sub-btn" onclick="openOrderHistory()"><i class="fa-solid fa-clock-rotate-left"></i> Order History</button>
+                    <button class="menu-sub-btn" onclick="openOrderTracking()"><i class="fa-solid fa-truck-fast"></i> Order Tracking</button>
+                </div>
             </div>
-        </div>
 
-        <!-- 2. Account -->
-        <button class="menu-item-btn" onclick="showAccountDetails()">
-            <i class="fa-solid fa-id-card"></i> Account
-        </button>
-
-        <!-- 3. Your Order -->
-        <div class="accordion-item">
-            <button class="acc-btn" onclick="toggleAccordion('orderAcc')">
-                <span><i class="fa-solid fa-box"></i> Your Orders</span>
-                <i class="fa-solid fa-chevron-right"></i>
+            <!-- 4. Cart -->
+            <button class="menu-item-btn" onclick="toggleCartDrawer(true); toggleMenuDrawer(false);">
+                <i class="fa-solid fa-bag-shopping"></i> Cart (<span id="menuCartCount">0</span>)
             </button>
-            <div id="orderAcc" class="acc-body">
-                <button class="menu-sub-btn" onclick="openOrderHistory()"><i class="fa-solid fa-clock-rotate-left"></i> Order History</button>
-                <button class="menu-sub-btn" onclick="openOrderTracking()"><i class="fa-solid fa-truck-fast"></i> Order Tracking</button>
+
+            <!-- 5. Wishlist -->
+            <button class="menu-item-btn" onclick="openWishlistModal(); toggleMenuDrawer(false);">
+                <i class="fa-solid fa-heart"></i> Wishlist (<span id="menuWishCount">0</span>)
+            </button>
+
+            <!-- 6. Coupon Code -->
+            <button class="menu-item-btn" onclick="openModal('couponsModal'); toggleMenuDrawer(false);">
+                <i class="fa-solid fa-ticket"></i> Coupon Codes
+            </button>
+
+            <!-- 7. Color Theme Picker -->
+            <div class="theme-picker-section">
+                <h4><i class="fa-solid fa-palette"></i> Color Themes</h4>
+                <div class="theme-grid">
+                    <button onclick="setTheme('dark')" style="background:#000; color:#fff;">Dark</button>
+                    <button onclick="setTheme('neon')" style="background:#0f172a; color:#38bdf8;">Neon</button>
+                    <button onclick="setTheme('luxury')" style="background:#1c1917; color:#fbbf24;">Gold</button>
+                </div>
             </div>
-        </div>
 
-        <!-- 4. Cart -->
-        <button class="menu-item-btn" onclick="toggleCartDrawer(true); toggleMenuDrawer(false);">
-            <i class="fa-solid fa-bag-shopping"></i> Cart (<span id="menuCartCount">0</span>)
-        </button>
-
-        <!-- 5. Wishlist -->
-        <button class="menu-item-btn" onclick="openWishlistModal(); toggleMenuDrawer(false);">
-            <i class="fa-solid fa-heart"></i> Wishlist (<span id="menuWishCount">0</span>)
-        </button>
-
-        <!-- 6. Coupon Code -->
-        <button class="menu-item-btn" onclick="openModal('couponModal')">
-            <i class="fa-solid fa-ticket"></i> Coupon Codes
-        </button>
-
-        <!-- 7. Color Theme Picker -->
-        <div class="theme-picker-section">
-            <h4><i class="fa-solid fa-palette"></i> Color Themes</h4>
-            <div class="theme-grid">
-                <button onclick="setTheme('dark')" style="background:#000; color:#fff;">Dark</button>
-                <button onclick="setTheme('neon')" style="background:#0f172a; color:#38bdf8;">Neon</button>
-                <button onclick="setTheme('luxury')" style="background:#1c1917; color:#fbbf24;">Gold</button>
-            </div>
-        </div>
-
-        <!-- 8. About Section -->
-        <div class="about-card">
-            <h4><i class="fa-solid fa-shield-halved"></i> About VORNEX</h4>
-            <p>100% Premium Heavyweight Fabrics | Express Shipping | Guaranteed Customer Satisfaction</p>
-            <div class="about-links">
-                <a href="https://instagram.com/vornex.instore" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a>
-                <a href="https://wa.me/918269444061" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
-                <a href="sms:8269444061"><i class="fa-solid fa-comment-sms"></i> Send SMS</a>
+            <!-- 8. About Section -->
+            <div class="about-card">
+                <h4><i class="fa-solid fa-shield-halved"></i> About VORNEX</h4>
+                <p>100% Premium Heavyweight Fabrics | Express Shipping | Guaranteed Customer Satisfaction</p>
+                <div class="about-links">
+                    <a href="https://instagram.com/vornex.instore" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                    <a href="https://wa.me/918269444061" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                    <a href="sms:8269444061"><i class="fa-solid fa-comment-sms"></i> Send SMS</a>
+                </div>
             </div>
         </div>
     </div>
-</div>
-
 
     <!-- 🖤 HERO BANNER SECTION -->
     <section class="hero-section">
@@ -169,7 +168,7 @@
             <div class="coupon-container">
                 <div class="coupon-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                     <label style="font-size: 0.8rem; font-weight: 700; color: #fff; text-transform: uppercase;">Apply Promo Code</label>
-                    <button type="button" class="view-coupons-btn" onclick="openAvailableCouponsModal()" style="background:none; border:none; color:#40c057; font-size:0.75rem; font-weight:700; cursor:pointer;">
+                    <button type="button" class="view-coupons-btn" onclick="openModal('couponsModal')" style="background:none; border:none; color:#40c057; font-size:0.75rem; font-weight:700; cursor:pointer;">
                         <i class="fa-solid fa-ticket"></i> View Offers
                     </button>
                 </div>
@@ -200,7 +199,7 @@
         </div>
     </aside>
 
-    <!-- 🎟️ AVAILABLE COUPONS MODAL (Dynamic Firebase Coupons) -->
+    <!-- 🎟️ AVAILABLE COUPONS MODAL -->
     <div id="couponsModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'couponsModal')">
         <div class="modal-card modal-content">
             <div class="modal-header">
@@ -208,7 +207,15 @@
                 <span class="close-modal close-btn" onclick="closeModal('couponsModal')">&times;</span>
             </div>
             <div id="availableCouponsList" class="coupons-modal-body" style="padding: 15px 0; max-height: 350px; overflow-y: auto;">
-                <p style="color:#888; text-align:center;">Loading available offers...</p>
+                <div style="border: 1px dashed #40c057; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    <strong style="color:#40c057;">VORNEX10</strong> - 10% OFF on all orders
+                </div>
+                <div style="border: 1px dashed #40c057; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                    <strong style="color:#40c057;">SAVE20</strong> - 20% OFF on street styles
+                </div>
+                <div style="border: 1px dashed #40c057; padding: 10px; border-radius: 8px;">
+                    <strong style="color:#40c057;">FLAT200</strong> - Flat ₹200 OFF
+                </div>
             </div>
         </div>
     </div>
@@ -283,47 +290,49 @@
         </div>
     </div>
 
+    <!-- 📦 Direct Quick Order Modal (WhatsApp + SMS) -->
+    <div id="quickOrderModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'quickOrderModal')">
+        <div class="modal-card modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-bag-shopping"></i> Quick Checkout</h3>
+                <span class="close-modal close-btn" onclick="closeModal('quickOrderModal')">&times;</span>
+            </div>
+            <div id="quickOrderSummary" style="padding: 15px 0; font-size: 0.85rem; color: #ccc;">
+                <!-- JavaScript se fill hoga -->
+            </div>
+            <div class="checkout-actions" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <button class="btn-wa" onclick="processQuickOrder('WA')">
+                    <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp
+                </button>
+                <button class="btn-sms" onclick="processQuickOrder('SMS')">
+                    <i class="fa-solid fa-comment-sms"></i> Order via SMS
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🛒 iPhone Style Glassmorphic Bottom Bar -->
+    <div class="glass-bottom-bar">
+        <div class="bar-info">
+            <span class="bar-title">VORNEX Premium</span>
+            <span class="bar-sub">Free Delivery & Express Dispatch</span>
+        </div>
+        <button class="glass-buy-btn" onclick="openQuickOrderModal()">
+            <i class="fa-solid fa-bolt"></i> BUY NOW
+        </button>
+    </div>
+
     <!-- 👣 FOOTER -->
     <footer class="footer">
         <div class="footer-logo">VORNEX</div>
         <p>© 2026 VORNEX STORE. ALL RIGHTS RESERVED.</p>
         <div class="social-links">
-            <a href="#"><i class="fa-brands fa-instagram"></i></a>
-            <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="https://instagram.com/vornex.instore" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://wa.me/918269444061" target="_blank"><i class="fa-brands fa-whatsapp"></i></a>
         </div>
     </footer>
 
     <!-- JavaScript File Link -->
     <script src="app.js"></script>
 </body>
-    <!-- 🛒 iPhone Style Glassmorphic Bottom Bar -->
-<div class="glass-bottom-bar">
-    <div class="bar-info">
-        <span class="bar-title">VORNEX Premium</span>
-        <span class="bar-sub">Free Delivery & Express Dispatch</span>
-    </div>
-    <button class="glass-buy-btn" onclick="openQuickOrderModal()">
-        <i class="fa-solid fa-bolt"></i> BUY NOW
-    </button>
-</div>
-
-<!-- 📦 Direct Quick Order Modal (WhatsApp + SMS) -->
-<div id="quickOrderModal" class="vornex-modal">
-    <div class="modal-glass-content">
-        <span class="close-btn" onclick="closeModal('quickOrderModal')">&times;</span>
-        <h2><i class="fa-solid fa-bag-shopping"></i> Quick Checkout</h2>
-        <div id="quickOrderSummary">
-            <!-- Order summary JS dwara populate hoga -->
-        </div>
-        <div class="checkout-actions">
-            <button class="btn-wa" onclick="processQuickOrder('WA')">
-                <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp
-            </button>
-            <button class="btn-sms" onclick="processQuickOrder('SMS')">
-                <i class="fa-solid fa-comment-sms"></i> Order via SMS
-            </button>
-        </div>
-    </div>
-</div>
-
 </html>
