@@ -29,23 +29,23 @@
         ⚡ FREE SHIPPING ON ALL ORDERS ABOVE ₹999 | USE CODE: <strong>VORNEX10</strong> FOR 10% OFF ⚡
     </div>
 
-    <!--  NAVBAR -->
-    <nav class="navbar">
+    <!-- 🧭 NAVBAR -->
+    <header class="navbar">
         <div class="nav-container">
-            <a href="#" class="brand-logo">VORNEX</a>
+            <a href="#" class="brand-logo logo">VORNEX</a>
             
             <div class="nav-icons">
                 <button class="nav-icon-btn" onclick="openWishlistModal()" title="Wishlist">
                     <i class="fa-solid fa-heart"></i>
                     <span id="wishlistCount" class="badge">0</span>
                 </button>
-                <button class="nav-icon-btn" onclick="toggleCartDrawer()" title="Cart">
+                <button class="nav-icon-btn cart-btn" onclick="toggleCartDrawer(true)" title="Cart">
                     <i class="fa-solid fa-bag-shopping"></i>
                     <span id="cartCount" class="badge">0</span>
                 </button>
             </div>
         </div>
-    </nav>
+    </header>
 
     <!-- 🖤 HERO BANNER SECTION -->
     <section class="hero-section">
@@ -59,7 +59,7 @@
     </section>
 
     <!-- 🛒 MAIN STORE SECTION -->
-    <section id="storeSection" class="store-container">
+    <main id="storeSection" class="store-container">
         
         <!-- Category Filter & Search Bar -->
         <div class="filter-bar">
@@ -80,51 +80,78 @@
         <div id="productGrid" class="product-grid">
             <div class="loading-spinner">Loading VORNEX Drops...</div>
         </div>
-    </section>
+    </main>
 
-    <!-- 🛍️ CART DRAWER (SLIDE IN) -->
-    <div id="cartDrawer" class="cart-drawer">
+    <!-- 🛍️ CART OVERLAY & DRAWER -->
+    <div id="cartOverlay" class="cart-overlay drawer-overlay" onclick="toggleCartDrawer(false)"></div>
+
+    <aside id="cartDrawer" class="cart-drawer">
         <div class="cart-header">
-            <h3>YOUR CART (<span id="cartTotalItems">0</span>)</h3>
-            <span class="close-drawer" onclick="toggleCartDrawer()">&times;</span>
+            <h3>YOUR BAG (<span id="cartTotalItems">0</span>)</h3>
+            <button class="close-btn close-drawer" onclick="toggleCartDrawer(false)">&times;</button>
         </div>
-        
+
         <div id="cartItemsList" class="cart-body">
             <p class="empty-cart-text">Your cart is currently empty.</p>
         </div>
 
+        <!-- Order Summary & Coupon Section -->
         <div class="cart-footer">
-            <!-- Coupon Input -->
-            <div class="coupon-box">
-                <input type="text" id="couponCodeInput" placeholder="PROMO CODE (e.g. VORNEX10)">
-                <button onclick="applyCoupon()">APPLY</button>
+            
+            <!-- 🏷️ ADVANCED DYNAMIC COUPON SYSTEM SECTION -->
+            <div class="coupon-container">
+                <div class="coupon-header-flex" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <label style="font-size: 0.8rem; font-weight: 700; color: #fff; text-transform: uppercase;">Apply Promo Code</label>
+                    <button type="button" class="view-coupons-btn" onclick="openAvailableCouponsModal()" style="background:none; border:none; color:#40c057; font-size:0.75rem; font-weight:700; cursor:pointer;">
+                        <i class="fa-solid fa-ticket"></i> View Offers
+                    </button>
+                </div>
+                
+                <div class="coupon-box">
+                    <input type="text" id="couponCodeInput" placeholder="ENTER CODE" style="text-transform:uppercase;">
+                    <button id="applyCouponBtn" onclick="applyCoupon()">APPLY</button>
+                    <button id="removeCouponBtn" onclick="removeCoupon()" style="display:none; background:#e74c3c;">REMOVE</button>
+                </div>
+                <div id="couponDiscountText" class="coupon-msg discount-text"></div>
             </div>
-            <div id="couponDiscountText" class="discount-text"></div>
 
-            <div class="price-row">
+            <!-- PRICE SUMMARY -->
+            <div class="summary-row price-row" style="margin-top: 15px;">
                 <span>Subtotal</span>
                 <span id="cartSubtotal">₹0</span>
             </div>
-            <div class="price-row">
+            <div class="summary-row discount-row price-row">
                 <span>Discount</span>
                 <span id="cartDiscount" style="color: #40c057;">-₹0</span>
             </div>
-            <div class="price-row total-row">
-                <span>Total</span>
+            <div class="summary-row total-row price-row">
+                <span>Total Amount</span>
                 <span id="cartGrandTotal">₹0</span>
             </div>
 
             <button class="checkout-btn" onclick="openCheckoutModal()">PROCEED TO CHECKOUT</button>
         </div>
+    </aside>
+
+    <!-- 🎟️ AVAILABLE COUPONS MODAL (Dynamic Firebase Coupons) -->
+    <div id="couponsModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'couponsModal')">
+        <div class="modal-card modal-content">
+            <div class="modal-header">
+                <h3>🎟️ AVAILABLE OFFERS & COUPONS</h3>
+                <span class="close-modal close-btn" onclick="closeModal('couponsModal')">&times;</span>
+            </div>
+            <div id="availableCouponsList" class="coupons-modal-body" style="padding: 15px 0; max-height: 350px; overflow-y: auto;">
+                <p style="color:#888; text-align:center;">Loading available offers...</p>
+            </div>
+        </div>
     </div>
-    <div id="cartOverlay" class="drawer-overlay" onclick="toggleCartDrawer()"></div>
 
     <!-- ❤️ WISHLIST MODAL -->
-    <div id="wishlistModal" class="custom-modal" onclick="closeModalOnBg(event, 'wishlistModal')">
-        <div class="modal-card">
+    <div id="wishlistModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'wishlistModal')">
+        <div class="modal-card modal-content">
             <div class="modal-header">
                 <h3>❤️ YOUR WISHLIST</h3>
-                <span class="close-modal" onclick="closeModal('wishlistModal')">&times;</span>
+                <span class="close-modal close-btn" onclick="closeModal('wishlistModal')">&times;</span>
             </div>
             <div id="wishlistItemsList" class="wishlist-body">
                 <p style="color:#888; text-align:center;">No wishlist items saved yet.</p>
@@ -133,11 +160,11 @@
     </div>
 
     <!-- 📏 SIZE CHART MODAL -->
-    <div id="sizeChartModal" class="custom-modal" onclick="closeModalOnBg(event, 'sizeChartModal')">
-        <div class="modal-card">
+    <div id="sizeChartModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'sizeChartModal')">
+        <div class="modal-card modal-content">
             <div class="modal-header">
                 <h3>📏 SIZE GUIDE (INCHES)</h3>
-                <span class="close-modal" onclick="closeModal('sizeChartModal')">&times;</span>
+                <span class="close-modal close-btn" onclick="closeModal('sizeChartModal')">&times;</span>
             </div>
             <div class="size-table-wrapper">
                 <table class="size-table">
@@ -165,11 +192,11 @@
     </div>
 
     <!-- 📦 CHECKOUT MODAL -->
-    <div id="checkoutModal" class="custom-modal" onclick="closeModalOnBg(event, 'checkoutModal')">
-        <div class="modal-card">
+    <div id="checkoutModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'checkoutModal')">
+        <div class="modal-card modal-content">
             <div class="modal-header">
                 <h3>📦 SHIPPING DETAILS</h3>
-                <span class="close-modal" onclick="closeModal('checkoutModal')">&times;</span>
+                <span class="close-modal close-btn" onclick="closeModal('checkoutModal')">&times;</span>
             </div>
             <form id="checkoutForm" onsubmit="submitOrder(event)">
                 <div class="input-group">
@@ -184,7 +211,7 @@
                     <label>Complete Shipping Address</label>
                     <textarea id="custAddress" placeholder="House/Flat No, Street, Landmark, Pincode" required rows="3"></textarea>
                 </div>
-                <button type="submit" class="checkout-btn">PLACE ORDER VIA WHATSAPP</button>
+                <button type="submit" class="checkout-btn submit-order-btn">CONFIRM ORDER ON WHATSAPP</button>
             </form>
         </div>
     </div>
