@@ -525,3 +525,81 @@ function closeModalOnBg(e, modalId) {
 function escapeHtml(text) {
     return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
 }
+// 📱 Menu Drawer Toggle Function
+function toggleMenuDrawer(open) {
+    const drawer = document.getElementById('iosMenuDrawer');
+    if (drawer) {
+        drawer.classList.toggle('open', open);
+    }
+}
+
+// 📂 Accordion Toggle Function
+function toggleAccordion(id) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+}
+
+// ⚡ Quick Order Popup Handlers
+function openQuickOrderModal() {
+    if (cart.length === 0) {
+        showToast("⚠️ Cart is empty! Add products first.", "error");
+        return;
+    }
+    
+    let summaryHtml = "";
+    let total = 0;
+    cart.forEach(item => {
+        summaryHtml += `<p>• ${item.name} (${item.size}) x ${item.qty} - ₹${item.price * item.qty}</p>`;
+        total += item.price * item.qty;
+    });
+    
+    summaryHtml += `<strong>Total Amount: ₹${total}</strong>`;
+    document.getElementById('quickOrderSummary').innerHTML = summaryHtml;
+    openModal('quickOrderModal');
+}
+
+// 📲 Process Quick Order via WhatsApp / SMS
+function processQuickOrder(type) {
+    const phoneNo = "918269444061";
+    let orderText = "Order Details from VORNEX:\n";
+    let total = 0;
+    
+    cart.forEach(item => {
+        orderText += `- ${item.name} | Size: ${item.size} | Qty: ${item.qty} | Price: ₹${item.price * item.qty}\n`;
+        total += item.price * item.qty;
+    });
+    orderText += `Total: ₹${total}`;
+
+    if (type === 'WA') {
+        window.open(`https://wa.me/${phoneNo}?text=${encodeURIComponent(orderText)}`, '_blank');
+    } else if (type === 'SMS') {
+        window.open(`sms:${phoneNo}?body=${encodeURIComponent(orderText)}`, '_blank');
+    }
+}
+
+// 🎨 Dynamic Theme Switcher
+function setTheme(theme) {
+    if (theme === 'neon') {
+        document.body.style.backgroundColor = '#0b132b';
+        document.body.style.color = '#6fffe9';
+    } else if (theme === 'luxury') {
+        document.body.style.backgroundColor = '#121212';
+        document.body.style.color = '#d4af37';
+    } else {
+        document.body.style.backgroundColor = '#000000';
+        document.body.style.color = '#ffffff';
+    }
+    showToast(`Theme changed to ${theme.toUpperCase()}`, "info");
+}
+
+// 👤 Account Details Dummy Modal Trigger
+function showAccountDetails() {
+    showToast("User: Aman Verma | City: Bilaspur", "info");
+}
+
+// 📱 Login Handlers
+function loginViaPhone() { showToast("Redirecting to OTP Verification...", "info"); }
+function loginViaGoogle() { showToast("Connecting Google Auth...", "info"); }
+
