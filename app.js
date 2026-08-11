@@ -52,7 +52,15 @@ let selectedCategory = 'ALL';
 let cart = JSON.parse(localStorage.getItem('vornex_cart')) || [];
 let wishlist = JSON.parse(localStorage.getItem('vornex_wishlist')) || [];
 let selectedSizes = {}; 
-let appliedDiscount = 0;
+
+// 🎟️ Coupon System Configuration
+const validCoupons = {
+    'VORNEX10': { type: 'percent', value: 10, label: '10% OFF' },
+    'SAVE20': { type: 'percent', value: 20, label: '20% OFF' },
+    'FLAT200': { type: 'flat', value: 200, label: '₹200 OFF' },
+    'WELCOME50': { type: 'percent', value: 50, label: '50% OFF' }
+};
+let appliedCouponCode = '';
 
 // 📈 Record Daily Traffic Views
 function recordTrafficView() {
@@ -231,6 +239,19 @@ function saveCart() {
     updateBadges();
 }
 
+// 🧮 Calculate Discount Amount Helper
+function getDiscountAmount(subtotal) {
+    if (!appliedCouponCode || !validCoupons[appliedCouponCode]) return 0;
+    const coupon = validCoupons[appliedCouponCode];
+
+    if (coupon.type === 'percent') {
+        return Math.round((subtotal * coupon.value) / 100);
+    } else if (coupon.type === 'flat') {
+        return Math.min(subtotal, coupon.value);
+    }
+    return 0;
+}
+
 function renderCart() {
     const listEl = document.getElementById('cartItemsList');
     if (cart.length === 0) {
@@ -269,8 +290,8 @@ function renderCart() {
     });
 
     listEl.innerHTML = html;
-    const discountAmount = Math.round(subtotal * appliedDiscount);
-    const grandTotal = subtotal - discountAmount;
+    const discountAmount = getDiscountAmount(subtotal);
+    const grandTotal = Math.max(0, subtotal - discountAmount);
 
     document.getElementById('cartSubtotal').innerText = `₹${subtotal}`;
     document.getElementById('cartDiscount').innerText = `-₹${discountAmount}`;
@@ -278,19 +299,45 @@ function renderCart() {
     document.getElementById('cartTotalItems').innerText = totalItems;
 }
 
+// 🏷️ Coupon Code Apply & Remove Functions
 function applyCoupon() {
-    const input = document.getElementById('couponCodeInput').value.trim().toUpperCase();
+    const inputEl = document.getElementById('couponCodeInput');
     const msgEl = document.getElementById('couponDiscountText');
+    
+    if (!inputEl) return;
+    const input = inputEl.value.trim().toUpperCase();
 
-    if (input === 'VORNEX10') {
-        appliedDiscount = 0.10; // 10% Off
-        msgEl.innerText = "✅ Promo Code 'VORNEX10' Applied (10% OFF)";
-        showToast("🎉 10% Discount Applied!", "success");
+    if (!input) {
+        if (msgEl) msgEl.innerText = "⚠️ Please enter a coupon code";
+        showToast("Please enter a coupon code!", "error");
+        return;
+    }
+
+    if (appliedCouponCode === input) {
+        showToast("Coupon is already applied!", "info");
+        return;
+    }
+
+    if (validCoupons[input]) {
+        appliedCouponCode = input;
+        const coupon = validCoupons[input];
+        if (msgEl) msgEl.innerText = `✅ Promo Code '${input}' Applied (${coupon.label})`;
+        showToast(`🎉 Code '${input}' applied (${coupon.label})!`, "success");
     } else {
-        appliedDiscount = 0;
-        msgEl.innerText = "⚠️ Invalid Promo Code";
+        appliedCouponCode = '';
+        if (msgEl) msgEl.innerText = "⚠️ Invalid Promo Code";
         showToast("Invalid Promo Code", "error");
     }
+    renderCart();
+}
+
+function removeCoupon() {
+    appliedCouponCode = '';
+    const inputEl = document.getElementById('couponCodeInput');
+    const msgEl = document.getElementById('couponDiscountText');
+    if (inputEl) inputEl.value = '';
+    if (msgEl) msgEl.innerText = '';
+    showToast("Coupon removed", "info");
     renderCart();
 }
 
@@ -384,8 +431,8 @@ function submitOrder(e) {
         orderDetails += `${i+1}. *${item.name}*\n   • Size: ${item.size}\n   • Qty: ${item.qty}\n   • Price: ₹${itemTotal}\n`;
     });
 
-    const discountAmount = Math.round(subtotal * appliedDiscount);
-    const finalTotal = subtotal - discountAmount;
+    const discountAmount = getDiscountAmount(subtotal);
+    const finalTotal = Math.max(0, subtotal - discountAmount);
 
     let msg = `*🔥 NEW ORDER - VORNEX STORE 🔥*\n\n`;
     msg += `*Customer Details:*\n`;
@@ -393,15 +440,19 @@ function submitOrder(e) {
     msg += `📞 Phone: ${phone}\n`;
     msg += `📍 Address: ${address}\n\n`;
     msg += `*Order Items:*\n${orderDetails}\n`;
-    if (discountAmount > 0) msg += `💰 Discount: -₹${discountAmount}\n`;
+    if (appliedCouponCode && discountAmount > 0) {
+        msg += `🎟️ Coupon Applied: ${appliedCouponCode}\n`;
+        msg += `💰 Discount: -₹${discountAmount}\n`;
+    }
     msg += `*TOTAL AMOUNT: ₹${finalTotal}*\n\n`;
     msg += `Please confirm my order and share payment details!`;
 
     const whatsappNumber = "919024220557"; // Store Owner WhatsApp
     const encodedUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(msg)}`;
 
-    // Clear Cart
+    // Clear Cart & Applied Coupon
     cart = [];
+    appliedCouponCode = '';
     localStorage.removeItem('vornex_cart');
     saveCart();
     closeModal('checkoutModal');
