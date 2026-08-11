@@ -1,5 +1,6 @@
 // ==========================================================================
 // VORNEX STORE - FRONTEND APPLICATION SCRIPT (2026)
+// Complete Merged & Production-Ready Code
 // ==========================================================================
 
 // 🔔 Custom Toast Helper Function
@@ -83,6 +84,8 @@ productsRef.on('value', (snapshot) => {
 // 🖼️ Render Product Grid
 function renderProducts() {
     const gridEl = document.getElementById('productGrid');
+    if (!gridEl) return;
+
     const keys = Object.keys(allProducts);
 
     if (keys.length === 0) {
@@ -119,7 +122,7 @@ function renderProducts() {
                 </div>
 
                 <div class="card-info">
-                    <span class="card-category">${p.category.toUpperCase()}</span>
+                    <span class="card-category">${p.category ? p.category.toUpperCase() : ''}</span>
                     <h3 class="card-title">${escapeHtml(p.name)}</h3>
                     
                     <div class="card-price-row">
@@ -161,6 +164,7 @@ function renderProducts() {
 }
 
 function getFirstAvailableSize(stocks) {
+    if (!stocks) return null;
     for (let sz of ['S', 'M', 'L', 'XL', 'XXL']) {
         if ((stocks[sz] || 0) > 0) return sz;
     }
@@ -175,16 +179,18 @@ function selectSize(prodKey, size) {
 function filterCategory(catName, btnEl) {
     selectedCategory = catName;
     document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-    btnEl.classList.add('active');
+    if (btnEl) btnEl.classList.add('active');
     renderProducts();
 }
 
 function searchProducts() {
-    const query = document.getElementById('storeSearch').value.toLowerCase().trim();
+    const input = document.getElementById('storeSearch');
+    if (!input) return;
+    const query = input.value.toLowerCase().trim();
     const cards = document.querySelectorAll('.product-card');
     cards.forEach(card => {
-        const title = card.querySelector('.card-title').innerText.toLowerCase();
-        const cat = card.querySelector('.card-category').innerText.toLowerCase();
+        const title = card.querySelector('.card-title')?.innerText.toLowerCase() || '';
+        const cat = card.querySelector('.card-category')?.innerText.toLowerCase() || '';
         if (title.includes(query) || cat.includes(query)) {
             card.style.display = 'flex';
         } else {
@@ -193,14 +199,28 @@ function searchProducts() {
     });
 }
 
-// 🛍️ Cart Management
+// 🛍️ Cart Management (With Multi-Item Stock Checks)
 function addToCart(prodKey) {
     const p = allProducts[prodKey];
     if (!p) return;
 
-    const size = selectedSizes[prodKey] || getFirstAvailableSize(p.sizeStocks) || 'M';
+    const stocks = p.sizeStocks || { S:5, M:10, L:10, XL:5, XXL:0 };
+    const size = selectedSizes[prodKey] || getFirstAvailableSize(stocks);
+
+    if (!size) {
+        showToast("⚠️ Selected item is out of stock!", "error");
+        return;
+    }
+
+    const availableStock = stocks[size] || 0;
     const cartItemId = `${prodKey}_${size}`;
     const existingIndex = cart.findIndex(item => item.id === cartItemId);
+    const currentQtyInCart = existingIndex > -1 ? cart[existingIndex].qty : 0;
+
+    if (currentQtyInCart + 1 > availableStock) {
+        showToast(`⚠️ Only ${availableStock} items available in size ${size}`, "error");
+        return;
+    }
 
     if (existingIndex > -1) {
         cart[existingIndex].qty += 1;
@@ -224,6 +244,17 @@ function addToCart(prodKey) {
 function updateCartQty(cartItemId, delta) {
     const index = cart.findIndex(item => item.id === cartItemId);
     if (index > -1) {
+        const item = cart[index];
+        const p = allProducts[item.prodKey];
+        
+        if (delta > 0 && p && p.sizeStocks) {
+            const availableStock = p.sizeStocks[item.size] || 0;
+            if (item.qty + delta > availableStock) {
+                showToast(`⚠️ Max stock reached for size ${item.size} (${availableStock})`, "error");
+                return;
+            }
+        }
+
         cart[index].qty += delta;
         if (cart[index].qty <= 0) {
             cart.splice(index, 1);
@@ -254,12 +285,14 @@ function getDiscountAmount(subtotal) {
 
 function renderCart() {
     const listEl = document.getElementById('cartItemsList');
+    if (!listEl) return;
+
     if (cart.length === 0) {
         listEl.innerHTML = `<p class="empty-cart-text">Your cart is currently empty.</p>`;
-        document.getElementById('cartSubtotal').innerText = '₹0';
-        document.getElementById('cartDiscount').innerText = '-₹0';
-        document.getElementById('cartGrandTotal').innerText = '₹0';
-        document.getElementById('cartTotalItems').innerText = '0';
+        if (document.getElementById('cartSubtotal')) document.getElementById('cartSubtotal').innerText = '₹0';
+        if (document.getElementById('cartDiscount')) document.getElementById('cartDiscount').innerText = '-₹0';
+        if (document.getElementById('cartGrandTotal')) document.getElementById('cartGrandTotal').innerText = '₹0';
+        if (document.getElementById('cartTotalItems')) document.getElementById('cartTotalItems').innerText = '0';
         return;
     }
 
@@ -293,10 +326,10 @@ function renderCart() {
     const discountAmount = getDiscountAmount(subtotal);
     const grandTotal = Math.max(0, subtotal - discountAmount);
 
-    document.getElementById('cartSubtotal').innerText = `₹${subtotal}`;
-    document.getElementById('cartDiscount').innerText = `-₹${discountAmount}`;
-    document.getElementById('cartGrandTotal').innerText = `₹${grandTotal}`;
-    document.getElementById('cartTotalItems').innerText = totalItems;
+    if (document.getElementById('cartSubtotal')) document.getElementById('cartSubtotal').innerText = `₹${subtotal}`;
+    if (document.getElementById('cartDiscount')) document.getElementById('cartDiscount').innerText = `-₹${discountAmount}`;
+    if (document.getElementById('cartGrandTotal')) document.getElementById('cartGrandTotal').innerText = `₹${grandTotal}`;
+    if (document.getElementById('cartTotalItems')) document.getElementById('cartTotalItems').innerText = totalItems;
 }
 
 // 🏷️ Coupon Code Apply & Remove Functions
@@ -345,6 +378,8 @@ function toggleCartDrawer(forceOpen = false) {
     const drawer = document.getElementById('cartDrawer');
     const overlay = document.getElementById('cartOverlay');
     
+    if (!drawer || !overlay) return;
+
     if (forceOpen || !drawer.classList.contains('open')) {
         drawer.classList.add('open');
         overlay.classList.add('open');
@@ -372,6 +407,8 @@ function toggleWishlist(prodKey) {
 
 function openWishlistModal() {
     const listEl = document.getElementById('wishlistItemsList');
+    if (!listEl) return;
+
     if (wishlist.length === 0) {
         listEl.innerHTML = `<p style="color:#888; text-align:center; padding: 20px;">Your wishlist is empty.</p>`;
     } else {
@@ -402,8 +439,11 @@ function openWishlistModal() {
 
 function updateBadges() {
     const totalCartCount = cart.reduce((sum, item) => sum + item.qty, 0);
-    document.getElementById('cartCount').innerText = totalCartCount;
-    document.getElementById('wishlistCount').innerText = wishlist.length;
+    const cartCountEl = document.getElementById('cartCount');
+    const wishlistCountEl = document.getElementById('wishlistCount');
+
+    if (cartCountEl) cartCountEl.innerText = totalCartCount;
+    if (wishlistCountEl) wishlistCountEl.innerText = wishlist.length;
 }
 
 // 📦 Checkout & WhatsApp Order Generation
@@ -418,9 +458,13 @@ function openCheckoutModal() {
 
 function submitOrder(e) {
     e.preventDefault();
-    const name = document.getElementById('custName').value.trim();
-    const phone = document.getElementById('custPhone').value.trim();
-    const address = document.getElementById('custAddress').value.trim();
+    const nameEl = document.getElementById('custName');
+    const phoneEl = document.getElementById('custPhone');
+    const addressEl = document.getElementById('custAddress');
+
+    const name = nameEl ? nameEl.value.trim() : '';
+    const phone = phoneEl ? phoneEl.value.trim() : '';
+    const address = addressEl ? addressEl.value.trim() : '';
 
     let subtotal = 0;
     let orderDetails = "";
@@ -464,9 +508,19 @@ function submitOrder(e) {
 }
 
 // 🔳 Modal Helpers
-function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
-function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-function closeModalOnBg(e, modalId) { if (e.target.id === modalId) closeModal(modalId); }
+function openModal(modalId) {
+    const el = document.getElementById(modalId);
+    if (el) el.style.display = 'flex';
+}
+
+function closeModal(modalId) {
+    const el = document.getElementById(modalId);
+    if (el) el.style.display = 'none';
+}
+
+function closeModalOnBg(e, modalId) {
+    if (e.target.id === modalId) closeModal(modalId);
+}
 
 function escapeHtml(text) {
     return text ? text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;") : '';
