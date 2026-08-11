@@ -30,22 +30,89 @@
     </div>
 
     <!-- 🧭 NAVBAR -->
-    <header class="navbar">
-        <div class="nav-container">
-            <a href="#" class="brand-logo logo">VORNEX</a>
-            
-            <div class="nav-icons">
-                <button class="nav-icon-btn" onclick="openWishlistModal()" title="Wishlist">
-                    <i class="fa-solid fa-heart"></i>
-                    <span id="wishlistCount" class="badge">0</span>
-                </button>
-                <button class="nav-icon-btn cart-btn" onclick="toggleCartDrawer(true)" title="Cart">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                    <span id="cartCount" class="badge">0</span>
-                </button>
+    <header class="vornex-header">
+    <div class="logo">VORNEX</div>
+    <!-- 3-Line Menu Icon -->
+    <button class="hamburger-btn" onclick="toggleMenuDrawer(true)">
+        <i class="fa-solid fa-bars-staggered"></i>
+    </button>
+</header>
+
+<!-- 📱 iOS Style Animated Side Drawer -->
+<div id="iosMenuDrawer" class="ios-drawer">
+    <div class="drawer-header">
+        <h3>VORNEX MENU</h3>
+        <button onclick="toggleMenuDrawer(false)" class="close-drawer">&times;</button>
+    </div>
+    
+    <div class="drawer-content">
+        <!-- 1. Login Section -->
+        <div class="accordion-item">
+            <button class="acc-btn" onclick="toggleAccordion('loginAcc')">
+                <span><i class="fa-solid fa-user-lock"></i> Login / Register</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <div id="loginAcc" class="acc-body">
+                <button class="menu-sub-btn" onclick="loginViaPhone()"><i class="fa-solid fa-phone"></i> Login via Phone Number</button>
+                <button class="menu-sub-btn" onclick="loginViaGoogle()"><i class="fa-brands fa-google"></i> Login via Google</button>
             </div>
         </div>
-    </header>
+
+        <!-- 2. Account -->
+        <button class="menu-item-btn" onclick="showAccountDetails()">
+            <i class="fa-solid fa-id-card"></i> Account
+        </button>
+
+        <!-- 3. Your Order -->
+        <div class="accordion-item">
+            <button class="acc-btn" onclick="toggleAccordion('orderAcc')">
+                <span><i class="fa-solid fa-box"></i> Your Orders</span>
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <div id="orderAcc" class="acc-body">
+                <button class="menu-sub-btn" onclick="openOrderHistory()"><i class="fa-solid fa-clock-rotate-left"></i> Order History</button>
+                <button class="menu-sub-btn" onclick="openOrderTracking()"><i class="fa-solid fa-truck-fast"></i> Order Tracking</button>
+            </div>
+        </div>
+
+        <!-- 4. Cart -->
+        <button class="menu-item-btn" onclick="toggleCartDrawer(true); toggleMenuDrawer(false);">
+            <i class="fa-solid fa-bag-shopping"></i> Cart (<span id="menuCartCount">0</span>)
+        </button>
+
+        <!-- 5. Wishlist -->
+        <button class="menu-item-btn" onclick="openWishlistModal(); toggleMenuDrawer(false);">
+            <i class="fa-solid fa-heart"></i> Wishlist (<span id="menuWishCount">0</span>)
+        </button>
+
+        <!-- 6. Coupon Code -->
+        <button class="menu-item-btn" onclick="openModal('couponModal')">
+            <i class="fa-solid fa-ticket"></i> Coupon Codes
+        </button>
+
+        <!-- 7. Color Theme Picker -->
+        <div class="theme-picker-section">
+            <h4><i class="fa-solid fa-palette"></i> Color Themes</h4>
+            <div class="theme-grid">
+                <button onclick="setTheme('dark')" style="background:#000; color:#fff;">Dark</button>
+                <button onclick="setTheme('neon')" style="background:#0f172a; color:#38bdf8;">Neon</button>
+                <button onclick="setTheme('luxury')" style="background:#1c1917; color:#fbbf24;">Gold</button>
+            </div>
+        </div>
+
+        <!-- 8. About Section -->
+        <div class="about-card">
+            <h4><i class="fa-solid fa-shield-halved"></i> About VORNEX</h4>
+            <p>100% Premium Heavyweight Fabrics | Express Shipping | Guaranteed Customer Satisfaction</p>
+            <div class="about-links">
+                <a href="https://instagram.com/vornex.instore" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                <a href="https://wa.me/918269444061" target="_blank"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
+                <a href="sms:8269444061"><i class="fa-solid fa-comment-sms"></i> Send SMS</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <!-- 🖤 HERO BANNER SECTION -->
     <section class="hero-section">
