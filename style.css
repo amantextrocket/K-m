@@ -825,3 +825,43 @@ body {
     .search-wrapper { max-width: 100%; }
     .cart-drawer { width: 100%; }
 }
+/* 🔮 Glassmorphism Bottom Sticky Bar */
+.glass-bottom-bar {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92%;
+    max-width: 450px;
+    background: rgba(20, 20, 20, 0.65);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.125);
+    border-radius: 20px;
+    padding: 12px 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 9999;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.bar-title { color: #fff; font-weight: 700; font-size: 0.9rem; display: block; }
+.bar-sub { color: #aaa; font-size: 0.7rem; }
+
+.glass-buy-btn {
+    background: #ffffff;
+    color: #000000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+/* Modal Buttons */
+.btn-wa { background: #25D366; color: #fff; border:none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; margin-bottom: 8px; cursor: pointer; }
+.btn-sms { background: #007AFF; color: #fff; border:none; padding: 12px; border-radius: 10px; font-weight: bold; width: 100%; cursor: pointer; }
+
