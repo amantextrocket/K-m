@@ -31,12 +31,32 @@
             border-radius: 14px;
         }
 
-        /* Analytics Grid */
-        .analytics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { padding: 20px; text-align: center; transition: all 0.3s ease; }
+        /* 🔳 1. SQUARE SHAPE TOP METRICS GRID */
+        .analytics-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            margin-bottom: 30px; 
+        }
+        .stat-card { 
+            aspect-ratio: 1 / 1; /* Perfect Square Shape */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 15px; 
+            text-align: center; 
+            transition: all 0.3s ease; 
+        }
         .stat-card:hover { transform: translateY(-4px); border-color: rgba(255, 255, 255, 0.25) !important; }
-        .stat-card h3 { font-size: 0.75rem; color: #888; letter-spacing: 1px; margin-bottom: 8px; }
-        .stat-card .value { font-size: 1.8rem; font-weight: 900; color: #fff; }
+        .stat-card h3 { font-size: 0.7rem; color: #888; letter-spacing: 1px; margin-bottom: 10px; font-weight: 800; text-transform: uppercase; }
+        .stat-card .value { font-size: 2rem; font-weight: 900; color: #fff; }
+
+        @media (max-width: 600px) {
+            .analytics-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .stat-card .value { font-size: 1.5rem; }
+            .stat-card h3 { font-size: 0.65rem; }
+        }
 
         /* Navigation Tabs */
         .section-nav { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
@@ -59,6 +79,7 @@
         .form-group { margin-bottom: 18px; }
         label { display: block; font-size: 0.8rem; font-weight: 800; margin-bottom: 6px; color: #aaa; letter-spacing: 0.5px; }
         input, select { width: 100%; padding: 12px 14px; background: #000; border: 1px solid #333; color: #fff; font-size: 0.9rem; border-radius: 8px; outline: none; transition: 0.2s; }
+        input[type="file"] { padding: 10px; background: #0a0a0a; border: 1px dashed #444; cursor: pointer; }
         input:focus, select:focus { border-color: #666; }
         
         /* Size-Wise Stock Inputs */
@@ -103,17 +124,31 @@
         .views-log-list { max-height: 220px; overflow-y: auto; background: #050505; border: 1px solid #222; border-radius: 8px; padding: 10px 15px; font-size: 0.85rem; }
         .views-log-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #1a1a1a; }
         .views-log-item:last-child { border-bottom: none; }
+
+        /* Media Button Styles */
+        .btn-media {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #fff;
+            margin-top: 20px;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        .btn-media:hover {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+        }
     </style>
 </head>
 <body>
 
-    <!-- 🔒 Password Login Popup -->
+    <!-- 🔒 4. Password Login Popup (Adaptive Keyboard Support) -->
     <div id="authOverlay">
         <div class="auth-card">
             <div class="logo">VORNEX</div>
             <div class="sub-title">ADMIN CONTROL PANEL</div>
             <form id="authForm" onsubmit="verifyPassword(event)">
-                <input type="password" id="passInput" placeholder="ENTER PASSWORD" autofocus required>
+                <!-- inputmode="text" supports both alphabets and numbers adaptively -->
+                <input type="password" id="passInput" placeholder="ENTER PASSWORD" autofocus required inputmode="text" autocomplete="current-password">
                 <button type="submit">LOGIN</button>
             </form>
             <div id="authError">⚠️ Access Denied: Incorrect Password</div>
@@ -124,7 +159,7 @@
     <div class="admin-container" id="mainAdminContent">
         <h1>VORNEX DASHBOARD</h1>
         
-        <!-- 📊 Main Top Overview Metrics -->
+        <!-- 🔳 1. TOP OVERVIEW METRICS (SQUARE BOXES Grid) -->
         <div class="analytics-grid">
             <div class="stat-card">
                 <h3>TODAY'S VIEWS</h3>
@@ -135,7 +170,7 @@
                 <div class="value" id="statTotal">0</div>
             </div>
             <div class="stat-card">
-                <h3>IN STOCK ITEMS</h3>
+                <h3>IN STOCK ITEM</h3>
                 <div class="value" id="statInStock" style="color: #40c057;">0</div>
             </div>
             <div class="stat-card">
@@ -215,14 +250,17 @@
                         <label>Tag / Badge</label>
                         <input type="text" id="pTag" placeholder="BESTSELLER / NEW DROP / HOT" required>
                     </div>
+
+                    <!-- 🖼️ 2. DIRECT PHOTO LIBRARY INPUTS -->
                     <div class="form-group">
-                        <label>Primary Image URL</label>
-                        <input type="url" id="pImage" placeholder="https://i.ibb.co/..." required>
+                        <label>Primary Image (Select from Phone Library / Gallery)</label>
+                        <input type="file" id="pImageFile" accept="image/*" required>
                     </div>
                     <div class="form-group">
-                        <label>Back View Image URL (Optional)</label>
-                        <input type="url" id="pImageBack" placeholder="https://i.ibb.co/... (Back image)">
+                        <label>Back View Image (Optional - Select from Library)</label>
+                        <input type="file" id="pImageBackFile" accept="image/*">
                     </div>
+
                     <button type="submit">ADD PRODUCT TO STORE</button>
                 </form>
             </div>
@@ -240,7 +278,7 @@
             </div>
         </div>
 
-        <!-- ================= SECTION 4: CHANGE PASSWORD ================= -->
+        <!-- ================= SECTION 4: CHANGE PASSWORD & MEDIA ================= -->
         <div id="securitySection" class="admin-section">
             <div class="card">
                 <h2>🔑 Change Admin Password</h2>
@@ -259,6 +297,11 @@
                     </div>
                     <button type="submit" style="background:#3b82f6; color:#fff;">UPDATE PASSWORD</button>
                 </form>
+
+                <hr style="margin: 25px 0 15px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+
+                <!-- 📂 3. MEDIA BUTTON BELOW CHANGE PASSWORD -->
+                <button class="btn-media" onclick="handleMediaClick()">📁 MEDIA</button>
             </div>
         </div>
 
@@ -309,12 +352,12 @@
                     <input type="text" id="editTag" required>
                 </div>
                 <div class="form-group">
-                    <label>Primary Image URL</label>
-                    <input type="url" id="editImage" required>
+                    <label>Change Primary Image (Optional)</label>
+                    <input type="file" id="editImageFile" accept="image/*">
                 </div>
                 <div class="form-group">
-                    <label>Back View Image URL</label>
-                    <input type="url" id="editImageBack">
+                    <label>Change Back View Image (Optional)</label>
+                    <input type="file" id="editImageBackFile" accept="image/*">
                 </div>
                 <button type="submit" style="background:#ffaa00; color:#000;">UPDATE PRODUCT</button>
             </form>
@@ -322,7 +365,6 @@
     </div>
 
     <script>
-        // Custom Toast Helper
         function showToast(message, type = "success") {
             let bgColor = "#10b981";
             if (type === "error") bgColor = "#ef4444";
@@ -369,7 +411,6 @@
             if(snap.exists()) currentDbPassword = snap.val();
         });
 
-        // Always show Login Popup on Load/Reload
         document.getElementById('authOverlay').style.display = 'flex';
         document.getElementById('mainAdminContent').style.display = 'none';
 
@@ -461,34 +502,58 @@
             });
         }
 
-        document.getElementById('addProductForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const sizeStocks = {
-                S: parseInt(document.getElementById('stock_S').value) || 0,
-                M: parseInt(document.getElementById('stock_M').value) || 0,
-                L: parseInt(document.getElementById('stock_L').value) || 0,
-                XL: parseInt(document.getElementById('stock_XL').value) || 0,
-                XXL: parseInt(document.getElementById('stock_XXL').value) || 0
-            };
-
-            const newProd = {
-                name: document.getElementById('pName').value.trim(),
-                category: document.getElementById('pCategory').value,
-                price: parseInt(document.getElementById('pPrice').value),
-                sizeStocks: sizeStocks,
-                tag: document.getElementById('pTag').value.trim(),
-                image: document.getElementById('pImage').value.trim(),
-                imageBack: document.getElementById('pImageBack').value.trim()
-            };
-
-            productsRef.push(newProd, (err) => {
-                if(!err) {
-                    showToast("✅ Product Added Successfully!", "success");
-                    document.getElementById('addProductForm').reset();
-                } else {
-                    showToast("Error: " + err.message, "error");
-                }
+        // Helper to convert Image file to Base64 Data URL
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve('');
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
             });
+        }
+
+        document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const primaryFile = document.getElementById('pImageFile').files[0];
+            const backFile = document.getElementById('pImageBackFile').files[0];
+
+            showToast("⏳ Processing image...", "info");
+
+            try {
+                const imageBase64 = await fileToBase64(primaryFile);
+                const imageBackBase64 = await fileToBase64(backFile);
+
+                const sizeStocks = {
+                    S: parseInt(document.getElementById('stock_S').value) || 0,
+                    M: parseInt(document.getElementById('stock_M').value) || 0,
+                    L: parseInt(document.getElementById('stock_L').value) || 0,
+                    XL: parseInt(document.getElementById('stock_XL').value) || 0,
+                    XXL: parseInt(document.getElementById('stock_XXL').value) || 0
+                };
+
+                const newProd = {
+                    name: document.getElementById('pName').value.trim(),
+                    category: document.getElementById('pCategory').value,
+                    price: parseInt(document.getElementById('pPrice').value),
+                    sizeStocks: sizeStocks,
+                    tag: document.getElementById('pTag').value.trim(),
+                    image: imageBase64,
+                    imageBack: imageBackBase64
+                };
+
+                productsRef.push(newProd, (err) => {
+                    if(!err) {
+                        showToast("✅ Product Added Successfully!", "success");
+                        document.getElementById('addProductForm').reset();
+                    } else {
+                        showToast("Error: " + err.message, "error");
+                    }
+                });
+            } catch(err) {
+                showToast("Image Processing Error!", "error");
+            }
         });
 
         productsRef.on('value', (snapshot) => {
@@ -581,8 +646,6 @@
             document.getElementById('editCategory').value = p.category;
             document.getElementById('editPrice').value = p.price;
             document.getElementById('editTag').value = p.tag || '';
-            document.getElementById('editImage').value = p.image;
-            document.getElementById('editImageBack').value = p.imageBack || '';
 
             const stocks = p.sizeStocks || { S:5, M:10, L:10, XL:5, XXL:0 };
             document.getElementById('editStock_S').value = stocks.S || 0;
@@ -597,9 +660,20 @@
         function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
         function closeModalOnBg(e) { if (e.target.id === 'editModal') closeEditModal(); }
 
-        document.getElementById('editProductForm').addEventListener('submit', (e) => {
+        document.getElementById('editProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const key = document.getElementById('editKey').value;
+            const existingProduct = allProducts[key];
+
+            const primaryFile = document.getElementById('editImageFile').files[0];
+            const backFile = document.getElementById('editImageBackFile').files[0];
+
+            let imageBase64 = existingProduct.image;
+            let imageBackBase64 = existingProduct.imageBack || '';
+
+            if (primaryFile) imageBase64 = await fileToBase64(primaryFile);
+            if (backFile) imageBackBase64 = await fileToBase64(backFile);
+
             const updatedData = {
                 name: document.getElementById('editName').value.trim(),
                 category: document.getElementById('editCategory').value,
@@ -612,8 +686,8 @@
                     XXL: parseInt(document.getElementById('editStock_XXL').value) || 0
                 },
                 tag: document.getElementById('editTag').value.trim(),
-                image: document.getElementById('editImage').value.trim(),
-                imageBack: document.getElementById('editImageBack').value.trim()
+                image: imageBase64,
+                imageBack: imageBackBase64
             };
 
             productsRef.child(key).update(updatedData, (err) => {
@@ -634,12 +708,12 @@
             }
 
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "ID,Name,Category,Price,S_Stock,M_Stock,L_Stock,XL_Stock,XXL_Stock,Tag,Image_URL\n";
+            csvContent += "ID,Name,Category,Price,S_Stock,M_Stock,L_Stock,XL_Stock,XXL_Stock,Tag\n";
 
             keys.forEach(key => {
                 const p = allProducts[key];
                 const stocks = p.sizeStocks || { S:0, M:0, L:0, XL:0, XXL:0 };
-                csvContent += `${key},"${p.name}","${p.category}",${p.price},${stocks.S||0},${stocks.M||0},${stocks.L||0},${stocks.XL||0},${stocks.XXL||0},"${p.tag||''}","${p.image||''}"\n`;
+                csvContent += `${key},"${p.name}","${p.category}",${p.price},${stocks.S||0},${stocks.M||0},${stocks.L||0},${stocks.XL||0},${stocks.XXL||0},"${p.tag||''}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
@@ -670,6 +744,11 @@
                     showToast("Error: " + err.message, "error");
                 }
             });
+        }
+
+        // Media Button Action Handler
+        function handleMediaClick() {
+            showToast("📁 MEDIA Option Clicked!", "info");
         }
     </script>
 </body>
