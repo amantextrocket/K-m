@@ -229,4 +229,34 @@
     <!-- JavaScript File Link -->
     <script src="app.js"></script>
 </body>
+    <!-- 🛒 iPhone Style Glassmorphic Bottom Bar -->
+<div class="glass-bottom-bar">
+    <div class="bar-info">
+        <span class="bar-title">VORNEX Premium</span>
+        <span class="bar-sub">Free Delivery & Express Dispatch</span>
+    </div>
+    <button class="glass-buy-btn" onclick="openQuickOrderModal()">
+        <i class="fa-solid fa-bolt"></i> BUY NOW
+    </button>
+</div>
+
+<!-- 📦 Direct Quick Order Modal (WhatsApp + SMS) -->
+<div id="quickOrderModal" class="vornex-modal">
+    <div class="modal-glass-content">
+        <span class="close-btn" onclick="closeModal('quickOrderModal')">&times;</span>
+        <h2><i class="fa-solid fa-bag-shopping"></i> Quick Checkout</h2>
+        <div id="quickOrderSummary">
+            <!-- Order summary JS dwara populate hoga -->
+        </div>
+        <div class="checkout-actions">
+            <button class="btn-wa" onclick="processQuickOrder('WA')">
+                <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp
+            </button>
+            <button class="btn-sms" onclick="processQuickOrder('SMS')">
+                <i class="fa-solid fa-comment-sms"></i> Order via SMS
+            </button>
+        </div>
+    </div>
+</div>
+
 </html>
