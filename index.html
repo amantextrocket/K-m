@@ -1,273 +1,4350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORNEX | Premium Streetwear</title>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-    
-    <!-- Toastify CSS & JS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VORNEX | Premium Streetwear</title>
 
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 
-    <!-- CSS Link -->
-    <link rel="stylesheet" href="style.css">
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:'Montserrat',sans-serif;
+}
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-  
-    <!-- Razorpay Checkout -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+html{
+    scroll-behavior:smooth;
+}
 
+body{
+    background:#070707;
+    color:#fff;
+    min-height:100vh;
+    padding-bottom:105px;
+}
+
+button,input,textarea,select{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+/* ================= ANNOUNCEMENT ================= */
+
+.announcement-bar{
+    background:#fff;
+    color:#000;
+    text-align:center;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:1px;
+    padding:9px 8px;
+}
+
+/* ================= HEADER ================= */
+
+.vornex-header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    height:65px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 18px;
+    background:rgba(8,8,8,.78);
+    backdrop-filter:blur(20px);
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo{
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:5px;
+}
+
+.hamburger-btn{
+    width:45px;
+    height:45px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.07);
+    color:#fff;
+    border-radius:13px;
+    font-size:19px;
+}
+
+/* ================= DRAWER ================= */
+
+.drawer-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    backdrop-filter:blur(5px);
+    z-index:90;
+    display:none;
+}
+
+.drawer-overlay.active{
+    display:block;
+}
+
+.ios-drawer{
+    position:fixed;
+    top:0;
+    right:-100%;
+    width:min(390px,92%);
+    height:100vh;
+    background:rgba(16,16,16,.96);
+    backdrop-filter:blur(25px);
+    z-index:100;
+    transition:.35s ease;
+    overflow-y:auto;
+    border-left:1px solid rgba(255,255,255,.1);
+}
+
+.ios-drawer.active{
+    right:0;
+}
+
+.drawer-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:20px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.close-drawer{
+    border:0;
+    background:transparent;
+    color:#fff;
+    font-size:28px;
+    width:auto;
+    padding:0;
+}
+
+.drawer-content{
+    padding:16px;
+}
+
+.menu-item-btn,
+.acc-btn{
+    width:100%;
+    border:1px solid rgba(255,255,255,.09);
+    background:rgba(255,255,255,.045);
+    color:#fff;
+    min-height:58px;
+    border-radius:14px;
+    margin-bottom:10px;
+    padding:15px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-weight:800;
+}
+
+.btn-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.badge{
+    min-width:24px;
+    height:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:#fff;
+    color:#000;
+    font-size:11px;
+    font-weight:900;
+}
+
+.acc-body{
+    display:none;
+    padding:0 5px 10px;
+}
+
+.user-profile-preview{
+    background:#111;
+    border:1px solid #222;
+    border-radius:12px;
+    padding:15px;
+    margin-bottom:10px;
+}
+
+.user-profile-preview p{
+    color:#888;
+    font-size:11px;
+    margin-bottom:6px;
+}
+
+.theme-picker-section,
+.about-card{
+    margin-top:20px;
+    padding:16px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:15px;
+    background:rgba(255,255,255,.03);
+}
+
+.theme-picker-section h4,
+.about-card h4{
+    font-size:11px;
+    letter-spacing:1px;
+    color:#888;
+    margin-bottom:13px;
+}
+
+.theme-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+}
+
+.theme-chip{
+    padding:10px 5px;
+    border:1px solid #333;
+    border-radius:9px;
+    text-align:center;
+    font-size:9px;
+    font-weight:900;
+}
+
+.theme-neon{color:#39ff14}
+.theme-gold{color:#ffd700}
+.theme-emerald{color:#10b981}
+.theme-violet{color:#a78bfa}
+.theme-amber{color:#f59e0b}
+
+.about-card p{
+    color:#888;
+    font-size:11px;
+    line-height:1.5;
+    margin-bottom:12px;
+}
+
+.about-links{
+    display:grid;
+    gap:8px;
+}
+
+.social-btn{
+    padding:11px;
+    border-radius:9px;
+    text-align:center;
+    font-size:11px;
+    font-weight:800;
+}
+
+.btn-insta{
+    background:#7c3aed;
+}
+
+.btn-wa{
+    background:#16a34a;
+}
+
+/* ================= HERO ================= */
+
+.hero-section{
+    min-height:420px;
+    position:relative;
+    display:flex;
+    align-items:flex-end;
+    padding:30px 20px;
+    overflow:hidden;
+    background:
+    radial-gradient(circle at 70% 20%,#252525,transparent 35%),
+    linear-gradient(145deg,#111,#030303);
+}
+
+.hero-overlay{
+    position:absolute;
+    inset:0;
+    background:linear-gradient(transparent 20%,rgba(0,0,0,.85));
+}
+
+.hero-content{
+    position:relative;
+    z-index:2;
+}
+
+.hero-tag{
+    font-size:10px;
+    letter-spacing:2px;
+    font-weight:900;
+    color:#bbb;
+}
+
+.hero-title{
+    font-size:clamp(32px,9vw,65px);
+    line-height:.95;
+    margin:12px 0;
+    font-weight:900;
+}
+
+.hero-subtitle{
+    color:#aaa;
+    font-size:12px;
+    margin-bottom:18px;
+}
+
+.hero-btn{
+    display:inline-block;
+    background:#fff;
+    color:#000;
+    padding:13px 20px;
+    border-radius:10px;
+    font-size:11px;
+    font-weight:900;
+}
+
+/* ================= STORE ================= */
+
+.store-container{
+    padding:25px 15px;
+    max-width:1200px;
+    margin:auto;
+}
+
+.filter-bar{
+    position:sticky;
+    top:65px;
+    z-index:20;
+    background:rgba(7,7,7,.82);
+    backdrop-filter:blur(15px);
+    padding:10px 0;
+}
+
+.categories-scroll{
+    display:flex;
+    gap:8px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    padding-bottom:8px;
+}
+
+.categories-scroll::-webkit-scrollbar{
+    display:none;
+}
+
+.cat-btn{
+    flex:none;
+    border:1px solid #292929;
+    background:#101010;
+    color:#888;
+    padding:10px 15px;
+    border-radius:20px;
+    font-size:9px;
+    font-weight:900;
+}
+
+.cat-btn.active{
+    background:#fff;
+    color:#000;
+}
+
+.search-wrapper{
+    position:relative;
+    margin-top:8px;
+}
+
+.search-wrapper input{
+    width:100%;
+    background:#0d0d0d;
+    color:#fff;
+    border:1px solid #222;
+    padding:13px 15px 13px 40px;
+    border-radius:12px;
+    outline:none;
+}
+
+.search-icon{
+    position:absolute;
+    left:15px;
+    top:14px;
+    color:#777;
+}
+
+/* ================= PRODUCT GRID ================= */
+
+.product-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:18px;
+}
+
+@media(min-width:700px){
+    .product-grid{
+        grid-template-columns:repeat(4,1fr);
+    }
+}
+
+.product-card{
+    position:relative;
+    overflow:hidden;
+    background:#101010;
+    border:1px solid #202020;
+    border-radius:14px;
+}
+
+.product-image-wrap{
+    position:relative;
+    aspect-ratio:4/5;
+    overflow:hidden;
+}
+
+.product-image-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.product-badge{
+    position:absolute;
+    top:9px;
+    left:9px;
+    z-index:3;
+    background:#fff;
+    color:#000;
+    padding:6px 8px;
+    border-radius:6px;
+    font-size:8px;
+    font-weight:900;
+}
+
+.wishlist-btn{
+    position:absolute;
+    right:8px;
+    top:8px;
+    z-index:4;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    background:rgba(0,0,0,.65);
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.wishlist-btn.active{
+    color:#ff4d6d;
+}
+
+.p-info{
+    padding:12px;
+}
+
+.p-title{
+    font-size:11px;
+    font-weight:800;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.p-category{
+    color:#666;
+    font-size:8px;
+    margin-top:4px;
+}
+
+.p-price{
+    font-size:15px;
+    font-weight:900;
+    margin-top:7px;
+}
+
+.add-btn{
+    width:100%;
+    margin-top:10px;
+    padding:10px;
+    background:#fff;
+    color:#000;
+    border:0;
+    border-radius:8px;
+    font-size:9px;
+    font-weight:900;
+}
+
+.loading-spinner{
+    grid-column:1/-1;
+    text-align:center;
+    padding:50px 10px;
+    color:#777;
+}
+
+/* ================= CART DRAWER ================= */
+
+.cart-drawer{
+    position:fixed;
+    right:-100%;
+    top:0;
+    width:min(420px,94%);
+    height:100vh;
+    background:#0d0d0d;
+    z-index:110;
+    transition:.35s;
+    display:flex;
+    flex-direction:column;
+    border-left:1px solid #222;
+}
+
+.cart-drawer.active{
+    right:0;
+}
+
+.cart-header{
+    padding:20px;
+    border-bottom:1px solid #222;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.cart-header h3{
+    font-size:14px;
+    letter-spacing:2px;
+}
+
+.cart-body{
+    flex:1;
+    overflow-y:auto;
+    padding:15px;
+}
+
+.cart-item{
+    display:flex;
+    gap:10px;
+    padding:12px 0;
+    border-bottom:1px solid #222;
+}
+
+.cart-item img{
+    width:70px;
+    height:85px;
+    object-fit:cover;
+    border-radius:8px;
+}
+
+.cart-item-info{
+    flex:1;
+}
+
+.cart-item-name{
+    font-size:11px;
+    font-weight:800;
+}
+
+.cart-item-price{
+    font-size:12px;
+    font-weight:900;
+    margin-top:6px;
+}
+
+.qty-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:8px;
+}
+
+.qty-btn{
+    width:28px;
+    height:28px;
+    padding:0;
+    margin:0;
+    border-radius:7px;
+    background:#222;
+    color:#fff;
+}
+
+.remove-cart{
+    background:#401010;
+    color:#ff6b6b;
+    border:0;
+    padding:6px 8px;
+    border-radius:6px;
+    font-size:8px;
+    font-weight:900;
+}
+
+.cart-footer{
+    padding:18px;
+    border-top:1px solid #222;
+    background:#111;
+}
+
+.summary-row{
+    display:flex;
+    justify-content:space-between;
+    margin:8px 0;
+    color:#aaa;
+    font-size:12px;
+}
+
+.summary-row.total{
+    color:#fff;
+    font-size:15px;
+    font-weight:900;
+}
+
+.checkout-btn{
+    width:100%;
+    border:0;
+    background:#25d366;
+    color:#000;
+    padding:14px;
+    border-radius:10px;
+    font-size:10px;
+    font-weight:900;
+    margin-top:12px;
+}
+
+/* ================= MODALS ================= */
+
+.custom-modal{
+    position:fixed;
+    inset:0;
+    z-index:120;
+    background:rgba(0,0,0,.82);
+    backdrop-filter:blur(8px);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
+}
+
+.custom-modal.active{
+    display:flex;
+}
+
+.modal-card{
+    width:min(500px,100%);
+    max-height:90vh;
+    overflow-y:auto;
+    background:rgba(18,18,18,.96);
+    border:1px solid #292929;
+    border-radius:18px;
+    padding:20px;
+    box-shadow:0 20px 60px rgba(0,0,0,.7);
+}
+
+.modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:18px;
+}
+
+.modal-header h3{
+    font-size:14px;
+    letter-spacing:1px;
+}
+
+.input-group{
+    margin-bottom:13px;
+}
+
+.input-group label{
+    display:block;
+    color:#999;
+    font-size:9px;
+    font-weight:800;
+    margin-bottom:6px;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select{
+    width:100%;
+    background:#050505;
+    color:#fff;
+    border:1px solid #292929;
+    border-radius:9px;
+    padding:12px;
+    outline:none;
+}
+
+.primary-btn{
+    width:100%;
+    padding:13px;
+    border:0;
+    border-radius:9px;
+    background:#fff;
+    color:#000;
+    font-weight:900;
+    font-size:10px;
+    margin-top:8px;
+}
+
+/* ================= PRODUCT DETAIL ================= */
+
+.product-detail-modal{
+    align-items:flex-start;
+    padding:0;
+}
+
+.product-detail-card{
+    width:100%;
+    max-width:700px;
+    height:100vh;
+    overflow-y:auto;
+    background:#080808;
+    position:relative;
+}
+
+.detail-back{
+    position:fixed;
+    top:15px;
+    left:15px;
+    z-index:10;
+    width:42px;
+    height:42px;
+    border:1px solid rgba(255,255,255,.2);
+    background:rgba(0,0,0,.65);
+    color:#fff;
+    border-radius:50%;
+}
+
+.detail-slider{
+    width:100%;
+    height:min(72vh,650px);
+    position:relative;
+    overflow:hidden;
+    touch-action:pan-y;
+}
+
+.detail-slider img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:none;
+}
+
+.detail-slider img.active{
+    display:block;
+    animation:fadeImage .35s ease;
+}
+
+@keyframes fadeImage{
+    from{opacity:.4}
+    to{opacity:1}
+}
+
+.slider-dots{
+    position:absolute;
+    bottom:15px;
+    left:0;
+    right:0;
+    display:flex;
+    justify-content:center;
+    gap:6px;
+}
+
+.slider-dot{
+    width:7px;
+    height:7px;
+    background:#777;
+    border-radius:50%;
+}
+
+.slider-dot.active{
+    background:#fff;
+}
+
+.detail-info{
+    padding:20px;
+}
+
+.detail-badge{
+    display:inline-block;
+    padding:7px 10px;
+    background:#fff;
+    color:#000;
+    border-radius:7px;
+    font-size:9px;
+    font-weight:900;
+    margin-bottom:12px;
+}
+
+.detail-title{
+    font-size:24px;
+    font-weight:900;
+}
+
+.detail-price{
+    font-size:20px;
+    font-weight:900;
+    margin:8px 0 18px;
+}
+
+.detail-description{
+    color:#aaa;
+    font-size:12px;
+    line-height:1.8;
+    margin-bottom:15px;
+}
+
+.detail-specs{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+}
+
+.spec{
+    background:#111;
+    border:1px solid #222;
+    border-radius:9px;
+    padding:11px;
+}
+
+.spec small{
+    display:block;
+    color:#666;
+    font-size:8px;
+}
+
+.spec strong{
+    display:block;
+    font-size:10px;
+    margin-top:4px;
+}
+
+.size-title{
+    margin:20px 0 9px;
+    font-size:10px;
+    font-weight:900;
+}
+
+.size-list{
+    display:flex;
+    gap:8px;
+}
+
+.size-btn{
+    width:50px;
+    padding:10px 0;
+    border:1px solid #333;
+    background:#111;
+    color:#fff;
+    border-radius:8px;
+    font-weight:900;
+    font-size:10px;
+}
+
+.size-btn.selected{
+    background:#fff;
+    color:#000;
+}
+
+.detail-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:20px;
+    padding-bottom:30px;
+}
+
+.detail-cart-btn{
+    background:#fff;
+    color:#000;
+}
+
+.detail-buy-btn{
+    background:#facc15;
+    color:#000;
+}
+
+/* ================= WISHLIST ================= */
+
+.wishlist-product{
+    display:flex;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px solid #222;
+}
+
+.wishlist-product img{
+    width:60px;
+    height:70px;
+    object-fit:cover;
+    border-radius:7px;
+}
+
+.wishlist-info{
+    flex:1;
+}
+
+.wishlist-info strong{
+    font-size:11px;
+}
+
+.wishlist-info p{
+    color:#aaa;
+    font-size:10px;
+    margin-top:4px;
+}
+
+.small-action{
+    width:auto;
+    padding:7px 10px;
+    margin:5px 0 0;
+    font-size:8px;
+}
+
+/* ================= COUPONS ================= */
+
+.coupon-item{
+    padding:13px;
+    background:#0d0d0d;
+    border:1px solid #292929;
+    border-radius:10px;
+    margin-bottom:8px;
+}
+
+.coupon-code{
+    font-size:13px;
+    color:#10b981;
+    font-weight:900;
+    letter-spacing:1px;
+}
+
+.coupon-desc{
+    color:#888;
+    font-size:9px;
+    margin-top:4px;
+}
+
+.apply-coupon{
+    margin-top:8px;
+    padding:8px 10px;
+    width:auto;
+    background:#fff;
+    color:#000;
+    border:0;
+    border-radius:7px;
+    font-size:8px;
+    font-weight:900;
+}
+
+/* ================= LOGIN ================= */
+
+.login-options{
+    display:grid;
+    gap:10px;
+}
+
+.login-btn{
+    width:100%;
+    padding:13px;
+    border:0;
+    border-radius:10px;
+    font-weight:900;
+    font-size:10px;
+}
+
+.phone-login{
+    background:#fff;
+    color:#000;
+}
+
+.google-login{
+    background:#4285f4;
+    color:#fff;
+}
+
+.otp-box{
+    display:none;
+}
+
+.recaptcha-wrap{
+    margin:12px 0;
+}
+
+/* ================= ACCOUNT ================= */
+
+.account-card{
+    text-align:center;
+}
+
+.account-avatar{
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:#fff;
+    color:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 12px;
+    font-size:24px;
+}
+
+.account-name{
+    font-weight:900;
+    font-size:17px;
+}
+
+.account-sub{
+    color:#777;
+    font-size:10px;
+    margin-top:5px;
+}
+
+.account-menu{
+    margin-top:20px;
+    display:grid;
+    gap:8px;
+}
+
+.account-menu button{
+    width:100%;
+    background:#111;
+    color:#fff;
+    border:1px solid #222;
+    border-radius:10px;
+    padding:13px;
+    text-align:left;
+    font-size:10px;
+    font-weight:800;
+}
+
+/* ================= ORDER HISTORY ================= */
+
+.order-card{
+    background:#0e0e0e;
+    border:1px solid #252525;
+    border-radius:12px;
+    padding:14px;
+    margin-bottom:10px;
+}
+
+.order-top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.order-id{
+    font-size:10px;
+    font-weight:900;
+}
+
+.order-status{
+    color:#facc15;
+    font-size:8px;
+    font-weight:900;
+}
+
+.order-date{
+    color:#666;
+    font-size:8px;
+    margin-top:5px;
+}
+
+.order-products{
+    margin-top:10px;
+    color:#aaa;
+    font-size:9px;
+    line-height:1.7;
+}
+
+.order-total{
+    margin-top:10px;
+    font-weight:900;
+    font-size:12px;
+}
+
+/* ================= CHECKOUT ================= */
+
+.checkout-summary{
+    background:#0b0b0b;
+    border:1px solid #222;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:15px;
+}
+
+.checkout-summary-item{
+    display:flex;
+    justify-content:space-between;
+    font-size:9px;
+    padding:5px 0;
+    color:#aaa;
+}
+
+.coupon-row{
+    display:flex;
+    gap:7px;
+}
+
+.coupon-row input{
+    flex:1;
+}
+
+.coupon-row button{
+    width:auto;
+    padding:0 13px;
+    margin:0;
+    background:#10b981;
+    color:#000;
+}
+
+/* ================= FOOTER ================= */
+
+.site-footer{
+    margin-top:40px;
+    padding:35px 18px 120px;
+    border-top:1px solid #222;
+    background:#050505;
+}
+
+.footer-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:25px;
+}
+
+.footer-column h4{
+    font-size:10px;
+    letter-spacing:1px;
+    margin-bottom:12px;
+}
+
+.footer-column a{
+    display:block;
+    color:#777;
+    font-size:9px;
+    margin:9px 0;
+}
+
+.copyright{
+    text-align:center;
+    color:#666;
+    font-size:9px;
+    margin-top:30px;
+    line-height:1.6;
+}
+
+/* ================= BOTTOM BAR ================= */
+
+.glass-bottom-bar{
+    position:fixed;
+    bottom:15px;
+    left:12px;
+    right:12px;
+    z-index:80;
+    background:rgba(250,204,21,.82);
+    backdrop-filter:blur(18px);
+    color:#000;
+    border:1px solid rgba(255,255,255,.45);
+    box-shadow:0 12px 35px rgba(0,0,0,.45);
+    border-radius:18px;
+    padding:11px 13px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.bar-title{
+    display:block;
+    font-size:10px;
+    font-weight:900;
+}
+
+.bar-sub{
+    display:block;
+    font-size:8px;
+    margin-top:3px;
+    opacity:.65;
+}
+
+.glass-buy-btn{
+    width:auto;
+    margin:0;
+    background:#000;
+    color:#fff;
+    border:0;
+    border-radius:10px;
+    padding:11px 17px;
+    font-size:9px;
+    font-weight:900;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-state{
+    text-align:center;
+    padding:30px 10px;
+    color:#666;
+    font-size:11px;
+}
+
+.empty-state i{
+    font-size:30px;
+    margin-bottom:10px;
+    color:#333;
+}
+</style>
 </head>
+
 <body>
 
-    <!-- 🚀 Announcement Bar -->
-    <div class="announcement-bar">
-        ⚡ FREE SHIPPING ON ALL ORDERS ABOVE ₹999 | USE CODE: <strong>VORNEX10</strong> FOR 10% OFF ⚡
+<div class="announcement-bar">
+🔥 FREE EXPRESS SHIPPING ON ORDERS ABOVE ₹1999 | VORNEX STREETWEAR 🔥
+</div>
+
+<header class="vornex-header">
+    <div class="logo">VORNEX</div>
+
+    <button class="hamburger-btn" onclick="toggleMenuDrawer(true)">
+        <i class="fa-solid fa-bars-staggered"></i>
+    </button>
+</header>
+
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeAllDrawers()"></div>
+
+<!-- ================= SIDE MENU ================= -->
+
+<div class="ios-drawer" id="iosMenuDrawer">
+
+    <div class="drawer-header">
+        <span class="logo">VORNEX</span>
+        <button class="close-drawer" onclick="toggleMenuDrawer(false)">×</button>
     </div>
 
-    <!-- 🧭 NAVBAR -->
-    <header class="vornex-header">
-        <div class="logo">VORNEX</div>
-        <button class="hamburger-btn" onclick="toggleMenuDrawer(true)">
-            <i class="fa-solid fa-bars-staggered"></i>
+    <div class="drawer-content">
+
+        <button class="menu-item-btn" onclick="openLoginOrAccount()">
+            <span class="btn-title">
+                <i class="fa-solid fa-user"></i>
+                <span id="menuAccountText">LOGIN</span>
+            </span>
+            <i class="fa-solid fa-chevron-right"></i>
         </button>
-    </header>
 
-    <!-- 🌫️ Backdrop Blur Overlay for Menu & Drawers -->
-    <div id="drawerOverlay" class="drawer-overlay" onclick="closeAllDrawers()"></div>
+        <button class="menu-item-btn" onclick="openAccountPage()">
+            <span class="btn-title">
+                <i class="fa-solid fa-circle-user"></i>
+                ACCOUNT
+            </span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
-    <!-- 📱 iOS Style Animated Side Drawer -->
-    <div id="iosMenuDrawer" class="ios-drawer">
-        <div class="drawer-header">
-            <h3>VORNEX MENU</h3>
-            <button onclick="toggleMenuDrawer(false)" class="close-drawer">&times;</button>
-        </div>
-        
-        <div class="drawer-content">
-            <!-- 1. Login Section -->
-            <div class="accordion-card">
-                <button class="acc-btn" onclick="toggleAccordion('loginAcc')">
-                    <span class="btn-title"><i class="fa-solid fa-user-lock"></i> Login / Register</span>
-                    <i class="fa-solid fa-chevron-down acc-icon"></i>
-                </button>
-                <div id="loginAcc" class="acc-body">
-                    <button class="menu-sub-btn" onclick="loginViaPhone()"><i class="fa-solid fa-mobile-screen"></i> Login via Phone</button>
-                    <button class="menu-sub-btn" onclick="loginViaGoogle()"><i class="fa-brands fa-google"></i> Login via Google</button>
-                </div>
-            </div>
+        <button class="menu-item-btn" onclick="openOrderHistory()">
+            <span class="btn-title">
+                <i class="fa-solid fa-box"></i>
+                YOUR ORDERS
+            </span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
-            <!-- 2. Account Section -->
-            <div class="accordion-card">
-                <button class="acc-btn" onclick="toggleAccordion('accountAcc')">
-                    <span class="btn-title"><i class="fa-solid fa-id-card"></i> Account Details</span>
-                    <i class="fa-solid fa-chevron-down acc-icon"></i>
-                </button>
-                <div id="accountAcc" class="acc-body">
-                    <div class="user-profile-preview">
-                        <p><strong>Name:</strong> Aman Verma</p>
-                        <p><strong>Location:</strong> Bilaspur</p>
-                        <p><strong>Membership:</strong> Premium VIP</p>
-                    </div>
-                </div>
-            </div>
+        <button class="menu-item-btn" onclick="openWishlistFromMenu()">
+            <span class="btn-title">
+                <i class="fa-solid fa-heart"></i>
+                WISHLIST
+            </span>
+            <span class="badge" id="menuWishCount">0</span>
+        </button>
 
-            <!-- 3. Your Orders Section -->
-            <div class="accordion-card">
-                <button class="acc-btn" onclick="toggleAccordion('orderAcc')">
-                    <span class="btn-title"><i class="fa-solid fa-box-open"></i> Your Orders</span>
-                    <i class="fa-solid fa-chevron-down acc-icon"></i>
-                </button>
-                <div id="orderAcc" class="acc-body">
-                    <button class="menu-sub-btn" onclick="openOrderHistory()"><i class="fa-solid fa-clock-rotate-left"></i> Order History</button>
-                    <button class="menu-sub-btn" onclick="openOrderTracking()"><i class="fa-solid fa-truck-fast"></i> Order Tracking</button>
-                </div>
-            </div>
+        <button class="menu-item-btn" onclick="openCartFromMenu()">
+            <span class="btn-title">
+                <i class="fa-solid fa-bag-shopping"></i>
+                SHOPPING BAG
+            </span>
+            <span class="badge" id="menuCartCount">0</span>
+        </button>
 
-            <!-- 4. Cart Button -->
-            <button class="menu-item-btn" onclick="openCartFromMenu()">
-                <span class="btn-title"><i class="fa-solid fa-bag-shopping"></i> Bag / Cart</span>
-                <span class="badge" id="menuCartCount">0</span>
-            </button>
+        <button class="menu-item-btn" onclick="openCouponsFromMenu()">
+            <span class="btn-title">
+                <i class="fa-solid fa-ticket"></i>
+                OFFERS & COUPONS
+            </span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
 
-            <!-- 5. Wishlist Button -->
-            <button class="menu-item-btn" onclick="openWishlistFromMenu()">
-                <span class="btn-title"><i class="fa-solid fa-heart"></i> Wishlist</span>
-                <span class="badge" id="menuWishCount">0</span>
-            </button>
+        <div class="theme-picker-section">
+            <h4>THEME PREFERENCES</h4>
 
-            <!-- 6. Coupon Code -->
-            <button class="menu-item-btn" onclick="openCouponsFromMenu()">
-                <span class="btn-title"><i class="fa-solid fa-ticket"></i> Coupon Codes</span>
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-
-            <!-- 7. Color Theme Picker (6 Themes) -->
-            <div class="theme-picker-section">
-                <h4><i class="fa-solid fa-palette"></i> Choose Color Theme</h4>
-                <div class="theme-grid">
-                    <button class="theme-chip theme-dark" onclick="setTheme('dark')">Dark</button>
-                    <button class="theme-chip theme-neon" onclick="setTheme('neon')">Neon</button>
-                    <button class="theme-chip theme-gold" onclick="setTheme('gold')">Gold</button>
-                    <button class="theme-chip theme-emerald" onclick="setTheme('emerald')">Emerald</button>
-                    <button class="theme-chip theme-violet" onclick="setTheme('violet')">Violet</button>
-                    <button class="theme-chip theme-amber" onclick="setTheme('amber')">Amber</button>
-                </div>
-            </div>
-
-            <!-- 8. About & Social Section -->
-            <div class="about-card">
-                <h4><i class="fa-solid fa-shield-halved"></i> About VORNEX</h4>
-                <p>100% Premium Heavyweight Fabrics | Express Shipping</p>
-                <div class="about-links">
-                    <a href="https://instagram.com/vornex.instore" target="_blank" class="social-btn btn-insta">
-                        <i class="fa-brands fa-instagram"></i> Instagram
-                    </a>
-                    <a href="https://wa.me/918269444061" target="_blank" class="social-btn btn-wa">
-                        <i class="fa-brands fa-whatsapp"></i> WhatsApp
-                    </a>
-                    <a href="sms:8269444061" class="social-btn btn-sms">
-                        <i class="fa-solid fa-comment-sms"></i> Send SMS
-                    </a>
-                </div>
+            <div class="theme-grid">
+                <div class="theme-chip theme-dark" onclick="setTheme('dark')">DARK</div>
+                <div class="theme-chip theme-neon" onclick="setTheme('neon')">NEON</div>
+                <div class="theme-chip theme-gold" onclick="setTheme('gold')">GOLD</div>
+                <div class="theme-chip theme-emerald" onclick="setTheme('emerald')">EMERALD</div>
+                <div class="theme-chip theme-violet" onclick="setTheme('violet')">VIOLET</div>
+                <div class="theme-chip theme-amber" onclick="setTheme('amber')">AMBER</div>
             </div>
         </div>
+
+        <div class="about-card">
+            <h4>VORNEX OFFICIAL</h4>
+            <p>Premium Heavyweight Oversized Aesthetics</p>
+
+            <div class="about-links">
+                <a href="https://instagram.com" target="_blank" class="social-btn btn-insta">
+                    <i class="fa-brands fa-instagram"></i> Instagram
+                </a>
+
+                <a href="https://wa.me/918269444061" target="_blank" class="social-btn btn-wa">
+                    <i class="fa-brands fa-whatsapp"></i> WhatsApp Support
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= HERO ================= -->
+
+<section class="hero-section">
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+
+        <span class="hero-tag">NEW DROP 2026</span>
+
+        <h1 class="hero-title">
+            OVERSIZED<br>
+            COLLECTION
+        </h1>
+
+        <p class="hero-subtitle">
+            Premium Streetwear • 240 GSM French Terry Cotton
+        </p>
+
+        <a href="#storeGrid" class="hero-btn">
+            EXPLORE NOW
+        </a>
+
     </div>
 
-    <!-- 🖤 HERO BANNER SECTION -->
-    <section class="hero-section">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <span class="hero-tag">NEW DROP 2026</span>
-            <h1 class="hero-title">REDEFINE YOUR STREETWEAR</h1>
-            <p class="hero-subtitle">Heavyweight Fabrics. Unmatched Aesthetics.</p>
-            <a href="#storeSection" class="hero-btn">EXPLORE COLLECTION</a>
-        </div>
-    </section>
+</section>
 
-    <!-- 🛒 MAIN STORE SECTION -->
-    <main id="storeSection" class="store-container">
-        
-        <!-- Category Filter & Search Bar -->
-        <div class="filter-bar">
-            <div class="categories-scroll">
-                <button class="cat-btn active" onclick="filterCategory('ALL', this)">ALL</button>
-                <button class="cat-btn" onclick="filterCategory('Oversized Tees', this)">OVERSIZED</button>
-                <button class="cat-btn" onclick="filterCategory('T-shirts', this)">T-SHIRTS</button>
-                <button class="cat-btn" onclick="filterCategory('Hoodies', this)">HOODIES</button>
-                <button class="cat-btn" onclick="filterCategory('Shirts', this)">SHIRTS</button>
+<!-- ================= STORE ================= -->
+
+<section class="store-container" id="storeGrid">
+
+    <div class="filter-bar">
+
+        <div class="categories-scroll">
+
+            <button class="cat-btn active"
+                    onclick="filterCategory('ALL',this)">
+                ALL
+            </button>
+
+            <button class="cat-btn"
+                    onclick="filterCategory('HOODIES',this)">
+                HOODIES
+            </button>
+
+            <button class="cat-btn"
+                    onclick="filterCategory('TEES',this)">
+                TEES
+            </button>
+
+            <button class="cat-btn"
+                    onclick="filterCategory('CARGOS',this)">
+                CARGOS
+            </button>
+
+            <button class="cat-btn"
+                    onclick="filterCategory('SWEATSHIRTS',this)">
+                SWEATSHIRTS
+            </button>
+
+        </div>
+
+        <div class="search-wrapper">
+
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+
+            <input
+                id="storeSearch"
+                type="text"
+                placeholder="Search streetwear..."
+                oninput="searchProducts()"
+            >
+
+        </div>
+
+    </div>
+
+    <div class="product-grid" id="productGrid">
+
+        <div class="loading-spinner">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            Loading Products...
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="site-footer">
+
+    <div class="footer-grid">
+
+        <div class="footer-column">
+
+            <h4>QUICK LINKS</h4>
+
+            <a href="#" onclick="openPolicy('Privacy Policy')">
+                Privacy Policy
+            </a>
+
+            <a href="#" onclick="openPolicy('Return & Shipping Policy')">
+                Return & Shipping Policy
+            </a>
+
+            <a href="#" onclick="openPolicy('Terms & Conditions')">
+                Terms & Conditions
+            </a>
+
+        </div>
+
+        <div class="footer-column">
+
+            <h4>CONNECT WITH US</h4>
+
+            <a href="#" onclick="openPolicy('About Us')">
+                About Us
+            </a>
+
+            <a href="#" onclick="openPolicy('Contact Us')">
+                Contact Us
+            </a>
+
+            <a href="#" onclick="openOrderTracking()">
+                Track Your Order
+            </a>
+
+        </div>
+
+    </div>
+
+    <div class="copyright">
+        Copyright ©️ 2026 Vornex<br>
+        powered by AMAN
+    </div>
+
+</footer>
+
+<!-- ================= CART ================= -->
+
+<div class="cart-drawer" id="cartDrawer">
+
+    <div class="cart-header">
+
+        <h3>SHOPPING BAG</h3>
+
+        <button class="close-drawer" onclick="closeCartDrawer()">
+            ×
+        </button>
+
+    </div>
+
+    <div class="cart-body" id="cartItemsList"></div>
+
+    <div class="cart-footer">
+
+        <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="cartSubtotal">₹0</span>
+        </div>
+
+        <div class="summary-row">
+            <span>Discount</span>
+            <span id="cartDiscount">₹0</span>
+        </div>
+
+        <div class="summary-row total">
+            <span>Total</span>
+            <span id="cartGrandTotal">₹0</span>
+        </div>
+
+        <button
+            class="checkout-btn"
+            onclick="openCheckoutModal()">
+            CHECKOUT / PLACE ORDER
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= WISHLIST ================= -->
+
+<div
+    class="custom-modal"
+    id="wishlistModal"
+    onclick="closeModalOnBg(event,'wishlistModal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>YOUR WISHLIST</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('wishlistModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div id="wishlistList"></div>
+
+    </div>
+
+</div>
+
+<!-- ================= COUPONS ================= -->
+
+<div
+    class="custom-modal"
+    id="couponsModal"
+    onclick="closeModalOnBg(event,'couponsModal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>AVAILABLE COUPONS</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('couponsModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div id="couponsList">
+            Loading coupons...
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= LOGIN ================= -->
+
+<div
+    class="custom-modal"
+    id="loginModal"
+    onclick="closeModalOnBg(event,'loginModal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>VORNEX LOGIN</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('loginModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div id="loginInitial">
+
+            <p style="color:#777;font-size:10px;margin-bottom:15px;">
+                Login to manage your account and orders.
+            </p>
+
+            <button
+                class="login-btn phone-login"
+                onclick="showPhoneLogin()">
+                <i class="fa-solid fa-phone"></i>
+                LOGIN VIA PHONE NUMBER
+            </button>
+
+            <button
+                class="login-btn google-login"
+                onclick="loginViaGoogle()">
+                <i class="fa-brands fa-google"></i>
+                CONTINUE WITH GOOGLE
+            </button>
+
+        </div>
+
+        <div id="phoneLoginBox" style="display:none;">
+
+            <div class="input-group">
+                <label>PHONE NUMBER</label>
+
+                <input
+                    id="loginPhone"
+                    type="tel"
+                    maxlength="10"
+                    placeholder="9876543210">
             </div>
-            <div class="search-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" id="storeSearch" placeholder="Search apparel..." onkeyup="searchProducts()">
+
+            <div id="recaptcha-container" class="recaptcha-wrap"></div>
+
+            <button
+                class="primary-btn"
+                onclick="sendPhoneOTP()">
+                SEND REAL OTP
+            </button>
+
+            <div class="otp-box" id="otpBox">
+
+                <div class="input-group" style="margin-top:15px;">
+
+                    <label>ENTER OTP</label>
+
+                    <input
+                        id="loginOTP"
+                        type="tel"
+                        maxlength="6"
+                        placeholder="6 digit OTP">
+
+                </div>
+
+                <button
+                    class="primary-btn"
+                    onclick="verifyPhoneOTP()">
+                    VERIFY OTP & LOGIN
+                </button>
+
             </div>
+
         </div>
 
-        <!-- Products Grid -->
-        <div id="productGrid" class="product-grid">
-            <div class="loading-spinner">Loading VORNEX Drops...</div>
-        </div>
-    </main>
+    </div>
 
-    <!-- 🛍️ CART OVERLAY & DRAWER -->
-    <aside id="cartDrawer" class="cart-drawer">
-        <div class="cart-header">
-            <h3>YOUR BAG (<span id="cartTotalItems">0</span>)</h3>
-            <button class="close-btn close-drawer" onclick="closeCartDrawer()">&times;</button>
+</div>
+
+<!-- ================= ACCOUNT ================= -->
+
+<div
+    class="custom-modal"
+    id="accountModal"
+    onclick="closeModalOnBg(event,'accountModal')">
+
+    <div class="modal-card account-card">
+
+        <div class="modal-header">
+
+            <h3>MY ACCOUNT</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('accountModal')">
+                ×
+            </button>
+
         </div>
 
-        <div id="cartItemsList" class="cart-body">
-            <p class="empty-cart-text">Your cart is currently empty.</p>
+        <div class="account-avatar">
+            <i class="fa-solid fa-user"></i>
         </div>
 
-        <div class="cart-footer">
-            <div class="summary-row price-row">
+        <div class="account-name" id="accountName">
+            Guest Customer
+        </div>
+
+        <div class="account-sub" id="accountEmail">
+            Login to view your account
+        </div>
+
+        <div class="account-menu">
+
+            <button onclick="openOrderHistory()">
+                <i class="fa-solid fa-box"></i>
+                &nbsp; My Orders
+            </button>
+
+            <button onclick="openWishlistFromMenu()">
+                <i class="fa-solid fa-heart"></i>
+                &nbsp; My Wishlist
+            </button>
+
+            <button onclick="openOrderTracking()">
+                <i class="fa-solid fa-location-dot"></i>
+                &nbsp; Track Order
+            </button>
+
+            <button
+                id="logoutBtn"
+                onclick="logoutCustomer()"
+                style="display:none;color:#ff6b6b;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                &nbsp; Logout
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= ORDERS ================= -->
+
+<div
+    class="custom-modal"
+    id="ordersModal"
+    onclick="closeModalOnBg(event,'ordersModal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>YOUR ORDERS</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('ordersModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div id="ordersList">
+            Login to see your orders.
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= CHECKOUT ================= -->
+
+<div
+    class="custom-modal"
+    id="checkoutModal"
+    onclick="closeModalOnBg(event,'checkoutModal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>ORDER SUMMARY</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('checkoutModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div class="checkout-summary">
+
+            <div id="checkoutItems"></div>
+
+            <div class="summary-row">
                 <span>Subtotal</span>
-                <span id="cartSubtotal">₹0</span>
+                <span id="checkoutSubtotal">₹0</span>
             </div>
-            <div class="summary-row total-row price-row">
-                <span>Total Amount</span>
-                <span id="cartGrandTotal">₹0</span>
-            </div>
-            <button class="checkout-btn" onclick="openCheckoutModal()">PROCEED TO CHECKOUT</button>
-        </div>
-    </aside>
 
-    <!-- 🎟️ COUPONS MODAL -->
-    <div id="couponsModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'couponsModal')">
-        <div class="modal-card modal-content">
-            <div class="modal-header">
-                <h3>🎟️ OFFERS & COUPONS</h3>
-                <span class="close-modal close-btn" onclick="closeModalStepBack('couponsModal')">&times;</span>
+            <div class="summary-row">
+                <span>Discount</span>
+                <span id="checkoutDiscount">₹0</span>
             </div>
-            <div id="availableCouponsList" class="coupons-modal-body">
-                <div class="coupon-item">
-                    <strong>VORNEX10</strong> - Flat 10% OFF
-                </div>
-                <div class="coupon-item">
-                    <strong>STREET2026</strong> - Flat ₹200 OFF on Oversized Tees
-                </div>
+
+            <div class="summary-row total">
+                <span>Payable</span>
+                <span id="checkoutTotal">₹0</span>
             </div>
+
         </div>
+
+        <div class="input-group">
+
+            <label>COUPON CODE</label>
+
+            <div class="coupon-row">
+
+                <input
+                    id="checkoutCoupon"
+                    placeholder="Enter coupon code">
+
+                <button onclick="applyCoupon()">
+                    APPLY
+                </button>
+
+            </div>
+
+            <small
+                id="couponMessage"
+                style="display:block;color:#777;font-size:8px;margin-top:5px;">
+            </small>
+
+        </div>
+
+        <form onsubmit="submitOrder(event)">
+
+            <div class="input-group">
+
+                <label>FULL NAME</label>
+
+                <input
+                    id="custName"
+                    required
+                    placeholder="Your full name">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>PHONE NUMBER</label>
+
+                <input
+                    id="custPhone"
+                    type="tel"
+                    maxlength="10"
+                    required
+                    placeholder="9876543210">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>PIN CODE</label>
+
+                <input
+                    id="custPin"
+                    type="tel"
+                    maxlength="6"
+                    required
+                    placeholder="Enter 6 digit pincode"
+                    oninput="lookupPincode(this.value)">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>CITY / VILLAGE</label>
+
+                <input
+                    id="custCity"
+                    required
+                    placeholder="City / Village">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>STATE</label>
+
+                <input
+                    id="custState"
+                    required
+                    placeholder="State">
+
+            </div>
+
+            <div class="input-group">
+
+                <label>DELIVERY ADDRESS</label>
+
+                <textarea
+                    id="custAddress"
+                    rows="3"
+                    required
+                    placeholder="House no., street, area, landmark">
+                </textarea>
+
+            </div>
+
+            <button
+                type="submit"
+                class="primary-btn"
+                style="background:#25d366;">
+                PLACE ORDER VIA WHATSAPP
+            </button>
+
+            <button
+                type="button"
+                class="primary-btn"
+                style="background:#facc15;"
+                onclick="placeOrderViaSMS()">
+                PLACE ORDER VIA SMS
+            </button>
+
+        </form>
+
     </div>
 
-    <!-- ❤️ WISHLIST MODAL -->
-    <div id="wishlistModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'wishlistModal')">
-        <div class="modal-card modal-content">
-            <div class="modal-header">
-                <h3>❤️ YOUR WISHLIST</h3>
-                <span class="close-modal close-btn" onclick="closeModalStepBack('wishlistModal')">&times;</span>
-            </div>
-            <div id="wishlistItemsList" class="wishlist-body">
-                <p style="color:#888; text-align:center;">No wishlist items saved yet.</p>
-            </div>
-        </div>
-    </div>
+</div>
 
-    <!-- 📦 CHECKOUT MODAL -->
-    <div id="checkoutModal" class="custom-modal modal" onclick="closeModalOnBg(event, 'checkoutModal')">
-        <div class="modal-card modal-content">
-            <div class="modal-header">
-                <h3>📦 SHIPPING DETAILS</h3>
-                <span class="close-modal close-btn" onclick="closeModalStepBack('checkoutModal')">&times;</span>
-            </div>
-            <form id="checkoutForm" onsubmit="submitOrder(event)">
-                <div class="input-group">
-                    <label>Full Name</label>
-                    <input type="text" id="custName" placeholder="Enter your full name" required>
-                </div>
-                <div class="input-group">
-                    <label>WhatsApp Number</label>
-                    <input type="tel" id="custPhone" placeholder="10 Digit WhatsApp Number" required pattern="[0-9]{10}">
-                </div>
-                <div class="input-group">
-                    <label>Complete Shipping Address</label>
-                    <textarea id="custAddress" placeholder="House/Flat No, Street, Landmark, Pincode" required rows="3"></textarea>
-                </div>
-                <button type="submit" class="checkout-btn submit-order-btn">CONFIRM ORDER ON WHATSAPP</button>
-            </form>
-        </div>
-    </div>
+<!-- ================= PRODUCT DETAIL ================= -->
 
-    <!-- 🛒 Floating Glassmorphic BUY NOW Bar -->
-    <div class="glass-bottom-bar">
-        <div class="bar-info">
-            <span class="bar-title">VORNEX Premium</span>
-            <span class="bar-sub">Express Delivery Nationwide</span>
-        </div>
-        <button class="glass-buy-btn" onclick="openQuickOrderModal()">
-            <i class="fa-solid fa-bolt"></i> BUY NOW
+<div
+    class="custom-modal product-detail-modal"
+    id="productDetailModal">
+
+    <div class="product-detail-card">
+
+        <button
+            class="detail-back"
+            onclick="closeProductDetail()">
+            <i class="fa-solid fa-arrow-left"></i>
         </button>
+
+        <div
+            class="detail-slider"
+            id="detailSlider"
+            ontouchstart="detailTouchStart(event)"
+            ontouchend="detailTouchEnd(event)">
+
+            <img id="detailImage1" class="active">
+
+            <img id="detailImage2">
+
+            <div class="slider-dots">
+
+                <span
+                    class="slider-dot active"
+                    id="dot1">
+                </span>
+
+                <span
+                    class="slider-dot"
+                    id="dot2">
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="detail-info">
+
+            <div
+                class="detail-badge"
+                id="detailBadge">
+            </div>
+
+            <div
+                class="detail-title"
+                id="detailTitle">
+            </div>
+
+            <div
+                class="detail-price"
+                id="detailPrice">
+            </div>
+
+            <div
+                class="detail-description"
+                id="detailDescription">
+            </div>
+
+            <div class="detail-specs">
+
+                <div class="spec">
+                    <small>CATEGORY</small>
+                    <strong id="detailCategory">-</strong>
+                </div>
+
+                <div class="spec">
+                    <small>FABRIC</small>
+                    <strong id="detailFabric">240 GSM Cotton</strong>
+                </div>
+
+                <div class="spec">
+                    <small>STOCK</small>
+                    <strong id="detailStock">-</strong>
+                </div>
+
+                <div class="spec">
+                    <small>QUALITY</small>
+                    <strong>Premium</strong>
+                </div>
+
+            </div>
+
+            <div class="size-title">
+                SELECT SIZE
+            </div>
+
+            <div class="size-list">
+
+                <button
+                    class="size-btn"
+                    onclick="selectSize('S',this)">
+                    S
+                </button>
+
+                <button
+                    class="size-btn"
+                    onclick="selectSize('M',this)">
+                    M
+                </button>
+
+                <button
+                    class="size-btn"
+                    onclick="selectSize('L',this)">
+                    L
+                </button>
+
+                <button
+                    class="size-btn"
+                    onclick="selectSize('XL',this)">
+                    XL
+                </button>
+
+                <button
+                    class="size-btn"
+                    onclick="selectSize('XXL',this)">
+                    XXL
+                </button>
+
+            </div>
+
+            <div class="detail-actions">
+
+                <button
+                    class="detail-cart-btn"
+                    onclick="addCurrentProductToCart()">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    ADD TO CART
+                </button>
+
+                <button
+                    class="detail-buy-btn"
+                    onclick="buyCurrentProduct()">
+                    BUY NOW
+                </button>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <!-- JavaScript File Link -->
-    <script src="app.js"></script>
+</div>
+
+<!-- ================= POLICY ================= -->
+
+<div
+    class="custom-modal"
+    id="policyModal"
+    onclick="closeModalOnBg(event,'policyModal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3 id="policyTitle">VORNEX</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('policyModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div
+            id="policyContent"
+            style="color:#aaa;font-size:11px;line-height:1.8;">
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= TRACK ORDER ================= -->
+
+<div
+    class="custom-modal"
+    id="trackingModal"
+    onclick="closeModalOnBg(event,'trackingModal')">
+
+    <div class="modal-card">
+
+        <div class="modal-header">
+
+            <h3>TRACK YOUR ORDER</h3>
+
+            <button
+                class="close-drawer"
+                onclick="closeModalStepBack('trackingModal')">
+                ×
+            </button>
+
+        </div>
+
+        <div class="input-group">
+
+            <label>ORDER ID</label>
+
+            <input
+                id="trackOrderId"
+                placeholder="Example: VN123456">
+
+        </div>
+
+        <button
+            class="primary-btn"
+            onclick="trackOrder()">
+            TRACK ORDER
+        </button>
+
+        <div
+            id="trackingResult"
+            style="margin-top:15px;">
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= FIREBASE ================= -->
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script>
+
+/* =========================================================
+   VORNEX FIREBASE CONFIG
+   SAME DATABASE AS AMAN.HTML
+========================================================= */
+
+const firebaseConfig = {
+
+    apiKey:"AIzaSyDItBcWY7ww6jj73h1HEtaTm7YllIBLQ1c",
+
+    authDomain:"vornex-b7a62.firebaseapp.com",
+
+    databaseURL:"https://vornex-b7a62-default-rtdb.firebaseio.com",
+
+    projectId:"vornex-b7a62",
+
+    storageBucket:"vornex-b7a62.firebasestorage.app",
+
+    messagingSenderId:"60746200967",
+
+    appId:"1:60746200967:web:29bf4cb533b14db3080522",
+
+    measurementId:"G-RBG15BDSG0"
+};
+
+if(!firebase.apps.length){
+    firebase.initializeApp(firebaseConfig);
+}
+
+const db=firebase.database();
+
+const auth=firebase.auth();
+
+const productsRef=db.ref("products");
+
+const couponsRef=db.ref("coupons");
+
+const ordersRef=db.ref("orders");
+
+
+/* =========================================================
+   GLOBAL VARIABLES
+========================================================= */
+
+let allProducts=[];
+
+let cart=JSON.parse(localStorage.getItem("vornex_cart"))||[];
+
+let wishlist=JSON.parse(localStorage.getItem("vornex_wishlist"))||[];
+
+let allCoupons={};
+
+let currentCategory="ALL";
+
+let currentProduct=null;
+
+let selectedSize="";
+
+let currentCoupon=null;
+
+let confirmationResult=null;
+
+let detailSlideTimer=null;
+
+let touchStartX=0;
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+function showToast(message,type="success"){
+
+    if(typeof Toastify!=="function"){
+        alert(message);
+        return;
+    }
+
+    let bg="#111";
+
+    if(type==="success") bg="#10b981";
+
+    if(type==="error") bg="#ef4444";
+
+    if(type==="info") bg="#3b82f6";
+
+    Toastify({
+
+        text:message,
+
+        duration:2500,
+
+        gravity:"bottom",
+
+        position:"center",
+
+        style:{
+            background:bg,
+            color:"#fff",
+            borderRadius:"10px",
+            fontWeight:"800",
+            fontSize:"11px"
+        }
+
+    }).showToast();
+}
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+document.addEventListener("DOMContentLoaded",()=>{
+
+    fetchProducts();
+
+    listenCoupons();
+
+    updateBadges();
+
+    updateAuthUI();
+
+});
+
+
+/* =========================================================
+   PRODUCTS
+========================================================= */
+
+function fetchProducts(){
+
+    productsRef.on("value",(snapshot)=>{
+
+        const data=snapshot.val()||{};
+
+        allProducts=[];
+
+        Object.keys(data).forEach(key=>{
+
+            allProducts.push({
+
+                id:key,
+
+                ...data[key]
+
+            });
+
+        });
+
+        applyFilters();
+
+    },error=>{
+
+        console.error(error);
+
+        document.getElementById("productGrid").innerHTML=`
+
+            <div class="loading-spinner">
+
+                Unable to load products.
+
+            </div>
+
+        `;
+
+    });
+
+}
+
+
+function renderProducts(products){
+
+    const grid=document.getElementById("productGrid");
+
+    if(!products.length){
+
+        grid.innerHTML=`
+
+            <div class="empty-state">
+
+                <i class="fa-solid fa-box-open"></i>
+
+                <br>
+
+                No products found.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    let html="";
+
+    products.forEach(p=>{
+
+        const liked=wishlist.some(x=>x.id===p.id);
+
+        const stocks=p.sizeStocks||{};
+
+        const totalStock=Object.values(stocks)
+            .reduce((a,b)=>a+(Number(b)||0),0);
+
+        const out=totalStock<=0;
+
+        html+=`
+
+        <div class="product-card">
+
+            <div
+                class="product-image-wrap"
+                onclick="openProductDetail('${p.id}')">
+
+                ${p.tag?`
+
+                    <span class="product-badge">
+
+                        ${escapeHtml(p.tag)}
+
+                    </span>
+
+                `:""}
+
+                <button
+                    class="wishlist-btn ${liked?"active":""}"
+                    onclick="event.stopPropagation();toggleWishlist('${p.id}')">
+
+                    <i class="${liked?"fa-solid":"fa-regular"} fa-heart"></i>
+
+                </button>
+
+                <img
+                    src="${p.image||"https://via.placeholder.com/500"}"
+                    alt="${escapeHtml(p.name||"Product")}"
+                    loading="lazy">
+
+            </div>
+
+            <div class="p-info">
+
+                <div class="p-title">
+                    ${escapeHtml(p.name||"VORNEX PRODUCT")}
+                </div>
+
+                <div class="p-category">
+                    ${escapeHtml(p.category||"")}
+                </div>
+
+                <div class="p-price">
+                    ₹${Number(p.price||0).toLocaleString("en-IN")}
+                </div>
+
+                <button
+                    class="add-btn"
+                    ${out?"disabled":""}
+                    style="${out?"opacity:.4":""}"
+                    onclick="addToCart('${p.id}')">
+
+                    ${out?"OUT OF STOCK":"ADD TO BAG"}
+
+                </button>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    grid.innerHTML=html;
+
+}
+
+
+function escapeHtml(value){
+
+    return String(value??"")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function filterCategory(cat,btn){
+
+    currentCategory=cat;
+
+    document.querySelectorAll(".cat-btn")
+        .forEach(x=>x.classList.remove("active"));
+
+    if(btn) btn.classList.add("active");
+
+    applyFilters();
+
+}
+
+
+function searchProducts(){
+
+    applyFilters();
+
+}
+
+
+function applyFilters(){
+
+    const q=(document.getElementById("storeSearch")?.value||"")
+        .toLowerCase()
+        .trim();
+
+    const filtered=allProducts.filter(p=>{
+
+        const name=(p.name||"").toLowerCase();
+
+        const category=(p.category||"").toLowerCase();
+
+        const cat=currentCategory.toLowerCase();
+
+        const categoryMatch=
+            currentCategory==="ALL"||
+            category.includes(cat)||
+            (cat==="tees"&&
+             (category.includes("tee")||category.includes("t-shirt")));
+
+        return categoryMatch && name.includes(q);
+
+    });
+
+    renderProducts(filtered);
+
+}
+
+
+/* =========================================================
+   PRODUCT DETAIL
+========================================================= */
+
+function openProductDetail(id){
+
+    const p=allProducts.find(x=>x.id===id);
+
+    if(!p) return;
+
+    currentProduct=p;
+
+    selectedSize="";
+
+    const modal=document.getElementById("productDetailModal");
+
+    const img1=document.getElementById("detailImage1");
+
+    const img2=document.getElementById("detailImage2");
+
+    img1.src=p.image||"https://via.placeholder.com/600";
+
+    img2.src=p.imageBack||p.image||"https://via.placeholder.com/600";
+
+    img1.classList.add("active");
+
+    img2.classList.remove("active");
+
+    document.getElementById("dot1").classList.add("active");
+
+    document.getElementById("dot2").classList.remove("active");
+
+    document.getElementById("detailBadge").textContent=
+        p.tag||"VORNEX PREMIUM";
+
+    document.getElementById("detailTitle").textContent=
+        p.name||"VORNEX PRODUCT";
+
+    document.getElementById("detailPrice").textContent=
+        "₹"+Number(p.price||0).toLocaleString("en-IN");
+
+    document.getElementById("detailCategory").textContent=
+        p.category||"-";
+
+    document.getElementById("detailFabric").textContent=
+        p.fabric||p.material||"240 GSM Cotton";
+
+    const stocks=p.sizeStocks||{};
+
+    const total=Object.values(stocks)
+        .reduce((a,b)=>a+(Number(b)||0),0);
+
+    document.getElementById("detailStock").textContent=
+        total>0?`${total} Available`:"Out of Stock";
+
+    document.getElementById("detailDescription").textContent=
+        p.description||
+        `Premium ${p.category||"VORNEX"} streetwear. Designed for comfort, style and everyday wear.`;
+
+    document.querySelectorAll(".size-btn")
+        .forEach(b=>b.classList.remove("selected"));
+
+    modal.classList.add("active");
+
+    startDetailSlider();
+
+}
+
+
+function closeProductDetail(){
+
+    stopDetailSlider();
+
+    document.getElementById("productDetailModal")
+        .classList.remove("active");
+
+    currentProduct=null;
+
+}
+
+
+function startDetailSlider(){
+
+    stopDetailSlider();
+
+    detailSlideTimer=setInterval(()=>{
+
+        if(!currentProduct) return;
+
+        const second=document.getElementById("detailImage2");
+
+        if(second.src){
+
+            switchDetailImage();
+
+        }
+
+    },3000);
+
+}
+
+
+function stopDetailSlider(){
+
+    if(detailSlideTimer){
+
+        clearInterval(detailSlideTimer);
+
+        detailSlideTimer=null;
+
+    }
+
+}
+
+
+function switchDetailImage(){
+
+    const img1=document.getElementById("detailImage1");
+
+    const img2=document.getElementById("detailImage2");
+
+    const dot1=document.getElementById("dot1");
+
+    const dot2=document.getElementById("dot2");
+
+    if(img1.classList.contains("active")){
+
+        img1.classList.remove("active");
+
+        img2.classList.add("active");
+
+        dot1.classList.remove("active");
+
+        dot2.classList.add("active");
+
+    }else{
+
+        img2.classList.remove("active");
+
+        img1.classList.add("active");
+
+        dot2.classList.remove("active");
+
+        dot1.classList.add("active");
+
+    }
+
+}
+
+
+function detailTouchStart(e){
+
+    touchStartX=e.changedTouches[0].screenX;
+
+}
+
+
+function detailTouchEnd(e){
+
+    const endX=e.changedTouches[0].screenX;
+
+    const diff=endX-touchStartX;
+
+    if(Math.abs(diff)<50) return;
+
+    if(diff<0){
+
+        switchDetailImage();
+
+    }else{
+
+        closeProductDetail();
+
+    }
+
+}
+
+
+function selectSize(size,btn){
+
+    if(!currentProduct) return;
+
+    const stocks=currentProduct.sizeStocks||{};
+
+    if(Number(stocks[size]||0)<=0){
+
+        showToast(`Size ${size} is out of stock`,"error");
+
+        return;
+
+    }
+
+    selectedSize=size;
+
+    document.querySelectorAll(".size-btn")
+        .forEach(b=>b.classList.remove("selected"));
+
+    btn.classList.add("selected");
+
+}
+
+
+/* =========================================================
+   CART
+========================================================= */
+
+function addToCart(id,size=""){
+
+    const p=allProducts.find(x=>x.id===id);
+
+    if(!p) return;
+
+    const stocks=p.sizeStocks||{};
+
+    if(Object.keys(stocks).length){
+
+        if(!size){
+
+            const available=
+                ["S","M","L","XL","XXL"]
+                .find(s=>Number(stocks[s]||0)>0);
+
+            size=available||"";
+
+        }
+
+        if(size && Number(stocks[size]||0)<=0){
+
+            showToast("Selected size is out of stock","error");
+
+            return;
+
+        }
+
+    }
+
+    const existing=cart.find(
+        x=>x.id===id && x.size===size
+    );
+
+    if(existing){
+
+        existing.qty=(existing.qty||1)+1;
+
+    }else{
+
+        cart.push({
+
+            ...p,
+
+            size:size,
+
+            qty:1
+
+        });
+
+    }
+
+    saveCart();
+
+    showToast("🛍️ Added to Bag!","success");
+
+}
+
+
+function addCurrentProductToCart(){
+
+    if(!currentProduct) return;
+
+    const stocks=currentProduct.sizeStocks||{};
+
+    if(Object.keys(stocks).length && !selectedSize){
+
+        showToast("Please select a size","error");
+
+        return;
+
+    }
+
+    addToCart(currentProduct.id,selectedSize);
+
+}
+
+
+function buyCurrentProduct(){
+
+    addCurrentProductToCart();
+
+    if(currentProduct){
+
+        closeProductDetail();
+
+        setTimeout(openCheckoutModal,250);
+
+    }
+
+}
+
+
+function saveCart(){
+
+    localStorage.setItem(
+        "vornex_cart",
+        JSON.stringify(cart)
+    );
+
+    updateBadges();
+
+    renderCart();
+
+}
+
+
+function renderCart(){
+
+    const list=document.getElementById("cartItemsList");
+
+    if(!cart.length){
+
+        list.innerHTML=`
+
+            <div class="empty-state">
+
+                <i class="fa-solid fa-bag-shopping"></i>
+
+                <br>
+
+                Your bag is empty.
+
+            </div>
+
+        `;
+
+        updateCartTotals();
+
+        return;
+
+    }
+
+    let html="";
+
+    cart.forEach((item,index)=>{
+
+        const qty=item.qty||1;
+
+        html+=`
+
+        <div class="cart-item">
+
+            <img
+                src="${item.image||"https://via.placeholder.com/100"}">
+
+            <div class="cart-item-info">
+
+                <div class="cart-item-name">
+                    ${escapeHtml(item.name)}
+                </div>
+
+                <div style="color:#777;font-size:8px;margin-top:3px;">
+                    ${item.size?"SIZE: "+item.size:""}
+                </div>
+
+                <div class="cart-item-price">
+                    ₹${(Number(item.price||0)*qty).toLocaleString("en-IN")}
+                </div>
+
+                <div class="qty-row">
+
+                    <button
+                        class="qty-btn"
+                        onclick="changeCartQty(${index},-1)">
+                        −
+                    </button>
+
+                    <span style="font-size:10px;font-weight:900;">
+                        ${qty}
+                    </span>
+
+                    <button
+                        class="qty-btn"
+                        onclick="changeCartQty(${index},1)">
+                        +
+                    </button>
+
+                    <button
+                        class="remove-cart"
+                        onclick="removeFromCart(${index})">
+                        REMOVE
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    list.innerHTML=html;
+
+    updateCartTotals();
+
+}
+
+
+function changeCartQty(index,delta){
+
+    if(!cart[index]) return;
+
+    cart[index].qty=(cart[index].qty||1)+delta;
+
+    if(cart[index].qty<=0){
+
+        cart.splice(index,1);
+
+    }
+
+    saveCart();
+
+}
+
+
+function removeFromCart(index){
+
+    cart.splice(index,1);
+
+    saveCart();
+
+}
+
+
+function updateCartTotals(){
+
+    let subtotal=0;
+
+    cart.forEach(item=>{
+
+        subtotal+=
+            Number(item.price||0)*
+            Number(item.qty||1);
+
+    });
+
+    const discount=calculateDiscount(subtotal);
+
+    const total=Math.max(0,subtotal-discount);
+
+    document.getElementById("cartSubtotal").textContent=
+        "₹"+subtotal.toLocaleString("en-IN");
+
+    document.getElementById("cartDiscount").textContent=
+        "₹"+discount.toLocaleString("en-IN");
+
+    document.getElementById("cartGrandTotal").textContent=
+        "₹"+total.toLocaleString("en-IN");
+
+}
+
+
+function updateBadges(){
+
+    const cartCount=cart.reduce(
+        (a,b)=>a+Number(b.qty||1),0
+    );
+
+    document.getElementById("menuCartCount").textContent=
+        cartCount;
+
+    document.getElementById("cartTotalItems").textContent=
+        cartCount;
+
+    document.getElementById("menuWishCount").textContent=
+        wishlist.length;
+
+}
+
+
+/* =========================================================
+   WISHLIST
+========================================================= */
+
+function toggleWishlist(id){
+
+    const p=allProducts.find(x=>x.id===id);
+
+    if(!p) return;
+
+    const index=wishlist.findIndex(x=>x.id===id);
+
+    if(index>=0){
+
+        wishlist.splice(index,1);
+
+        showToast("Removed from wishlist","info");
+
+    }else{
+
+        wishlist.push(p);
+
+        showToast("❤️ Added to wishlist","success");
+
+    }
+
+    localStorage.setItem(
+        "vornex_wishlist",
+        JSON.stringify(wishlist)
+    );
+
+    updateBadges();
+
+    applyFilters();
+
+    renderWishlist();
+
+}
+
+
+function renderWishlist(){
+
+    const list=document.getElementById("wishlistList");
+
+    if(!wishlist.length){
+
+        list.innerHTML=`
+
+            <div class="empty-state">
+
+                <i class="fa-regular fa-heart"></i>
+
+                <br>
+
+                Your wishlist is empty.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    let html="";
+
+    wishlist.forEach(p=>{
+
+        html+=`
+
+        <div class="wishlist-product">
+
+            <img src="${p.image||""}">
+
+            <div class="wishlist-info">
+
+                <strong>${escapeHtml(p.name)}</strong>
+
+                <p>
+                    ₹${Number(p.price||0).toLocaleString("en-IN")}
+                </p>
+
+                <button
+                    class="small-action"
+                    onclick="openProductDetail('${p.id}')">
+                    VIEW PRODUCT
+                </button>
+
+                <button
+                    class="small-action"
+                    style="background:#ff3333;color:#fff;"
+                    onclick="toggleWishlist('${p.id}')">
+                    REMOVE
+                </button>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+    list.innerHTML=html;
+
+}
+
+
+/* =========================================================
+   COUPONS
+========================================================= */
+
+function listenCoupons(){
+
+    couponsRef.on("value",snapshot=>{
+
+        allCoupons=snapshot.val()||{};
+
+        renderCoupons();
+
+        updateCartTotals();
+
+    });
+
+}
+
+
+function getCouponValue(coupon){
+
+    const type=
+        String(
+            coupon.discountType||
+            coupon.type||
+            ""
+        ).toLowerCase();
+
+    const value=Number(
+        coupon.discountValue ??
+        coupon.discount ??
+        coupon.discountPercent ??
+        0
+    );
+
+    return {
+
+        type:
+            type==="flat"||
+            type==="fixed"||
+            type==="amount"
+            ?"flat":"percent",
+
+        value:value
+
+    };
+
+}
+
+
+function renderCoupons(){
+
+    const list=document.getElementById("couponsList");
+
+    const keys=Object.keys(allCoupons);
+
+    if(!keys.length){
+
+        list.innerHTML=`
+
+            <div class="empty-state">
+                No active coupons available.
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    let html="";
+
+    keys.forEach(code=>{
+
+        const c=allCoupons[code];
+
+        const d=getCouponValue(c);
+
+        html+=`
+
+        <div class="coupon-item">
+
+            <div class="coupon-code">
+                ${escapeHtml(c.code||code)}
+            </div>
+
+            <div class="coupon-desc">
+
+                ${d.type==="flat"
+                    ?`₹${d.value} FLAT DISCOUNT`
+                    :`${d.value}% OFF`
+                }
+
+            </div>
+
+            <button
+                class="apply-coupon"
+                onclick="useCoupon('${escapeHtml(c.code||code)}')">
+                APPLY COUPON
+            </button>
+
+        </div>
+
+        `;
+
+    });
+
+    list.innerHTML=html;
+
+}
+
+
+function useCoupon(code){
+
+    document.getElementById("checkoutCoupon").value=code;
+
+    closeModalStepBack("couponsModal");
+
+    openCheckoutModal();
+
+    applyCoupon();
+
+}
+
+
+function applyCoupon(){
+
+    const code=
+        document.getElementById("checkoutCoupon")
+        .value
+        .trim()
+        .toUpperCase();
+
+    if(!code){
+
+        showToast("Enter coupon code","error");
+
+        return;
+
+    }
+
+    const foundKey=Object.keys(allCoupons)
+        .find(k=>k.toUpperCase()===code);
+
+    if(!foundKey){
+
+        currentCoupon=null;
+
+        document.getElementById("couponMessage")
+            .textContent="Invalid coupon code.";
+
+        showToast("Invalid coupon code","error");
+
+        updateCheckoutSummary();
+
+        return;
+
+    }
+
+    currentCoupon={
+
+        key:foundKey,
+
+        ...allCoupons[foundKey]
+
+    };
+
+    document.getElementById("couponMessage")
+        .textContent="✓ Coupon applied successfully.";
+
+    showToast("🎉 Coupon applied!","success");
+
+    updateCheckoutSummary();
+
+}
+
+
+function calculateDiscount(subtotal){
+
+    if(!currentCoupon) return 0;
+
+    const d=getCouponValue(currentCoupon);
+
+    if(d.type==="flat"){
+
+        return Math.min(subtotal,d.value);
+
+    }
+
+    return Math.min(
+        subtotal,
+        Math.round(subtotal*d.value/100)
+    );
+
+}
+
+
+/* =========================================================
+   CHECKOUT
+========================================================= */
+
+function openCheckoutModal(){
+
+    if(!cart.length){
+
+        showToast("Your cart is empty","error");
+
+        openCartFromMenu();
+
+        return;
+
+    }
+
+    renderCheckoutSummary();
+
+    document.getElementById("checkoutModal")
+        .classList.add("active");
+
+}
+
+
+function renderCheckoutSummary(){
+
+    const box=document.getElementById("checkoutItems");
+
+    let html="";
+
+    cart.forEach(item=>{
+
+        const qty=Number(item.qty||1);
+
+        html+=`
+
+            <div class="checkout-summary-item">
+
+                <span>
+                    ${escapeHtml(item.name)}
+                    ${item.size?` (${item.size})`:""}
+                    × ${qty}
+                </span>
+
+                <span>
+                    ₹${(Number(item.price||0)*qty).toLocaleString("en-IN")}
+                </span>
+
+            </div>
+
+        `;
+
+    });
+
+    box.innerHTML=html;
+
+    updateCheckoutSummary();
+
+}
+
+
+function updateCheckoutSummary(){
+
+    let subtotal=0;
+
+    cart.forEach(item=>{
+
+        subtotal+=
+            Number(item.price||0)*
+            Number(item.qty||1);
+
+    });
+
+    const discount=calculateDiscount(subtotal);
+
+    const total=Math.max(0,subtotal-discount);
+
+    document.getElementById("checkoutSubtotal").textContent=
+        "₹"+subtotal.toLocaleString("en-IN");
+
+    document.getElementById("checkoutDiscount").textContent=
+        "₹"+discount.toLocaleString("en-IN");
+
+    document.getElementById("checkoutTotal").textContent=
+        "₹"+total.toLocaleString("en-IN");
+
+}
+
+
+function lookupPincode(pin){
+
+    if(!/^\d{6}$/.test(pin)) return;
+
+    fetch(
+        "https://api.postalpincode.in/pincode/"+pin
+    )
+    .then(r=>r.json())
+    .then(data=>{
+
+        if(
+            data &&
+            data[0] &&
+            data[0].Status==="Success" &&
+            data[0].PostOffice &&
+            data[0].PostOffice.length
+        ){
+
+            const po=data[0].PostOffice[0];
+
+            document.getElementById("custCity").value=
+                po.District||
+                po.Block||
+                po.Name||
+                "";
+
+            document.getElementById("custState").value=
+                po.State||
+                "";
+
+            showToast("📍 Address details found","success");
+
+        }else{
+
+            showToast("Pincode not found","error");
+
+        }
+
+    })
+    .catch(()=>{
+
+        showToast(
+            "Pincode service unavailable. Enter details manually.",
+            "error"
+        );
+
+    });
+
+}
+
+
+/* =========================================================
+   ORDER SUBMIT
+========================================================= */
+
+async function submitOrder(e){
+
+    e.preventDefault();
+
+    if(!cart.length){
+
+        showToast("Your cart is empty","error");
+
+        return;
+
+    }
+
+    const name=
+        document.getElementById("custName").value.trim();
+
+    const phone=
+        document.getElementById("custPhone").value.trim();
+
+    const pin=
+        document.getElementById("custPin").value.trim();
+
+    const city=
+        document.getElementById("custCity").value.trim();
+
+    const state=
+        document.getElementById("custState").value.trim();
+
+    const address=
+        document.getElementById("custAddress").value.trim();
+
+    if(!/^\d{10}$/.test(phone)){
+
+        showToast("Enter valid 10 digit phone number","error");
+
+        return;
+
+    }
+
+    if(!/^\d{6}$/.test(pin)){
+
+        showToast("Enter valid 6 digit pincode","error");
+
+        return;
+
+    }
+
+    let subtotal=0;
+
+    cart.forEach(item=>{
+
+        subtotal+=
+            Number(item.price||0)*
+            Number(item.qty||1);
+
+    });
+
+    const discount=calculateDiscount(subtotal);
+
+    const total=Math.max(0,subtotal-discount);
+
+    const orderId=
+        "VN"+
+        Date.now().toString().slice(-8);
+
+    const order={
+
+        orderId:orderId,
+
+        customer:{
+
+            name:name,
+
+            phone:phone,
+
+            address:address,
+
+            pincode:pin,
+
+            city:city,
+
+            state:state,
+
+            uid:auth.currentUser?
+                auth.currentUser.uid:null,
+
+            email:auth.currentUser?
+                auth.currentUser.email||"": ""
+
+        },
+
+        items:cart,
+
+        subtotal:subtotal,
+
+        discount:discount,
+
+        total:total,
+
+        coupon:currentCoupon?
+            currentCoupon.code||
+            currentCoupon.key||
+            "":"",
+
+        status:"NEW",
+
+        paymentStatus:"PENDING",
+
+        paymentMethod:"COD / MANUAL",
+
+        createdAt:new Date().toISOString()
+
+    };
+
+    try{
+
+        await ordersRef
+            .child(orderId)
+            .set(order);
+
+        const message=buildOrderMessage(order);
+
+        const whatsappUrl=
+            "https://wa.me/918269444061?text="+
+            encodeURIComponent(message);
+
+        window.open(whatsappUrl,"_blank");
+
+        cart=[];
+
+        currentCoupon=null;
+
+        localStorage.setItem(
+            "vornex_cart",
+            JSON.stringify([])
+        );
+
+        updateBadges();
+
+        renderCart();
+
+        document.getElementById("checkoutModal")
+            .classList.remove("active");
+
+        showToast(
+            "✅ Order placed successfully!",
+            "success"
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        showToast(
+            "Order save failed: "+error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+function buildOrderMessage(order){
+
+    let text=
+`VORNEX ORDER
+
+Order ID: ${order.orderId}
+
+CUSTOMER
+Name: ${order.customer.name}
+Phone: ${order.customer.phone}
+
+DELIVERY
+Address: ${order.customer.address}
+City/Village: ${order.customer.city}
+State: ${order.customer.state}
+Pincode: ${order.customer.pincode}
+
+PRODUCTS
+`;
+
+    order.items.forEach((item,i)=>{
+
+        text+=
+`${i+1}. ${item.name}`+
+`${item.size?" | Size: "+item.size:""}`+
+` | Qty: ${item.qty||1}`+
+` | ₹${Number(item.price||0)*(item.qty||1)}
+`;
+
+    });
+
+    text+=
+`
+Subtotal: ₹${order.subtotal}
+Discount: ₹${order.discount}
+Total: ₹${order.total}
+Coupon: ${order.coupon||"None"}
+
+Please confirm this order.`;
+
+    return text;
+
+}
+
+
+function placeOrderViaSMS(){
+
+    if(!cart.length){
+
+        showToast("Cart is empty","error");
+
+        return;
+
+    }
+
+    const phone=
+        document.getElementById("custPhone").value.trim();
+
+    const name=
+        document.getElementById("custName").value.trim();
+
+    const message=
+        `VORNEX order from ${name}. Please contact me to confirm my order.`;
+
+    window.location.href=
+        "sms:+918269444061?body="+
+        encodeURIComponent(message);
+
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+function openLoginOrAccount(){
+
+    toggleMenuDrawer(false);
+
+    if(auth.currentUser){
+
+        openAccountPage();
+
+    }else{
+
+        openModal("loginModal");
+
+    }
+
+}
+
+
+function showPhoneLogin(){
+
+    document.getElementById("loginInitial")
+        .style.display="none";
+
+    document.getElementById("phoneLoginBox")
+        .style.display="block";
+
+    if(!window.recaptchaVerifier){
+
+        window.recaptchaVerifier=
+            new firebase.auth.RecaptchaVerifier(
+                "recaptcha-container",
+                {
+                    size:"normal"
+                },
+                auth
+            );
+
+        window.recaptchaVerifier.render();
+
+    }
+
+}
+
+
+function sendPhoneOTP(){
+
+    let phone=
+        document.getElementById("loginPhone")
+        .value
+        .trim();
+
+    if(!/^\d{10}$/.test(phone)){
+
+        showToast(
+            "Enter valid 10 digit phone number",
+            "error"
+        );
+
+        return;
+
+    }
+
+    phone="+91"+phone;
+
+    if(!window.recaptchaVerifier){
+
+        showPhoneLogin();
+
+    }
+
+    auth.signInWithPhoneNumber(
+        phone,
+        window.recaptchaVerifier
+    )
+    .then(result=>{
+
+        confirmationResult=result;
+
+        document.getElementById("otpBox")
+            .style.display="block";
+
+        showToast(
+            "📱 Real OTP sent to your phone",
+            "success"
+        );
+
+    })
+    .catch(error=>{
+
+        console.error(error);
+
+        showToast(
+            error.message||"OTP sending failed",
+            "error"
+        );
+
+        if(window.recaptchaVerifier){
+
+            window.recaptchaVerifier.clear();
+
+            window.recaptchaVerifier=null;
+
+        }
+
+    });
+
+}
+
+
+function verifyPhoneOTP(){
+
+    const otp=
+        document.getElementById("loginOTP")
+        .value
+        .trim();
+
+    if(!confirmationResult){
+
+        showToast(
+            "Please request OTP first",
+            "error"
+        );
+
+        return;
+
+    }
+
+    confirmationResult
+        .confirm(otp)
+        .then(()=>{
+
+            showToast(
+                "🔓 Phone login successful",
+                "success"
+            );
+
+            closeModalStepBack("loginModal");
+
+            updateAuthUI();
+
+        })
+        .catch(()=>{
+
+            showToast(
+                "Invalid OTP",
+                "error"
+            );
+
+        });
+
+}
+
+
+/* Google authentication */
+
+function loginViaGoogle(){
+
+    const provider=
+        new firebase.auth.GoogleAuthProvider();
+
+    auth.signInWithPopup(provider)
+        .then(()=>{
+
+            showToast(
+                "🔓 Google login successful",
+                "success"
+            );
+
+            closeModalStepBack("loginModal");
+
+            updateAuthUI();
+
+        })
+        .catch(error=>{
+
+            console.error(error);
+
+            showToast(
+                error.message||"Google login failed",
+                "error"
+            );
+
+        });
+
+}
+
+
+auth.onAuthStateChanged(user=>{
+
+    updateAuthUI();
+
+    if(user){
+
+        loadCustomerOrders();
+
+    }
+
+});
+
+
+function updateAuthUI(){
+
+    const user=auth.currentUser;
+
+    const accountText=
+        document.getElementById("menuAccountText");
+
+    const name=
+        document.getElementById("accountName");
+
+    const email=
+        document.getElementById("accountEmail");
+
+    const logout=
+        document.getElementById("logoutBtn");
+
+    if(user){
+
+        accountText.textContent="MY ACCOUNT";
+
+        name.textContent=
+            user.displayName||
+            user.phoneNumber||
+            "VORNEX Customer";
+
+        email.textContent=
+            user.email||
+            user.phoneNumber||
+            "Verified Customer";
+
+        logout.style.display="block";
+
+    }else{
+
+        accountText.textContent="LOGIN";
+
+        name.textContent="Guest Customer";
+
+        email.textContent=
+            "Login to view your account";
+
+        logout.style.display="none";
+
+    }
+
+}
+
+
+function openAccountPage(){
+
+    toggleMenuDrawer(false);
+
+    openModal("accountModal");
+
+}
+
+
+function logoutCustomer(){
+
+    auth.signOut()
+        .then(()=>{
+
+            showToast(
+                "Logged out successfully",
+                "success"
+            );
+
+            closeModalStepBack("accountModal");
+
+            updateAuthUI();
+
+        });
+
+}
+
+
+/* =========================================================
+   ORDERS
+========================================================= */
+
+function openOrderHistory(){
+
+    toggleMenuDrawer(false);
+
+    openModal("ordersModal");
+
+    loadCustomerOrders();
+
+}
+
+
+function loadCustomerOrders(){
+
+    const list=
+        document.getElementById("ordersList");
+
+    const user=auth.currentUser;
+
+    if(!user){
+
+        list.innerHTML=`
+
+            <div class="empty-state">
+
+                <i class="fa-solid fa-lock"></i>
+
+                <br>
+
+                Please login first to view your orders.
+
+                <br><br>
+
+                <button
+                    class="small-action"
+                    onclick="closeModalStepBack('ordersModal');openModal('loginModal')">
+                    LOGIN
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    ordersRef
+        .orderByChild("customer/uid")
+        .equalTo(user.uid)
+        .once("value")
+        .then(snapshot=>{
+
+            const data=snapshot.val()||{};
+
+            const keys=Object.keys(data)
+                .sort((a,b)=>
+                    String(data[b].createdAt)
+                    .localeCompare(String(data[a].createdAt))
+                );
+
+            if(!keys.length){
+
+                list.innerHTML=`
+
+                    <div class="empty-state">
+
+                        <i class="fa-solid fa-box-open"></i>
+
+                        <br>
+
+                        No orders found.
+
+                    </div>
+
+                `;
+
+                return;
+
+            }
+
+            let html="";
+
+            keys.forEach(key=>{
+
+                const o=data[key];
+
+                const items=(o.items||[])
+                    .map(x=>
+                        `${x.name}${x.size?" ("+x.size+")":""} × ${x.qty||1}`
+                    )
+                    .join("<br>");
+
+                html+=`
+
+                <div class="order-card">
+
+                    <div class="order-top">
+
+                        <div class="order-id">
+                            ${escapeHtml(o.orderId||key)}
+                        </div>
+
+                        <div class="order-status">
+                            ${escapeHtml(o.status||"NEW")}
+                        </div>
+
+                    </div>
+
+                    <div class="order-date">
+                        ${o.createdAt?
+                            new Date(o.createdAt).toLocaleString("en-IN"):
+                            ""}
+                    </div>
+
+                    <div class="order-products">
+                        ${items}
+                    </div>
+
+                    <div class="order-total">
+                        Total: ₹${Number(o.total||0).toLocaleString("en-IN")}
+                    </div>
+
+                </div>
+
+                `;
+
+            });
+
+            list.innerHTML=html;
+
+        })
+        .catch(error=>{
+
+            console.error(error);
+
+            list.innerHTML=
+                `<div class="empty-state">Unable to load orders.</div>`;
+
+        });
+
+}
+
+
+/* =========================================================
+   TRACK ORDER
+========================================================= */
+
+function openOrderTracking(){
+
+    toggleMenuDrawer(false);
+
+    openModal("trackingModal");
+
+}
+
+
+function trackOrder(){
+
+    const id=
+        document.getElementById("trackOrderId")
+        .value
+        .trim();
+
+    if(!id){
+
+        showToast(
+            "Enter order ID",
+            "error"
+        );
+
+        return;
+
+    }
+
+    ordersRef
+        .child(id)
+        .once("value")
+        .then(snapshot=>{
+
+            const o=snapshot.val();
+
+            const result=
+                document.getElementById("trackingResult");
+
+            if(!o){
+
+                result.innerHTML=
+                    `<p style="color:#ff6b6b;font-size:10px;">
+                        Order not found.
+                    </p>`;
+
+                return;
+
+            }
+
+            result.innerHTML=`
+
+                <div class="order-card">
+
+                    <div class="order-id">
+                        ORDER: ${escapeHtml(o.orderId||id)}
+                    </div>
+
+                    <div style="margin-top:10px;font-size:11px;">
+                        Status:
+                        <strong style="color:#facc15;">
+                            ${escapeHtml(o.status||"NEW")}
+                        </strong>
+                    </div>
+
+                    <div style="margin-top:8px;color:#777;font-size:9px;">
+                        Total: ₹${Number(o.total||0).toLocaleString("en-IN")}
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+}
+
+
+/* =========================================================
+   DRAWERS / MODALS
+========================================================= */
+
+function toggleMenuDrawer(open){
+
+    const drawer=
+        document.getElementById("iosMenuDrawer");
+
+    const overlay=
+        document.getElementById("drawerOverlay");
+
+    if(open){
+
+        drawer.classList.add("active");
+
+        overlay.classList.add("active");
+
+    }else{
+
+        drawer.classList.remove("active");
+
+        overlay.classList.remove("active");
+
+    }
+
+}
+
+
+function closeAllDrawers(){
+
+    toggleMenuDrawer(false);
+
+    closeCartDrawer();
+
+    document.querySelectorAll(".custom-modal")
+        .forEach(x=>x.classList.remove("active"));
+
+}
+
+
+function openCartFromMenu(){
+
+    toggleMenuDrawer(false);
+
+    renderCart();
+
+    document.getElementById("cartDrawer")
+        .classList.add("active");
+
+    document.getElementById("drawerOverlay")
+        .classList.add("active");
+
+}
+
+
+function closeCartDrawer(){
+
+    document.getElementById("cartDrawer")
+        .classList.remove("active");
+
+    document.getElementById("drawerOverlay")
+        .classList.remove("active");
+
+}
+
+
+function openWishlistFromMenu(){
+
+    toggleMenuDrawer(false);
+
+    renderWishlist();
+
+    openModal("wishlistModal");
+
+}
+
+
+function openCouponsFromMenu(){
+
+    toggleMenuDrawer(false);
+
+    renderCoupons();
+
+    openModal("couponsModal");
+
+}
+
+
+function openModal(id){
+
+    document.getElementById(id)
+        .classList.add("active");
+
+}
+
+
+function closeModalStepBack(id){
+
+    document.getElementById(id)
+        .classList.remove("active");
+
+}
+
+
+function closeModalOnBg(event,id){
+
+    if(event.target.id===id){
+
+        closeModalStepBack(id);
+
+    }
+
+}
+
+
+/* =========================================================
+   ACCORDION
+========================================================= */
+
+function toggleAccordion(id){
+
+    const el=document.getElementById(id);
+
+    if(!el) return;
+
+    el.style.display=
+        el.style.display==="block"
+        ?"none":"block";
+
+}
+
+
+/* =========================================================
+   THEMES
+========================================================= */
+
+function setTheme(theme){
+
+    if(theme==="dark"){
+
+        document.body.style.filter="none";
+
+    }
+
+    if(theme==="gold"){
+
+        document.documentElement.style
+            .setProperty("--theme","gold");
+
+    }
+
+    showToast(
+        "Theme: "+theme.toUpperCase(),
+        "info"
+    );
+
+}
+
+
+/* =========================================================
+   POLICIES
+========================================================= */
+
+function openPolicy(title){
+
+    event?.preventDefault();
+
+    document.getElementById("policyTitle")
+        .textContent=title;
+
+    const content=document.getElementById("policyContent");
+
+    const policies={
+
+        "Privacy Policy":
+        "VORNEX customer information is used only for order processing, delivery, customer support and account services. We do not intentionally sell customer information.",
+
+        "Return & Shipping Policy":
+        "Orders are processed after confirmation. Shipping time depends on the delivery location. For return or exchange requests, contact VORNEX support with your order ID.",
+
+        "Terms & Conditions":
+        "By using VORNEX website and placing an order, the customer agrees to provide correct delivery information and follow the applicable store policies.",
+
+        "About Us":
+        "VORNEX is a premium streetwear brand focused on oversized and modern everyday fashion.",
+
+        "Contact Us":
+        "For support, contact VORNEX through WhatsApp or the official contact channel provided on the website."
+
+    };
+
+    content.textContent=
+        policies[title]||
+        "VORNEX information.";
+
+    openModal("policyModal");
+
+}
+
+
+/* =========================================================
+   CART / FOOTER
+========================================================= */
+
+document.getElementById("cartDrawer")
+    .addEventListener("touchstart",()=>{});
+
+renderCart();
+
+</script>
+
 </body>
 </html>
