@@ -1,28 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VORNEX | Admin Control Panel</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VORNEX | Admin Control Panel</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800;900&display=swap" rel="stylesheet">
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Toastify -->
-    <link rel="stylesheet"
-          type="text/css"
-          href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <style>
 *{
@@ -35,21 +29,66 @@
 body{
     background:#080808;
     color:#fff;
-    padding:20px;
+    padding:15px;
     min-height:100vh;
 }
 
 .admin-container{
-    max-width:1000px;
+    max-width:950px;
     margin:0 auto;
     display:none;
 }
 
 h1{
     text-align:center;
-    margin-bottom:25px;
+    margin-bottom:18px;
     letter-spacing:4px;
     font-weight:900;
+    font-size:1.65rem;
+}
+
+/* =========================
+   COMPACT TOP COUNT BOXES
+========================= */
+
+.analytics-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.stat-card{
+    min-height:82px;
+    height:82px;
+    aspect-ratio:auto !important;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    padding:8px;
+    text-align:center;
+    transition:.3s;
+    border-radius:10px;
+}
+
+.stat-card:hover{
+    transform:translateY(-3px);
+}
+
+.stat-card h3{
+    font-size:.55rem;
+    color:#888;
+    letter-spacing:.7px;
+    margin-bottom:5px;
+    font-weight:800;
+    text-transform:uppercase;
+}
+
+.stat-card .value{
+    font-size:1.35rem;
+    font-weight:900;
+    color:#fff;
 }
 
 .card,
@@ -64,65 +103,30 @@ h1{
     border-radius:14px;
 }
 
-.analytics-grid{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:15px;
-    margin-bottom:30px;
-}
-
-.stat-card{
-    aspect-ratio:1/1;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    padding:15px;
-    text-align:center;
-    transition:.3s;
-}
-
-.stat-card:hover{
-    transform:translateY(-4px);
-}
-
-.stat-card h3{
-    font-size:.7rem;
-    color:#888;
-    letter-spacing:1px;
-    margin-bottom:10px;
-    font-weight:800;
-    text-transform:uppercase;
-}
-
-.stat-card .value{
-    font-size:2rem;
-    font-weight:900;
-}
+/* =========================
+   NAVIGATION
+========================= */
 
 .section-nav{
-    display:flex;
-    gap:10px;
-    margin-bottom:25px;
-    flex-wrap:wrap;
-    justify-content:center;
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:8px;
+    margin-bottom:20px;
 }
 
 .nav-tab{
-    flex:1;
-    min-width:170px;
-    padding:14px 18px;
+    padding:12px 8px;
     background:rgba(20,20,20,.5);
     backdrop-filter:blur(10px);
     border:1px solid rgba(255,255,255,.08);
     color:#888;
     font-weight:800;
-    font-size:.78rem;
-    border-radius:10px;
+    font-size:.68rem;
+    border-radius:9px;
     cursor:pointer;
     text-align:center;
     transition:.3s;
-    letter-spacing:1px;
+    letter-spacing:.5px;
 }
 
 .nav-tab:hover{
@@ -134,8 +138,12 @@ h1{
     background:#fff!important;
     color:#000!important;
     font-weight:900;
-    box-shadow:0 0 20px rgba(255,255,255,.25);
+    box-shadow:0 0 18px rgba(255,255,255,.2);
 }
+
+/* =========================
+   SECTIONS
+========================= */
 
 .admin-section{
     display:none;
@@ -158,80 +166,75 @@ h1{
 }
 
 .card{
-    padding:25px;
-    margin-bottom:25px;
+    padding:20px;
+    margin-bottom:18px;
 }
 
 .card h2{
-    margin-bottom:20px;
-    font-size:1.2rem;
+    margin-bottom:18px;
+    font-size:1.05rem;
     letter-spacing:1px;
     border-bottom:1px solid rgba(255,255,255,.1);
-    padding-bottom:12px;
-}
-
-.card h3{
-    color:#aaa;
+    padding-bottom:10px;
 }
 
 .form-group{
-    margin-bottom:18px;
+    margin-bottom:15px;
 }
 
 label{
     display:block;
-    font-size:.8rem;
+    font-size:.72rem;
     font-weight:800;
     margin-bottom:6px;
     color:#aaa;
-    letter-spacing:.5px;
+    letter-spacing:.4px;
 }
 
 input,
 select,
 textarea{
     width:100%;
-    padding:12px 14px;
+    padding:11px 13px;
     background:#000;
     border:1px solid #333;
     color:#fff;
-    font-size:.9rem;
+    font-size:.85rem;
     border-radius:8px;
     outline:none;
-    transition:.2s;
 }
 
 textarea{
-    min-height:100px;
+    min-height:90px;
     resize:vertical;
 }
 
-input:focus,
-select:focus,
-textarea:focus{
-    border-color:#666;
-}
-
 input[type=file]{
-    padding:10px;
+    padding:9px;
     background:#0a0a0a;
     border:1px dashed #444;
     cursor:pointer;
 }
 
+input:focus,
+select:focus,
+textarea:focus{
+    border-color:#777;
+}
+
 button{
     width:100%;
-    padding:14px;
+    padding:12px;
     background:#fff;
     color:#000;
     font-weight:900;
     border:none;
     cursor:pointer;
     border-radius:8px;
-    margin-top:10px;
-    font-size:.9rem;
+    margin-top:8px;
+    font-size:.78rem;
     transition:.2s;
-    letter-spacing:1px;
+    letter-spacing:.7px;
 }
 
 button:hover{
@@ -243,42 +246,73 @@ button:active{
     transform:scale(.98);
 }
 
+/* =========================
+   STOCK
+========================= */
+
+.size-stock-grid{
+    display:grid;
+    grid-template-columns:repeat(5,1fr);
+    gap:7px;
+    margin-top:8px;
+}
+
+.size-input-box{
+    background:#050505;
+    border:1px solid #222;
+    padding:7px;
+    border-radius:8px;
+    text-align:center;
+}
+
+.size-input-box span{
+    font-weight:900;
+    font-size:.75rem;
+    color:#888;
+    display:block;
+    margin-bottom:4px;
+}
+
+.size-input-box input{
+    text-align:center;
+    padding:6px;
+    font-weight:bold;
+}
+
+/* =========================
+   PRODUCTS
+========================= */
+
 .search-box{
     width:100%;
-    padding:12px;
+    padding:11px;
     background:#000;
     border:1px solid #333;
     color:#fff;
-    font-size:.95rem;
+    font-size:.85rem;
     border-radius:8px;
 }
 
 .product-list{
     display:grid;
-    gap:12px;
+    gap:10px;
 }
 
 .product-item{
     background:rgba(5,5,5,.8);
     border:1px solid #222;
-    padding:16px;
+    padding:12px;
     display:flex;
     justify-content:space-between;
     align-items:center;
     border-radius:10px;
     flex-wrap:wrap;
-    gap:12px;
-    transition:.3s;
-}
-
-.product-item:hover{
-    border-color:#444;
-    transform:translateY(-2px);
+    gap:10px;
 }
 
 .product-item img{
-    width:60px;
-    height:75px;
+    width:52px;
+    height:65px;
     object-fit:cover;
     border-radius:6px;
     background:#222;
@@ -288,16 +322,16 @@ button:active{
     flex-grow:1;
     display:flex;
     align-items:center;
-    gap:15px;
+    gap:12px;
 }
 
 .badge-stock{
-    padding:4px 10px;
+    padding:3px 8px;
     border-radius:4px;
-    font-size:.7rem;
+    font-size:.62rem;
     font-weight:900;
     display:inline-block;
-    margin-top:5px;
+    margin-top:4px;
 }
 
 .in-stock{
@@ -314,16 +348,15 @@ button:active{
 
 .action-btns{
     display:flex;
-    gap:8px;
-    flex-wrap:wrap;
+    gap:6px;
 }
 
 .btn-edit{
     background:#ffaa00;
     color:#000;
     width:auto;
-    padding:8px 14px;
-    font-size:.75rem;
+    padding:7px 11px;
+    font-size:.68rem;
     margin:0;
 }
 
@@ -331,35 +364,14 @@ button:active{
     background:#ff3333;
     color:#fff;
     width:auto;
-    padding:8px 14px;
-    font-size:.75rem;
+    padding:7px 11px;
+    font-size:.68rem;
     margin:0;
 }
 
-.btn-blue{
-    background:#3b82f6;
-    color:#fff;
-}
-
-.btn-green{
-    background:#10b981;
-    color:#fff;
-}
-
-.btn-purple{
-    background:linear-gradient(135deg,#6366f1,#8b5cf6);
-    color:#fff;
-}
-
-.btn-red{
-    background:#dc2626;
-    color:#fff;
-}
-
-.btn-gray{
-    background:#333;
-    color:#fff;
-}
+/* =========================
+   MODAL
+========================= */
 
 .modal{
     display:none;
@@ -371,16 +383,16 @@ button:active{
     background:rgba(0,0,0,.85);
     justify-content:center;
     align-items:center;
-    padding:20px;
-    z-index:10000;
+    padding:15px;
+    z-index:100;
 }
 
 .modal-content{
-    max-width:550px;
+    max-width:500px;
     width:100%;
     max-height:90vh;
     overflow-y:auto;
-    padding:25px;
+    padding:20px;
 }
 
 .modal-header{
@@ -396,6 +408,10 @@ button:active{
     font-weight:bold;
 }
 
+/* =========================
+   AUTH
+========================= */
+
 #authOverlay{
     position:fixed;
     top:0;
@@ -406,12 +422,12 @@ button:active{
     display:flex;
     justify-content:center;
     align-items:center;
-    z-index:99999;
+    z-index:9999;
     padding:20px;
 }
 
 .auth-card{
-    padding:40px 30px;
+    padding:35px 25px;
     width:100%;
     max-width:360px;
     text-align:center;
@@ -449,358 +465,208 @@ button:active{
     40%,80%{transform:translateX(12px)}
 }
 
+/* =========================
+   TRAFFIC
+========================= */
+
 .views-log-list{
     max-height:220px;
     overflow-y:auto;
     background:#050505;
     border:1px solid #222;
     border-radius:8px;
-    padding:10px 15px;
-    font-size:.85rem;
+    padding:8px 12px;
+    font-size:.78rem;
 }
 
 .views-log-item{
     display:flex;
     justify-content:space-between;
-    padding:10px 0;
+    padding:9px 0;
     border-bottom:1px solid #1a1a1a;
 }
 
-.views-log-item:last-child{
-    border-bottom:none;
-}
+/* =========================
+   COUPONS
+========================= */
 
-.size-stock-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+.coupon-item{
+    background:#0a0a0a;
+    border:1px solid #222;
+    padding:12px;
+    border-radius:8px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
     gap:10px;
     margin-top:8px;
 }
 
-.size-input-box{
-    background:#050505;
-    border:1px solid #222;
-    padding:8px 12px;
-    border-radius:8px;
-    text-align:center;
-}
-
-.size-input-box span{
-    font-weight:900;
-    font-size:.85rem;
-    color:#888;
-    display:block;
-    margin-bottom:4px;
-}
-
-.size-input-box input{
-    text-align:center;
-    padding:6px;
-    font-weight:bold;
-}
-
-/* MEDIA */
-
-.media-category-grid{
+.discount-type-box{
     display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:10px;
-    margin-bottom:20px;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
 }
 
-.media-category-btn{
-    padding:16px 8px;
-    background:#111;
-    color:#888;
-    border:1px solid #252525;
-    border-radius:10px;
-    cursor:pointer;
+.discount-option{
+    background:#0b0b0b;
+    border:1px solid #333;
+    padding:11px;
     text-align:center;
-    font-size:.72rem;
-    font-weight:900;
-    transition:.2s;
+    border-radius:8px;
+    cursor:pointer;
+    color:#888;
+    font-size:.75rem;
+    font-weight:800;
 }
 
-.media-category-btn:hover{
-    color:#fff;
-    border-color:#555;
-}
-
-.media-category-btn.active{
+.discount-option.active{
     background:#fff;
     color:#000;
 }
 
-.media-list{
+/* =========================
+   MEDIA
+========================= */
+
+.media-grid{
     display:grid;
-    gap:12px;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
 }
 
-.media-item{
-    background:#090909;
-    border:1px solid #252525;
+.media-control{
+    background:#0a0a0a;
+    border:1px solid #222;
     border-radius:10px;
     padding:15px;
 }
 
-.media-item-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:15px;
-}
-
-.media-title{
-    font-weight:900;
-    font-size:.95rem;
-}
-
-.media-description{
-    color:#888;
-    font-size:.78rem;
-    margin-top:6px;
-    line-height:1.5;
-    white-space:pre-wrap;
-}
-
-.media-url{
-    color:#3b82f6;
-    font-size:.75rem;
-    word-break:break-all;
-    margin-top:7px;
-}
-
-.media-actions{
-    display:flex;
-    gap:7px;
-}
-
-.media-actions button{
-    width:auto;
-    margin:0;
-    padding:7px 11px;
-    font-size:.68rem;
+.media-control h3{
+    font-size:.85rem;
+    margin-bottom:10px;
 }
 
 .media-preview{
-    margin-top:10px;
-    padding:10px;
-    background:#050505;
-    border-radius:8px;
-    border:1px solid #1d1d1d;
+    width:100%;
+    max-height:150px;
+    object-fit:cover;
+    border-radius:7px;
+    margin-top:8px;
+    display:none;
 }
 
-.media-preview img,
-.media-preview video{
-    max-width:100%;
-    max-height:180px;
-    border-radius:6px;
-}
-
-/* ORDERS */
-
-.order-list{
-    display:grid;
-    gap:15px;
-}
-
-.order-card{
+.media-list-item{
     background:#090909;
-    border:1px solid #252525;
-    border-radius:12px;
-    padding:18px;
+    border:1px solid #222;
+    padding:10px;
+    border-radius:8px;
+    margin-top:8px;
+}
+
+.media-list-item img,
+.media-list-item video{
+    width:70px;
+    height:55px;
+    object-fit:cover;
+    border-radius:5px;
+    vertical-align:middle;
+    margin-right:8px;
+}
+
+/* =========================
+   ORDERS
+========================= */
+
+.order-item{
+    background:#090909;
+    border:1px solid #222;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:10px;
 }
 
 .order-header{
     display:flex;
     justify-content:space-between;
-    align-items:flex-start;
     gap:10px;
-    margin-bottom:15px;
+    flex-wrap:wrap;
+    margin-bottom:10px;
 }
 
 .order-id{
     font-weight:900;
-    color:#fff;
-}
-
-.order-date{
-    font-size:.7rem;
-    color:#777;
-    margin-top:5px;
+    color:#60a5fa;
 }
 
 .order-status{
-    padding:6px 10px;
-    border-radius:6px;
-    font-size:.68rem;
+    padding:4px 8px;
+    border-radius:5px;
+    background:#222;
+    font-size:.65rem;
     font-weight:900;
 }
 
-.status-pending{
-    background:#3b2a00;
-    color:#fbbf24;
-}
-
-.status-confirmed{
-    background:#082f49;
-    color:#38bdf8;
-}
-
-.status-shipped{
-    background:#312e81;
-    color:#a5b4fc;
-}
-
-.status-delivered{
-    background:#064e3b;
-    color:#34d399;
-}
-
-.status-cancelled{
-    background:#450a0a;
-    color:#f87171;
-}
-
-.customer-box{
-    background:#050505;
-    border:1px solid #1e1e1e;
-    padding:12px;
-    border-radius:8px;
-    margin-bottom:12px;
-}
-
-.customer-row{
-    display:flex;
-    justify-content:space-between;
-    gap:15px;
-    padding:5px 0;
-    font-size:.78rem;
-}
-
-.customer-row span:first-child{
-    color:#777;
-}
-
-.customer-row span:last-child{
-    text-align:right;
-    word-break:break-word;
-}
-
-.order-products{
-    margin-top:10px;
-}
-
-.order-product-row{
-    padding:10px 0;
-    border-bottom:1px solid #1c1c1c;
-    display:flex;
-    justify-content:space-between;
-    gap:10px;
-    font-size:.78rem;
-}
-
-.order-total{
-    display:flex;
-    justify-content:space-between;
-    margin-top:15px;
-    font-size:1rem;
-    font-weight:900;
-}
-
-.order-actions{
-    display:flex;
-    gap:8px;
-    margin-top:15px;
-    flex-wrap:wrap;
-}
-
-.order-actions button{
-    width:auto;
-    margin:0;
-    padding:9px 12px;
-    font-size:.7rem;
-}
-
-.coupon-item{
-    background:#0a0a0a;
-    border:1px solid #222;
-    padding:12px 16px;
-    border-radius:8px;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-top:10px;
-}
-
-.empty-state{
-    text-align:center;
-    padding:30px 15px;
-    color:#666;
-    font-size:.8rem;
-}
-
-.small-muted{
-    color:#777;
+.order-info{
+    color:#aaa;
     font-size:.72rem;
+    line-height:1.7;
 }
+
+.order-product{
+    color:#fff;
+    font-weight:800;
+    margin-top:7px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media(max-width:700px){
-
     body{
         padding:10px;
     }
 
+    h1{
+        font-size:1.25rem;
+        letter-spacing:3px;
+    }
+
     .analytics-grid{
-        grid-template-columns:repeat(2,1fr);
-        gap:10px;
+        gap:7px;
+    }
+
+    .stat-card{
+        height:70px;
+        min-height:70px;
+        padding:5px;
     }
 
     .stat-card .value{
-        font-size:1.5rem;
+        font-size:1.15rem;
     }
 
     .stat-card h3{
-        font-size:.62rem;
+        font-size:.48rem;
     }
 
-    .nav-tab{
-        min-width:145px;
-        font-size:.68rem;
-        padding:12px 8px;
-    }
-
-    .card{
-        padding:18px;
-    }
-
-    .media-category-grid{
+    .section-nav{
         grid-template-columns:repeat(2,1fr);
     }
 
-    .media-category-btn:last-child{
-        grid-column:span 2;
+    .nav-tab{
+        min-width:0;
+        font-size:.62rem;
+        padding:11px 5px;
     }
 
-    .customer-row{
-        flex-direction:column;
-        gap:3px;
+    .size-stock-grid{
+        grid-template-columns:repeat(5,1fr);
     }
 
-    .customer-row span:last-child{
-        text-align:left;
-    }
-
-    .product-item{
-        align-items:flex-start;
-    }
-
-    .action-btns{
-        width:100%;
-    }
-
-    .action-btns button{
-        flex:1;
+    .media-grid{
+        grid-template-columns:1fr;
     }
 }
 </style>
@@ -808,16 +674,15 @@ button:active{
 
 <body>
 
-<!-- ================= PASSWORD ================= -->
+<!-- =========================
+     PASSWORD SCREEN
+========================= -->
 
 <div id="authOverlay">
-
     <div class="auth-card">
-
         <div class="logo">VORNEX</div>
 
         <form onsubmit="return false;">
-
             <input
                 type="password"
                 id="passInput"
@@ -828,810 +693,687 @@ button:active{
                 pattern="[0-9]*"
                 oninput="autoVerifyPassword(this.value)"
             >
-
         </form>
-
     </div>
-
 </div>
 
-
-<!-- ================= MAIN ADMIN ================= -->
+<!-- =========================
+     MAIN DASHBOARD
+========================= -->
 
 <div class="admin-container" id="mainAdminContent">
 
-    <h1>VORNEX DASHBOARD</h1>
+<h1>VORNEX DASHBOARD</h1>
 
+<!-- TOP COUNTING BOXES -->
+<div class="analytics-grid">
 
-    <!-- ANALYTICS -->
-
-    <div class="analytics-grid">
-
-        <div class="stat-card">
-            <h3>TODAY'S VIEWS</h3>
-            <div class="value" id="statTodayViews" style="color:#3b82f6;">0</div>
-        </div>
-
-        <div class="stat-card">
-            <h3>TOTAL PRODUCTS</h3>
-            <div class="value" id="statTotal">0</div>
-        </div>
-
-        <div class="stat-card">
-            <h3>IN STOCK ITEM</h3>
-            <div class="value" id="statInStock" style="color:#40c057;">0</div>
-        </div>
-
-        <div class="stat-card">
-            <h3>ORDERS</h3>
-            <div class="value" id="statOrders" style="color:#a78bfa;">0</div>
-        </div>
-
+    <div class="stat-card">
+        <h3>TODAY'S VIEWS</h3>
+        <div class="value" id="statTodayViews" style="color:#3b82f6;">0</div>
     </div>
 
-
-    <!-- ================= NAVIGATION ================= -->
-
-    <div class="section-nav">
-
-        <div class="nav-tab active"
-             onclick="switchSection('trafficSection',this)">
-            📈 TRAFFIC
-        </div>
-
-        <div class="nav-tab"
-             onclick="switchSection('addProductSection',this)">
-            ➕ ADD PRODUCT
-        </div>
-
-        <div class="nav-tab"
-             onclick="switchSection('inventorySection',this)">
-            📦 INVENTORY
-        </div>
-
-        <div class="nav-tab"
-             onclick="switchSection('mediaSection',this)">
-            📁 MEDIA
-        </div>
-
-        <div class="nav-tab"
-             onclick="switchSection('securitySection',this)">
-            🔐 SECURITY
-        </div>
-
-        <div class="nav-tab"
-             onclick="switchSection('ordersSection',this)">
-            🛒 ORDERS
-        </div>
-
+    <div class="stat-card">
+        <h3>TOTAL PRODUCTS</h3>
+        <div class="value" id="statTotal">0</div>
     </div>
 
-
-    <!-- =====================================================
-         TRAFFIC
-    ====================================================== -->
-
-    <div id="trafficSection" class="admin-section active-section">
-
-        <div class="card">
-
-            <h2>📈 Website Traffic Analytics</h2>
-
-            <div style="position:relative;height:260px;margin-bottom:25px;">
-                <canvas id="viewsChart"></canvas>
-            </div>
-
-            <h3 style="font-size:.85rem;margin-bottom:12px;">
-                📅 DAILY LOGS HISTORY
-            </h3>
-
-            <div id="dailyViewsList" class="views-log-list">
-                <p class="empty-state">Loading traffic data...</p>
-            </div>
-
-        </div>
-
+    <div class="stat-card">
+        <h3>IN STOCK</h3>
+        <div class="value" id="statInStock" style="color:#40c057;">0</div>
     </div>
 
-
-    <!-- =====================================================
-         ADD PRODUCT
-    ====================================================== -->
-
-    <div id="addProductSection" class="admin-section">
-
-        <div class="card">
-
-            <h2>➕ Add New Product</h2>
-
-            <form id="addProductForm">
-
-                <div class="form-group">
-                    <label>Product Name</label>
-                    <input
-                        type="text"
-                        id="pName"
-                        placeholder="VORNEX HEAVYWEIGHT TEE"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-
-                    <label>Category</label>
-
-                    <select id="pCategory">
-
-                        <option>Oversized Tees</option>
-                        <option>T-shirts</option>
-                        <option>Shirts</option>
-                        <option>Hoodies</option>
-                        <option>Sweatshirts</option>
-                        <option>Jeans</option>
-
-                    </select>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Price (₹)</label>
-
-                    <input
-                        type="number"
-                        id="pPrice"
-                        placeholder="799"
-                        required
-                        min="1"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Size Stock Quantity</label>
-
-                    <div class="size-stock-grid">
-
-                        <div class="size-input-box">
-                            <span>S</span>
-                            <input type="number" id="stock_S" value="5" min="0">
-                        </div>
-
-                        <div class="size-input-box">
-                            <span>M</span>
-                            <input type="number" id="stock_M" value="10" min="0">
-                        </div>
-
-                        <div class="size-input-box">
-                            <span>L</span>
-                            <input type="number" id="stock_L" value="10" min="0">
-                        </div>
-
-                        <div class="size-input-box">
-                            <span>XL</span>
-                            <input type="number" id="stock_XL" value="5" min="0">
-                        </div>
-
-                        <div class="size-input-box">
-                            <span>XXL</span>
-                            <input type="number" id="stock_XXL" value="0" min="0">
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Tag / Badge</label>
-
-                    <input
-                        type="text"
-                        id="pTag"
-                        placeholder="BESTSELLER / NEW DROP / HOT"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Primary Image</label>
-
-                    <input
-                        type="file"
-                        id="pImageFile"
-                        accept="image/*"
-                        required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Back View Image (Optional)</label>
-
-                    <input
-                        type="file"
-                        id="pImageBackFile"
-                        accept="image/*"
-                    >
-
-                </div>
-
-                <button type="submit">
-                    ADD PRODUCT TO STORE
-                </button>
-
-            </form>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         INVENTORY
-    ====================================================== -->
-
-    <div id="inventorySection" class="admin-section">
-
-        <div class="card">
-
-            <h2>📦 Live Inventory</h2>
-
-            <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
-
-                <input
-                    type="text"
-                    id="searchBar"
-                    class="search-box"
-                    style="flex:1;"
-                    placeholder="🔍 Search product..."
-                    onkeyup="filterAdminProducts()"
-                >
-
-                <button
-                    onclick="exportToPDF()"
-                    style="width:auto;padding:0 20px;white-space:nowrap;background:#dc2626;color:#fff;"
-                >
-                    📄 PDF
-                </button>
-
-            </div>
-
-            <div id="adminProductList" class="product-list">
-                Loading products...
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         MEDIA
-    ====================================================== -->
-
-    <div id="mediaSection" class="admin-section">
-
-        <div class="card">
-
-            <h2>📁 Website Media Control</h2>
-
-            <p class="small-muted" style="margin-bottom:18px;">
-                Yahan se main website ke social links, WhatsApp,
-                SMS, photos aur videos ko manage kar sakte ho.
-            </p>
-
-
-            <!-- MEDIA CATEGORY -->
-
-            <div class="media-category-grid">
-
-                <div
-                    class="media-category-btn active"
-                    onclick="selectMediaType('instagram',this)"
-                >
-                    📸 INSTAGRAM
-                </div>
-
-                <div
-                    class="media-category-btn"
-                    onclick="selectMediaType('whatsapp',this)"
-                >
-                    💬 WHATSAPP
-                </div>
-
-                <div
-                    class="media-category-btn"
-                    onclick="selectMediaType('sms',this)"
-                >
-                    📱 SMS
-                </div>
-
-                <div
-                    class="media-category-btn"
-                    onclick="selectMediaType('photos',this)"
-                >
-                    🖼️ PHOTOS
-                </div>
-
-                <div
-                    class="media-category-btn"
-                    onclick="selectMediaType('videos',this)"
-                >
-                    🎬 VIDEOS
-                </div>
-
-            </div>
-
-
-            <!-- MEDIA FORM -->
-
-            <form id="mediaForm">
-
-                <input type="hidden" id="mediaEditKey">
-
-                <div class="form-group">
-
-                    <label>Title / Name</label>
-
-                    <input
-                        type="text"
-                        id="mediaTitle"
-                        placeholder="e.g. Official Instagram"
-                        required
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Link / URL / Number</label>
-
-                    <input
-                        type="text"
-                        id="mediaUrl"
-                        placeholder="https://instagram.com/..."
-                    >
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Description / Message</label>
-
-                    <textarea
-                        id="mediaDescription"
-                        placeholder="Description ya SMS message..."
-                    ></textarea>
-
-                </div>
-
-
-                <div class="form-group">
-
-                    <label>Image / Video URL (Optional)</label>
-
-                    <input
-                        type="text"
-                        id="mediaFileUrl"
-                        placeholder="https://..."
-                    >
-
-                </div>
-
-
-                <button
-                    type="submit"
-                    id="mediaSubmitBtn"
-                    class="btn-purple"
-                >
-                    ADD MEDIA
-                </button>
-
-
-                <button
-                    type="button"
-                    class="btn-gray"
-                    onclick="resetMediaForm()"
-                >
-                    CLEAR FORM
-                </button>
-
-            </form>
-
-        </div>
-
-
-        <!-- MEDIA LIST -->
-
-        <div class="card">
-
-            <h2>
-                <span id="mediaListTitle">📸 Instagram</span>
-            </h2>
-
-            <div id="mediaList" class="media-list">
-                <div class="empty-state">
-                    Loading media...
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         SECURITY
-    ====================================================== -->
-
-    <div id="securitySection" class="admin-section">
-
-        <div class="card">
-
-            <h2>🔑 Change Admin Password</h2>
-
-            <form
-                id="changePassForm"
-                onsubmit="updateAdminPassword(event)"
-            >
-
-                <div class="form-group">
-
-                    <label>Current Password</label>
-
-                    <input
-                        type="password"
-                        id="currPass"
-                        required
-                        inputmode="numeric"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>New Password</label>
-
-                    <input
-                        type="password"
-                        id="newPass"
-                        required
-                        inputmode="numeric"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Confirm New Password</label>
-
-                    <input
-                        type="password"
-                        id="confirmPass"
-                        required
-                        inputmode="numeric"
-                    >
-
-                </div>
-
-                <button
-                    type="submit"
-                    class="btn-blue"
-                >
-                    UPDATE PASSWORD
-                </button>
-
-            </form>
-
-        </div>
-
-
-        <!-- COUPON -->
-
-        <div class="card">
-
-            <h2>🎫 Dynamic Coupon Generator</h2>
-
-            <form
-                id="createCouponForm"
-                onsubmit="generateCoupon(event)"
-            >
-
-                <div class="form-group">
-
-                    <label>Coupon Code Name</label>
-
-                    <input
-                        type="text"
-                        id="couponName"
-                        placeholder="SUMMER20"
-                        required
-                        style="text-transform:uppercase;"
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label>Discount Percentage (%)</label>
-
-                    <input
-                        type="number"
-                        id="couponDiscount"
-                        placeholder="15"
-                        min="1"
-                        max="100"
-                        required
-                    >
-
-                </div>
-
-                <button
-                    type="submit"
-                    class="btn-green"
-                >
-                    GENERATE COUPON
-                </button>
-
-            </form>
-
-
-            <h3 style="font-size:.85rem;margin:20px 0 10px;">
-                🏷️ ACTIVE STORE COUPONS
-            </h3>
-
-            <div id="activeCouponsList">
-                <p class="empty-state">
-                    Loading coupons...
-                </p>
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         ORDERS
-    ====================================================== -->
-
-    <div id="ordersSection" class="admin-section">
-
-        <div class="card">
-
-            <h2>🛒 Customer Orders</h2>
-
-            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
-
-                <input
-                    type="text"
-                    id="orderSearch"
-                    class="search-box"
-                    placeholder="🔍 Search order / customer / phone..."
-                    onkeyup="filterOrders()"
-                >
-
-                <select
-                    id="orderStatusFilter"
-                    onchange="filterOrders()"
-                    style="max-width:180px;"
-                >
-
-                    <option value="all">ALL STATUS</option>
-                    <option value="pending">PENDING</option>
-                    <option value="confirmed">CONFIRMED</option>
-                    <option value="shipped">SHIPPED</option>
-                    <option value="delivered">DELIVERED</option>
-                    <option value="cancelled">CANCELLED</option>
-
-                </select>
-
-            </div>
-
-            <div id="ordersList" class="order-list">
-
-                <div class="empty-state">
-                    Loading orders...
-                </div>
-
-            </div>
-
-        </div>
-
+    <div class="stat-card">
+        <h3>OUT OF STOCK</h3>
+        <div class="value" id="statOutStock" style="color:#ff6b6b;">0</div>
     </div>
 
 </div>
 
+<!-- =========================
+     DASHBOARD BUTTONS
+========================= -->
 
-<!-- =====================================================
+<div class="section-nav">
+
+    <div class="nav-tab active"
+         onclick="switchSection('trafficSection',this)">
+        📈 TRAFFIC
+    </div>
+
+    <div class="nav-tab"
+         onclick="switchSection('addProductSection',this)">
+        ➕ ADD PRODUCT
+    </div>
+
+    <div class="nav-tab"
+         onclick="switchSection('inventorySection',this)">
+        📦 INVENTORY
+    </div>
+
+    <div class="nav-tab"
+         onclick="switchSection('securitySection',this)">
+        🔐 SECURITY
+    </div>
+
+    <div class="nav-tab"
+         onclick="switchSection('couponSection',this)">
+        🎫 COUPONS
+    </div>
+
+    <div class="nav-tab"
+         onclick="switchSection('mediaSection',this)">
+        📁 MEDIA
+    </div>
+
+    <div class="nav-tab"
+         onclick="switchSection('ordersSection',this)">
+        📦 ORDERS
+    </div>
+
+</div>
+
+<!-- =========================
+     TRAFFIC
+========================= -->
+
+<div id="trafficSection" class="admin-section active-section">
+
+<div class="card">
+
+<h2>📈 Website Traffic Analytics</h2>
+
+<div style="position:relative;height:260px;margin-bottom:20px;">
+    <canvas id="viewsChart"></canvas>
+</div>
+
+<h3 style="font-size:.75rem;color:#888;margin-bottom:10px;">
+📅 DAILY LOGS HISTORY
+</h3>
+
+<div id="dailyViewsList" class="views-log-list">
+Loading traffic data...
+</div>
+
+</div>
+</div>
+
+<!-- =========================
+     ADD PRODUCT
+========================= -->
+
+<div id="addProductSection" class="admin-section">
+
+<div class="card">
+
+<h2>➕ Add New Product</h2>
+
+<form id="addProductForm">
+
+<div class="form-group">
+<label>Product Name</label>
+<input type="text" id="pName"
+placeholder="e.g. VORNEX HEAVYWEIGHT TEE" required>
+</div>
+
+<div class="form-group">
+<label>Category</label>
+
+<select id="pCategory">
+<option>Oversized Tees</option>
+<option>T-shirts</option>
+<option>Shirts</option>
+<option>Hoodies</option>
+<option>Sweatshirts</option>
+<option>Jeans</option>
+</select>
+
+</div>
+
+<div class="form-group">
+<label>Price (₹)</label>
+<input type="number" id="pPrice" placeholder="799" required min="1">
+</div>
+
+<div class="form-group">
+
+<label>Size Stock Quantity</label>
+
+<div class="size-stock-grid">
+
+<div class="size-input-box">
+<span>S</span>
+<input type="number" id="stock_S" value="5" min="0">
+</div>
+
+<div class="size-input-box">
+<span>M</span>
+<input type="number" id="stock_M" value="10" min="0">
+</div>
+
+<div class="size-input-box">
+<span>L</span>
+<input type="number" id="stock_L" value="10" min="0">
+</div>
+
+<div class="size-input-box">
+<span>XL</span>
+<input type="number" id="stock_XL" value="5" min="0">
+</div>
+
+<div class="size-input-box">
+<span>XXL</span>
+<input type="number" id="stock_XXL" value="0" min="0">
+</div>
+
+</div>
+</div>
+
+<div class="form-group">
+<label>Tag / Badge</label>
+<input type="text" id="pTag"
+placeholder="BESTSELLER / NEW DROP / HOT" required>
+</div>
+
+<div class="form-group">
+<label>Primary Image — Gallery</label>
+<input type="file" id="pImageFile" accept="image/*" required>
+</div>
+
+<div class="form-group">
+<label>Back View Image — Gallery</label>
+<input type="file" id="pImageBackFile" accept="image/*">
+</div>
+
+<button type="submit">ADD PRODUCT TO STORE</button>
+
+</form>
+</div>
+</div>
+
+<!-- =========================
+     INVENTORY
+========================= -->
+
+<div id="inventorySection" class="admin-section">
+
+<div class="card">
+
+<h2>📦 Live Inventory</h2>
+
+<div style="display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;">
+
+<input
+type="text"
+id="searchBar"
+class="search-box"
+style="flex:1;"
+placeholder="🔍 Search product..."
+onkeyup="filterAdminProducts()"
+>
+
+<button
+onclick="exportToPDF()"
+style="width:auto;padding:0 15px;white-space:nowrap;background:#dc2626;color:#fff;">
+📄 PDF
+</button>
+
+</div>
+
+<div id="adminProductList" class="product-list">
+Loading products...
+</div>
+
+</div>
+</div>
+
+<!-- =========================
+     SECURITY
+========================= -->
+
+<div id="securitySection" class="admin-section">
+
+<div class="card">
+
+<h2>🔐 Change Admin Password</h2>
+
+<form id="changePassForm"
+onsubmit="updateAdminPassword(event)">
+
+<div class="form-group">
+<label>Current Password</label>
+<input
+type="password"
+id="currPass"
+required
+inputmode="numeric"
+>
+</div>
+
+<div class="form-group">
+<label>New Password</label>
+<input
+type="password"
+id="newPass"
+required
+inputmode="numeric"
+>
+</div>
+
+<div class="form-group">
+<label>Confirm New Password</label>
+<input
+type="password"
+id="confirmPass"
+required
+inputmode="numeric"
+>
+</div>
+
+<button
+type="submit"
+style="background:#3b82f6;color:#fff;">
+UPDATE PASSWORD
+</button>
+
+</form>
+
+</div>
+</div>
+
+<!-- =========================
+     COUPONS
+========================= -->
+
+<div id="couponSection" class="admin-section">
+
+<div class="card">
+
+<h2>🎫 Coupon Generator</h2>
+
+<form id="createCouponForm"
+onsubmit="generateCoupon(event)">
+
+<div class="form-group">
+
+<label>Coupon Code</label>
+
+<input
+type="text"
+id="couponName"
+placeholder="VORNEX20"
+required
+style="text-transform:uppercase;"
+>
+
+</div>
+
+<div class="form-group">
+
+<label>Discount Type</label>
+
+<div class="discount-type-box">
+
+<div
+id="percentOption"
+class="discount-option active"
+onclick="selectDiscountType('percentage')">
+% PERCENTAGE
+</div>
+
+<div
+id="flatOption"
+class="discount-option"
+onclick="selectDiscountType('flat')">
+₹ FLAT DISCOUNT
+</div>
+
+</div>
+
+<input
+type="hidden"
+id="discountType"
+value="percentage">
+
+</div>
+
+<div class="form-group">
+
+<label id="discountLabel">
+Discount Percentage (%)
+</label>
+
+<input
+type="number"
+id="couponDiscount"
+placeholder="20"
+min="1"
+required
+>
+
+</div>
+
+<button
+type="submit"
+style="background:#10b981;color:#fff;">
+GENERATE COUPON
+</button>
+
+</form>
+
+<h3 style="font-size:.75rem;color:#888;margin:18px 0 8px;">
+🏷️ ACTIVE STORE COUPONS
+</h3>
+
+<div id="activeCouponsList">
+Loading active coupons...
+</div>
+
+</div>
+</div>
+
+<!-- =========================
+     MEDIA
+========================= -->
+
+<div id="mediaSection" class="admin-section">
+
+<div class="card">
+
+<h2>📁 Website Media Controls</h2>
+
+<p style="font-size:.72rem;color:#777;margin-bottom:15px;">
+यहाँ से website media data Firebase में manage किया जा सकता है।
+</p>
+
+<div class="media-grid">
+
+<!-- PHOTOS -->
+
+<div class="media-control">
+
+<h3>🖼️ Photos</h3>
+
+<input
+type="file"
+id="mediaPhotoFile"
+accept="image/*"
+onchange="previewMediaImage(this,'photoPreview')">
+
+<img
+id="photoPreview"
+class="media-preview">
+
+<input
+type="text"
+id="mediaPhotoTitle"
+placeholder="Photo title">
+
+<button
+onclick="addMediaPhoto()"
+style="background:#6366f1;color:#fff;">
+ADD PHOTO
+</button>
+
+</div>
+
+<!-- VIDEOS -->
+
+<div class="media-control">
+
+<h3>🎥 Videos</h3>
+
+<input
+type="file"
+id="mediaVideoFile"
+accept="video/*"
+onchange="previewMediaVideo(this)">
+
+<video
+id="videoPreview"
+class="media-preview"
+controls>
+</video>
+
+<input
+type="text"
+id="mediaVideoTitle"
+placeholder="Video title">
+
+<button
+onclick="addMediaVideo()"
+style="background:#8b5cf6;color:#fff;">
+ADD VIDEO
+</button>
+
+</div>
+
+<!-- INSTAGRAM -->
+
+<div class="media-control">
+
+<h3>📸 Instagram</h3>
+
+<input
+type="text"
+id="instagramValue"
+placeholder="Instagram URL">
+
+<button
+onclick="saveMediaText('instagram')"
+style="background:#e1306c;color:#fff;">
+SAVE INSTAGRAM
+</button>
+
+</div>
+
+<!-- WHATSAPP -->
+
+<div class="media-control">
+
+<h3>💬 WhatsApp</h3>
+
+<input
+type="text"
+id="whatsappValue"
+placeholder="WhatsApp number/link">
+
+<button
+onclick="saveMediaText('whatsapp')"
+style="background:#25d366;color:#000;">
+SAVE WHATSAPP
+</button>
+
+</div>
+
+<!-- SMS -->
+
+<div class="media-control">
+
+<h3>📱 SMS</h3>
+
+<input
+type="text"
+id="smsValue"
+placeholder="SMS number/link">
+
+<button
+onclick="saveMediaText('sms')"
+style="background:#3b82f6;color:#fff;">
+SAVE SMS
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🗂️ Saved Media</h2>
+
+<div id="mediaList">
+Loading media...
+</div>
+
+</div>
+
+</div>
+
+<!-- =========================
+     ORDERS
+========================= -->
+
+<div id="ordersSection" class="admin-section">
+
+<div class="card">
+
+<h2>📦 Customer Orders</h2>
+
+<div style="display:flex;gap:8px;margin-bottom:15px;">
+
+<input
+type="text"
+id="orderSearch"
+class="search-box"
+placeholder="🔍 Search Order / Customer / Phone..."
+onkeyup="filterOrders()">
+
+<button
+onclick="loadOrders()"
+style="width:auto;background:#3b82f6;color:#fff;padding:0 15px;">
+REFRESH
+</button>
+
+</div>
+
+<div id="ordersList">
+Loading orders...
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- =========================
      EDIT PRODUCT MODAL
-====================================================== -->
+========================= -->
 
-<div
-    id="editModal"
-    class="modal"
-    onclick="closeModalOnBg(event)"
->
+<div id="editModal"
+class="modal"
+onclick="closeModalOnBg(event)">
 
-    <div class="modal-content">
+<div class="modal-content">
 
-        <div class="modal-header">
+<div class="modal-header">
 
-            <h3>✏️ Edit Product</h3>
+<h3>✏️ Edit Product</h3>
 
-            <span
-                class="close-btn"
-                onclick="closeEditModal()"
-            >
-                &times;
-            </span>
-
-        </div>
-
-        <form id="editProductForm">
-
-            <input type="hidden" id="editKey">
-
-            <div class="form-group">
-                <label>Product Name</label>
-                <input type="text" id="editName" required>
-            </div>
-
-            <div class="form-group">
-
-                <label>Category</label>
-
-                <select id="editCategory">
-
-                    <option>Oversized Tees</option>
-                    <option>T-shirts</option>
-                    <option>Shirts</option>
-                    <option>Hoodies</option>
-                    <option>Sweatshirts</option>
-                    <option>Jeans</option>
-
-                </select>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Price (₹)</label>
-
-                <input
-                    type="number"
-                    id="editPrice"
-                    required
-                    min="1"
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Size Stock</label>
-
-                <div class="size-stock-grid">
-
-                    <div class="size-input-box">
-                        <span>S</span>
-                        <input type="number" id="editStock_S" min="0">
-                    </div>
-
-                    <div class="size-input-box">
-                        <span>M</span>
-                        <input type="number" id="editStock_M" min="0">
-                    </div>
-
-                    <div class="size-input-box">
-                        <span>L</span>
-                        <input type="number" id="editStock_L" min="0">
-                    </div>
-
-                    <div class="size-input-box">
-                        <span>XL</span>
-                        <input type="number" id="editStock_XL" min="0">
-                    </div>
-
-                    <div class="size-input-box">
-                        <span>XXL</span>
-                        <input type="number" id="editStock_XXL" min="0">
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Tag / Badge</label>
-
-                <input type="text" id="editTag" required>
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Change Primary Image</label>
-
-                <input
-                    type="file"
-                    id="editImageFile"
-                    accept="image/*"
-                >
-
-            </div>
-
-            <div class="form-group">
-
-                <label>Change Back Image</label>
-
-                <input
-                    type="file"
-                    id="editImageBackFile"
-                    accept="image/*"
-                >
-
-            </div>
-
-            <button
-                type="submit"
-                style="background:#ffaa00;color:#000;"
-            >
-                UPDATE PRODUCT
-            </button>
-
-        </form>
-
-    </div>
+<span
+class="close-btn"
+onclick="closeEditModal()">
+&times;
+</span>
 
 </div>
 
+<form id="editProductForm">
 
-<!-- =====================================================
-     ORDER DETAILS MODAL
-====================================================== -->
+<input type="hidden" id="editKey">
 
-<div
-    id="orderModal"
-    class="modal"
-    onclick="closeOrderModalBg(event)"
->
+<div class="form-group">
+<label>Product Name</label>
+<input type="text" id="editName" required>
+</div>
 
-    <div class="modal-content">
+<div class="form-group">
 
-        <div class="modal-header">
+<label>Category</label>
 
-            <h3>🛒 Order Details</h3>
-
-            <span
-                class="close-btn"
-                onclick="closeOrderModal()"
-            >
-                &times;
-            </span>
-
-        </div>
-
-        <div id="orderModalContent"></div>
-
-    </div>
+<select id="editCategory">
+<option>Oversized Tees</option>
+<option>T-shirts</option>
+<option>Shirts</option>
+<option>Hoodies</option>
+<option>Sweatshirts</option>
+<option>Jeans</option>
+</select>
 
 </div>
 
+<div class="form-group">
+<label>Price</label>
+<input type="number" id="editPrice" required min="1">
+</div>
+
+<div class="form-group">
+
+<label>Size Stock</label>
+
+<div class="size-stock-grid">
+
+<div class="size-input-box">
+<span>S</span>
+<input type="number" id="editStock_S" min="0">
+</div>
+
+<div class="size-input-box">
+<span>M</span>
+<input type="number" id="editStock_M" min="0">
+</div>
+
+<div class="size-input-box">
+<span>L</span>
+<input type="number" id="editStock_L" min="0">
+</div>
+
+<div class="size-input-box">
+<span>XL</span>
+<input type="number" id="editStock_XL" min="0">
+</div>
+
+<div class="size-input-box">
+<span>XXL</span>
+<input type="number" id="editStock_XXL" min="0">
+</div>
+
+</div>
+</div>
+
+<div class="form-group">
+<label>Tag</label>
+<input type="text" id="editTag" required>
+</div>
+
+<div class="form-group">
+<label>Change Primary Image</label>
+<input type="file" id="editImageFile" accept="image/*">
+</div>
+
+<div class="form-group">
+<label>Change Back Image</label>
+<input type="file" id="editImageBackFile" accept="image/*">
+</div>
+
+<button
+type="submit"
+style="background:#ffaa00;color:#000;">
+UPDATE PRODUCT
+</button>
+
+</form>
+
+</div>
+</div>
 
 <script>
 
-/* =========================================================
+/* =====================================================
    TOAST
-========================================================= */
+===================================================== */
 
 function showToast(message,type="success"){
 
@@ -1645,23 +1387,21 @@ function showToast(message,type="success"){
         duration:2500,
         gravity:"bottom",
         position:"right",
-        stopOnFocus:true,
         style:{
             background:"#141414",
             color:"#fff",
             border:"1px solid "+border,
             borderRadius:"8px",
-            fontFamily:"Montserrat,sans-serif",
-            fontWeight:"600",
-            fontSize:".85rem"
+            fontFamily:"Montserrat",
+            fontWeight:"600"
         }
     }).showToast();
 }
 
 
-/* =========================================================
+/* =====================================================
    FIREBASE
-========================================================= */
+===================================================== */
 
 const firebaseConfig={
 
@@ -1693,133 +1433,91 @@ const productsRef=db.ref("products");
 const analyticsRef=db.ref("analytics/daily_views");
 const adminAuthRef=db.ref("admin_settings/password");
 const couponsRef=db.ref("coupons");
-
-/*
-   NEW PATHS
-*/
-
 const mediaRef=db.ref("media");
 const ordersRef=db.ref("orders");
 
 
-/* =========================================================
+/* =====================================================
    PASSWORD
-========================================================= */
-
-/*
-   DEFAULT PASSWORD = 0000
-
-   Database me agar purana 444061 saved hai,
-   tab bhi is replacement ke saath initial password 0000 rahega.
-
-   Jab admin khud password change karega,
-   tab Firebase me naya password save hoga.
-*/
+===================================================== */
 
 let currentDbPassword="0000";
 
-let passwordLoaded=false;
+adminAuthRef.on("value",snap=>{
 
-adminAuthRef.once("value")
-.then(snapshot=>{
-
-    if(snapshot.exists()){
-
-        /*
-          Agar Firebase me password already 0000 hai
-          to use continue rakho.
-
-          Agar purana value hai, first login ke liye
-          requested default 0000 rakha gaya hai.
-        */
-
-        const saved=String(snapshot.val());
-
-        if(saved==="0000"){
-            currentDbPassword="0000";
-        }
-
-    }else{
-
-        adminAuthRef.set("0000");
-
+    if(snap.exists()){
+        currentDbPassword=String(snap.val());
     }
 
-    passwordLoaded=true;
-
-})
-.catch(()=>{
-    passwordLoaded=true;
 });
 
-
 document.getElementById("authOverlay").style.display="flex";
-
 document.getElementById("mainAdminContent").style.display="none";
-
 
 let isProcessingAuth=false;
 
-function autoVerifyPassword(value){
+function autoVerifyPassword(val){
 
     if(isProcessingAuth)return;
 
-    const cleanVal=value.trim();
+    const cleanVal=val.trim();
 
-    if(cleanVal.length!==currentDbPassword.length)return;
+    if(cleanVal.length===currentDbPassword.length){
 
-    if(cleanVal===currentDbPassword){
+        if(cleanVal===currentDbPassword){
 
-        document.getElementById("authOverlay").style.display="none";
+            document.getElementById("authOverlay").style.display="none";
 
-        document.getElementById("mainAdminContent").style.display="block";
+            document.getElementById("mainAdminContent").style.display="block";
 
-        showToast("🔓 Access Granted! Welcome Admin.");
+            showToast(
+                "🔓 Access Granted! Welcome Admin.",
+                "success"
+            );
 
-    }else{
+        }else{
 
-        triggerWrongPasswordAlert();
+            isProcessingAuth=true;
+
+            const input=
+            document.getElementById("passInput");
+
+            input.classList.add("shake-error");
+
+            if(navigator.vibrate){
+                navigator.vibrate([100,50,100]);
+            }
+
+            showToast(
+                "⚠️ Incorrect Password!",
+                "error"
+            );
+
+            setTimeout(()=>{
+
+                input.classList.remove("shake-error");
+                input.value="";
+                isProcessingAuth=false;
+
+            },600);
+
+        }
 
     }
+
 }
 
 
-function triggerWrongPasswordAlert(){
-
-    isProcessingAuth=true;
-
-    const input=document.getElementById("passInput");
-
-    input.classList.add("shake-error");
-
-    if(navigator.vibrate){
-        navigator.vibrate([100,50,100,50,100]);
-    }
-
-    showToast("⚠️ Incorrect Password!","error");
-
-    setTimeout(()=>{
-
-        input.classList.remove("shake-error");
-
-        input.value="";
-
-        isProcessingAuth=false;
-
-    },600);
-}
-
-
-/* =========================================================
+/* =====================================================
    SECTION SWITCH
-========================================================= */
+===================================================== */
 
-function switchSection(sectionId,button){
+function switchSection(sectionId,btn){
 
     document
     .querySelectorAll(".admin-section")
-    .forEach(section=>{
-        section.classList.remove("active-section");
+    .forEach(sec=>{
+        sec.classList.remove("active-section");
     });
 
     document
@@ -1828,47 +1526,52 @@ function switchSection(sectionId,button){
         tab.classList.remove("active");
     });
 
-    const target=document.getElementById(sectionId);
+    document
+    .getElementById(sectionId)
+    .classList.add("active-section");
 
-    if(target){
-        target.classList.add("active-section");
+    btn.classList.add("active");
+
+    if(sectionId==="ordersSection"){
+        loadOrders();
     }
 
-    if(button){
-        button.classList.add("active");
+    if(sectionId==="mediaSection"){
+        loadMedia();
     }
 
 }
 
 
-/* =========================================================
+/* =====================================================
    TRAFFIC
-========================================================= */
+===================================================== */
 
 let viewsChartInstance=null;
 
 analyticsRef.on("value",snapshot=>{
 
-    const data=snapshot.val()||{};
-
-    renderTrafficAnalytics(data);
+    renderTrafficAnalytics(
+        snapshot.val()||{}
+    );
 
 });
 
-
 function renderTrafficAnalytics(data){
 
-    const sortedDates=Object.keys(data).sort();
+    const sortedDates=
+    Object.keys(data).sort();
 
     const labels=[];
-    const values=[];
+    const chartValues=[];
 
-    const list=document.getElementById("dailyViewsList");
+    const listEl=
+    document.getElementById("dailyViewsList");
 
     if(sortedDates.length===0){
 
-        list.innerHTML=
-        `<p class="empty-state">No traffic data yet.</p>`;
+        listEl.innerHTML=
+        "<p style='color:#666;text-align:center;'>No traffic data yet.</p>";
 
         document.getElementById("statTodayViews").innerText="0";
 
@@ -1877,45 +1580,35 @@ function renderTrafficAnalytics(data){
 
     const now=new Date();
 
-    const today=
-    now.getFullYear()+"-"+
-    String(now.getMonth()+1).padStart(2,"0")+"-"+
-    String(now.getDate()).padStart(2,"0");
+    const todayStr=
+    `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 
     document.getElementById("statTodayViews").innerText=
-    data[today]||0;
+    data[todayStr]||0;
 
     let html="";
 
     for(let i=sortedDates.length-1;i>=0;i--){
 
         const date=sortedDates[i];
-
-        const count=Number(data[date])||0;
+        const count=data[date];
 
         html+=`
         <div class="views-log-item">
-
-            <span>📅 ${escapeHtml(date)}</span>
-
+            <span>📅 ${date}</span>
             <strong style="color:#40c057;">
-                ${count} view${count!==1?"s":""}
+                ${count} view${count>1?"s":""}
             </strong>
+        </div>`;
 
-        </div>
-        `;
     }
 
-    list.innerHTML=html;
+    listEl.innerHTML=html;
 
     sortedDates.forEach(date=>{
-
         labels.push(date);
-
-        values.push(Number(data[date])||0);
-
+        chartValues.push(data[date]);
     });
-
 
     const ctx=
     document.getElementById("viewsChart").getContext("2d");
@@ -1929,39 +1622,25 @@ function renderTrafficAnalytics(data){
         type:"line",
 
         data:{
-
             labels:labels,
 
             datasets:[{
-
                 label:"Daily Visitors",
-
-                data:values,
-
+                data:chartValues,
                 borderColor:"#3b82f6",
-
-                backgroundColor:"rgba(59,130,246,.15)",
-
+                backgroundColor:
+                "rgba(59,130,246,.15)",
                 borderWidth:3,
-
-                pointBackgroundColor:"#3b82f6",
-
                 fill:true,
-
                 tension:.3
-
             }]
-
         },
 
         options:{
-
             responsive:true,
-
             maintainAspectRatio:false,
 
             scales:{
-
                 x:{
                     ticks:{color:"#888"},
                     grid:{color:"#1a1a1a"}
@@ -1972,20 +1651,14 @@ function renderTrafficAnalytics(data){
                     grid:{color:"#1a1a1a"},
                     beginAtZero:true
                 }
-
             },
 
             plugins:{
-
                 legend:{
                     labels:{
-                        color:"#fff",
-                        font:{
-                            family:"Montserrat"
-                        }
+                        color:"#fff"
                     }
                 }
-
             }
 
         }
@@ -1995,9 +1668,9 @@ function renderTrafficAnalytics(data){
 }
 
 
-/* =========================================================
-   FILE BASE64
-========================================================= */
+/* =====================================================
+   FILE TO BASE64
+===================================================== */
 
 function fileToBase64(file){
 
@@ -2025,9 +1698,9 @@ function fileToBase64(file){
 }
 
 
-/* =========================================================
+/* =====================================================
    ADD PRODUCT
-========================================================= */
+===================================================== */
 
 document
 .getElementById("addProductForm")
@@ -2041,30 +1714,44 @@ document
     const backFile=
     document.getElementById("pImageBackFile").files[0];
 
-    showToast("⏳ Processing image...","info");
+    showToast(
+        "⏳ Processing image...",
+        "info"
+    );
 
     try{
 
-        const image=await fileToBase64(primaryFile);
+        const image=
+        await fileToBase64(primaryFile);
 
         const imageBack=
         await fileToBase64(backFile);
 
         const sizeStocks={
 
-            S:Number(document.getElementById("stock_S").value)||0,
+            S:parseInt(
+                document.getElementById("stock_S").value
+            )||0,
 
-            M:Number(document.getElementById("stock_M").value)||0,
+            M:parseInt(
+                document.getElementById("stock_M").value
+            )||0,
 
-            L:Number(document.getElementById("stock_L").value)||0,
+            L:parseInt(
+                document.getElementById("stock_L").value
+            )||0,
 
-            XL:Number(document.getElementById("stock_XL").value)||0,
+            XL:parseInt(
+                document.getElementById("stock_XL").value
+            )||0,
 
-            XXL:Number(document.getElementById("stock_XXL").value)||0
+            XXL:parseInt(
+                document.getElementById("stock_XXL").value
+            )||0
 
         };
 
-        const product={
+        const newProd={
 
             name:
             document.getElementById("pName").value.trim(),
@@ -2073,7 +1760,9 @@ document
             document.getElementById("pCategory").value,
 
             price:
-            Number(document.getElementById("pPrice").value),
+            parseInt(
+                document.getElementById("pPrice").value
+            ),
 
             sizeStocks:sizeStocks,
 
@@ -2086,32 +1775,31 @@ document
 
         };
 
-        productsRef.push(product,error=>{
+        productsRef.push(newProd,err=>{
 
-            if(error){
-
-                showToast(
-                    "Error: "+error.message,
-                    "error"
-                );
-
-            }else{
+            if(!err){
 
                 showToast(
-                    "✅ Product Added Successfully!"
+                    "✅ Product Added Successfully!",
+                    "success"
                 );
 
                 document
                 .getElementById("addProductForm")
                 .reset();
 
+            }else{
+
+                showToast(
+                    "Error: "+err.message,
+                    "error"
+                );
+
             }
 
         });
 
-    }catch(error){
-
-        console.error(error);
+    }catch(err){
 
         showToast(
             "Image Processing Error!",
@@ -2123,9 +1811,9 @@ document
 });
 
 
-/* =========================================================
-   PRODUCTS
-========================================================= */
+/* =====================================================
+   PRODUCTS LISTENER
+===================================================== */
 
 let allProducts={};
 
@@ -2144,31 +1832,47 @@ function updateAnalytics(data){
 
     const keys=Object.keys(data);
 
+    let total=keys.length;
     let inStock=0;
-
     let outStock=0;
 
     keys.forEach(key=>{
 
-        const stocks=data[key].sizeStocks||{};
+        const stocks=
+        data[key].sizeStocks||{};
 
-        const total=Object
-        .values(stocks)
+        const totalStock=
+        Object.values(stocks)
         .reduce((a,b)=>a+Number(b||0),0);
 
-        if(total>0){
+        if(totalStock>0){
+
             inStock++;
+
         }else{
+
             outStock++;
+
         }
 
     });
 
-    document.getElementById("statTotal").innerText=
-    keys.length;
+    document.getElementById("statTotal").innerText=total;
+    document.getElementById("statInStock").innerText=inStock;
+    document.getElementById("statOutStock").innerText=outStock;
 
-    document.getElementById("statInStock").innerText=
-    inStock;
+}
+
+
+function escapeHtml(text){
+
+    return text?
+    String(text)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;"):
+    "";
 
 }
 
@@ -2178,14 +1882,14 @@ function renderAdminProducts(data){
     const list=
     document.getElementById("adminProductList");
 
+    list.innerHTML="";
+
     const keys=Object.keys(data);
 
     if(keys.length===0){
 
         list.innerHTML=
-        `<div class="empty-state">
-            No products found in database.
-        </div>`;
+        "<p style='color:#777;text-align:center;'>No products found.</p>";
 
         return;
     }
@@ -2196,17 +1900,12 @@ function renderAdminProducts(data){
 
         const p=data[key];
 
-        const stocks=p.sizeStocks||{
-            S:5,
-            M:10,
-            L:10,
-            XL:5,
-            XXL:0
-        };
+        const stocks=
+        p.sizeStocks||
+        {S:0,M:0,L:0,XL:0,XXL:0};
 
-        const total=
-        Object
-        .values(stocks)
+        const totalQty=
+        Object.values(stocks)
         .reduce((a,b)=>a+Number(b||0),0);
 
         html+=`
@@ -2216,12 +1915,9 @@ function renderAdminProducts(data){
             <div class="p-details">
 
                 <img
-                    src="${p.image||""}"
-                    alt="Product"
-                    onerror="
-                    this.src='https://via.placeholder.com/60x75?text=No+Img'
-                    "
-                >
+                src="${p.image||""}"
+                alt="Product"
+                onerror="this.src='https://via.placeholder.com/60x75?text=No+Img'">
 
                 <div>
 
@@ -2232,15 +1928,12 @@ function renderAdminProducts(data){
                     <br>
 
                     <small style="color:#aaa;">
-                        ₹${Number(p.price)||0}
-                        |
-                        ${escapeHtml(p.category||"")}
+                        ₹${p.price} | ${escapeHtml(p.category)}
                     </small>
 
                     <br>
 
                     <small style="color:#888;">
-                        Stock:
                         S:${stocks.S||0},
                         M:${stocks.M||0},
                         L:${stocks.L||0},
@@ -2251,13 +1944,13 @@ function renderAdminProducts(data){
                     <br>
 
                     <span class="badge-stock
-                        ${total>0?"in-stock":"out-stock"}">
+                    ${totalQty>0?"in-stock":"out-stock"}">
 
-                        ${
-                            total>0
-                            ?`IN STOCK (${total} Total)`
-                            :"OUT OF STOCK"
-                        }
+                    ${
+                        totalQty>0
+                        ?"IN STOCK ("+totalQty+")"
+                        :"OUT OF STOCK"
+                    }
 
                     </span>
 
@@ -2268,40 +1961,24 @@ function renderAdminProducts(data){
             <div class="action-btns">
 
                 <button
-                    class="btn-edit"
-                    onclick="openEditModal('${key}')"
-                >
-                    EDIT
+                class="btn-edit"
+                onclick="openEditModal('${key}')">
+                EDIT
                 </button>
 
                 <button
-                    class="btn-delete"
-                    onclick="deleteProduct('${key}')"
-                >
-                    DELETE
+                class="btn-delete"
+                onclick="deleteProduct('${key}')">
+                DELETE
                 </button>
 
             </div>
 
-        </div>
-
-        `;
+        </div>`;
 
     });
 
     list.innerHTML=html;
-
-}
-
-
-function escapeHtml(text){
-
-    return String(text??"")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
 
 }
 
@@ -2321,15 +1998,14 @@ function filterAdminProducts(){
 
         const p=allProducts[key];
 
-        const name=
-        String(p.name||"").toLowerCase();
-
-        const category=
-        String(p.category||"").toLowerCase();
-
         if(
-            name.includes(query) ||
-            category.includes(query)
+            String(p.name||"")
+            .toLowerCase()
+            .includes(query)
+            ||
+            String(p.category||"")
+            .toLowerCase()
+            .includes(query)
         ){
 
             filtered[key]=p;
@@ -2345,33 +2021,23 @@ function filterAdminProducts(){
 
 function deleteProduct(key){
 
-    if(
-        !confirm(
-            "Are you sure you want to delete this product?"
-        )
-    ){
-        return;
-    }
+    if(confirm("Are you sure you want to delete this product?")){
 
-    productsRef
-    .child(key)
-    .remove()
-    .then(()=>{
-        showToast("🗑️ Product deleted!","info");
-    })
-    .catch(error=>{
+        productsRef.child(key).remove();
+
         showToast(
-            "Delete error: "+error.message,
-            "error"
+            "🗑️ Product deleted!",
+            "info"
         );
-    });
+
+    }
 
 }
 
 
-/* =========================================================
+/* =====================================================
    EDIT PRODUCT
-========================================================= */
+===================================================== */
 
 function openEditModal(key){
 
@@ -2381,8 +2047,7 @@ function openEditModal(key){
 
     document.getElementById("editKey").value=key;
 
-    document.getElementById("editName").value=
-    p.name||"";
+    document.getElementById("editName").value=p.name||"";
 
     document.getElementById("editCategory").value=
     p.category||"Oversized Tees";
@@ -2393,26 +2058,15 @@ function openEditModal(key){
     document.getElementById("editTag").value=
     p.tag||"";
 
-    const stocks=p.sizeStocks||{};
+    const s=
+    p.sizeStocks||
+    {S:0,M:0,L:0,XL:0,XXL:0};
 
-    document.getElementById("editStock_S").value=
-    stocks.S||0;
-
-    document.getElementById("editStock_M").value=
-    stocks.M||0;
-
-    document.getElementById("editStock_L").value=
-    stocks.L||0;
-
-    document.getElementById("editStock_XL").value=
-    stocks.XL||0;
-
-    document.getElementById("editStock_XXL").value=
-    stocks.XXL||0;
-
-    document.getElementById("editImageFile").value="";
-
-    document.getElementById("editImageBackFile").value="";
+    document.getElementById("editStock_S").value=s.S||0;
+    document.getElementById("editStock_M").value=s.M||0;
+    document.getElementById("editStock_L").value=s.L||0;
+    document.getElementById("editStock_XL").value=s.XL||0;
+    document.getElementById("editStock_XXL").value=s.XXL||0;
 
     document.getElementById("editModal").style.display="flex";
 
@@ -2448,15 +2102,14 @@ document
 
     if(!existing)return;
 
+    let image=existing.image||"";
+    let imageBack=existing.imageBack||"";
+
     const primary=
     document.getElementById("editImageFile").files[0];
 
     const back=
     document.getElementById("editImageBackFile").files[0];
-
-    let image=existing.image||"";
-
-    let imageBack=existing.imageBack||"";
 
     if(primary){
         image=await fileToBase64(primary);
@@ -2475,27 +2128,29 @@ document
         document.getElementById("editCategory").value,
 
         price:
-        Number(document.getElementById("editPrice").value),
+        parseInt(
+            document.getElementById("editPrice").value
+        ),
 
         sizeStocks:{
 
-            S:Number(
+            S:parseInt(
                 document.getElementById("editStock_S").value
             )||0,
 
-            M:Number(
+            M:parseInt(
                 document.getElementById("editStock_M").value
             )||0,
 
-            L:Number(
+            L:parseInt(
                 document.getElementById("editStock_L").value
             )||0,
 
-            XL:Number(
+            XL:parseInt(
                 document.getElementById("editStock_XL").value
             )||0,
 
-            XXL:Number(
+            XXL:parseInt(
                 document.getElementById("editStock_XXL").value
             )||0
 
@@ -2512,40 +2167,43 @@ document
 
     productsRef
     .child(key)
-    .update(updated)
-    .then(()=>{
+    .update(updated,err=>{
 
-        showToast(
-            "✏️ Product Updated Successfully!"
-        );
+        if(!err){
 
-        closeEditModal();
+            showToast(
+                "✏️ Product Updated!",
+                "success"
+            );
 
-    })
-    .catch(error=>{
+            closeEditModal();
 
-        showToast(
-            "Update error: "+error.message,
-            "error"
-        );
+        }else{
+
+            showToast(
+                "Error: "+err.message,
+                "error"
+            );
+
+        }
 
     });
 
 });
 
 
-/* =========================================================
+/* =====================================================
    PDF
-========================================================= */
+===================================================== */
 
 function exportToPDF(){
 
     const keys=Object.keys(allProducts);
 
-    if(keys.length===0){
+    if(!keys.length){
 
         showToast(
-            "⚠️ Export karne ke liye koi data nahi hai!",
+            "No inventory data!",
             "error"
         );
 
@@ -2557,24 +2215,12 @@ function exportToPDF(){
     const doc=new jsPDF();
 
     doc.setFont("helvetica","bold");
-
-    doc.setFontSize(18);
+    doc.setFontSize(17);
 
     doc.text(
         "VORNEX STORE - INVENTORY REPORT",
         14,
         18
-    );
-
-    doc.setFontSize(9);
-
-    doc.setFont("helvetica","normal");
-
-    doc.text(
-        "Generated: "+
-        new Date().toLocaleString(),
-        14,
-        25
     );
 
     const rows=[];
@@ -2583,24 +2229,25 @@ function exportToPDF(){
 
         const p=allProducts[key];
 
-        const s=p.sizeStocks||{};
+        const s=
+        p.sizeStocks||
+        {S:0,M:0,L:0,XL:0,XXL:0};
 
         const total=
-        Object
-        .values(s)
+        Object.values(s)
         .reduce((a,b)=>a+Number(b||0),0);
 
         rows.push([
 
             index+1,
 
-            p.name||"-",
+            p.name,
 
-            p.category||"-",
+            p.category,
 
-            "Rs. "+(p.price||0),
+            "Rs. "+p.price,
 
-            `S:${s.S||0}, M:${s.M||0}, L:${s.L||0}, XL:${s.XL||0}, XXL:${s.XXL||0}`,
+            `S:${s.S||0} M:${s.M||0} L:${s.L||0} XL:${s.XL||0} XXL:${s.XXL||0}`,
 
             total,
 
@@ -2618,7 +2265,7 @@ function exportToPDF(){
                 "Product",
                 "Category",
                 "Price",
-                "Size",
+                "Stock",
                 "Total",
                 "Tag"
             ]
@@ -2626,13 +2273,12 @@ function exportToPDF(){
 
         body:rows,
 
-        startY:30,
+        startY:28,
 
         theme:"grid",
 
         styles:{
-            fontSize:8,
-            cellPadding:3
+            fontSize:7
         }
 
     });
@@ -2644,30 +2290,31 @@ function exportToPDF(){
     );
 
     showToast(
-        "📄 PDF Report Downloaded!"
+        "📄 PDF Downloaded!",
+        "success"
     );
 
 }
 
 
-/* =========================================================
-   PASSWORD CHANGE
-========================================================= */
+/* =====================================================
+   SECURITY
+===================================================== */
 
 function updateAdminPassword(e){
 
     e.preventDefault();
 
-    const current=
+    const curr=
     document.getElementById("currPass").value.trim();
 
-    const newPassword=
+    const newP=
     document.getElementById("newPass").value.trim();
 
-    const confirmPassword=
+    const conf=
     document.getElementById("confirmPass").value.trim();
 
-    if(current!==currentDbPassword){
+    if(curr!==currentDbPassword){
 
         showToast(
             "⚠️ Current password is wrong!",
@@ -2677,27 +2324,27 @@ function updateAdminPassword(e){
         return;
     }
 
-    if(!/^[0-9]+$/.test(newPassword)){
+    if(newP!==conf){
 
         showToast(
-            "⚠️ Password numbers only hona chahiye!",
+            "⚠️ Passwords do not match!",
             "error"
         );
 
         return;
     }
 
-    if(newPassword!==confirmPassword){
+    if(!/^[0-9]+$/.test(newP)){
 
         showToast(
-            "⚠️ New passwords do not match!",
+            "⚠️ Password must contain numbers only!",
             "error"
         );
 
         return;
     }
 
-    if(newPassword.length<4){
+    if(newP.length<4){
 
         showToast(
             "⚠️ Password must be at least 4 digits!",
@@ -2707,36 +2354,89 @@ function updateAdminPassword(e){
         return;
     }
 
-    adminAuthRef
-    .set(newPassword)
-    .then(()=>{
+    adminAuthRef.set(newP,err=>{
 
-        currentDbPassword=newPassword;
+        if(!err){
 
-        showToast(
-            "🔑 Admin password changed successfully!"
-        );
+            currentDbPassword=newP;
 
-        document
-        .getElementById("changePassForm")
-        .reset();
+            showToast(
+                "🔑 Password updated!",
+                "success"
+            );
 
-    })
-    .catch(error=>{
+            document
+            .getElementById("changePassForm")
+            .reset();
 
-        showToast(
-            "Error: "+error.message,
-            "error"
-        );
+        }else{
+
+            showToast(
+                "Error: "+err.message,
+                "error"
+            );
+
+        }
 
     });
 
 }
 
 
-/* =========================================================
+/* =====================================================
    COUPONS
-========================================================= */
+===================================================== */
+
+let selectedDiscountType="percentage";
+
+function selectDiscountType(type){
+
+    selectedDiscountType=type;
+
+    document.getElementById("discountType").value=type;
+
+    document
+    .getElementById("percentOption")
+    .classList.toggle(
+        "active",
+        type==="percentage"
+    );
+
+    document
+    .getElementById("flatOption")
+    .classList.toggle(
+        "active",
+        type==="flat"
+    );
+
+    const label=
+    document.getElementById("discountLabel");
+
+    const input=
+    document.getElementById("couponDiscount");
+
+    if(type==="percentage"){
+
+        label.innerText=
+        "Discount Percentage (%)";
+
+        input.placeholder="20";
+
+        input.max="100";
+
+    }else{
+
+        label.innerText=
+        "Flat Discount (₹)";
+
+        input.placeholder="200";
+
+        input.removeAttribute("max");
+
+    }
+
+}
+
 
 function generateCoupon(e){
 
@@ -2750,11 +2450,34 @@ function generateCoupon(e){
     .toUpperCase();
 
     const discount=
-    Number(
-        document.getElementById("couponDiscount").value
+    parseInt(
+        document
+        .getElementById("couponDiscount")
+        .value
     );
 
-    if(!name||!discount)return;
+    const type=
+    selectedDiscountType;
+
+    if(!name||!discount){
+
+        showToast(
+            "⚠️ Coupon details भरें!",
+            "error"
+        );
+
+        return;
+    }
+
+    if(type==="percentage" && discount>100){
+
+        showToast(
+            "⚠️ Percentage 100 से ज्यादा नहीं हो सकता!",
+            "error"
+        );
+
+        return;
+    }
 
     couponsRef
     .child(name)
@@ -2762,28 +2485,42 @@ function generateCoupon(e){
 
         code:name,
 
-        discountPercent:discount,
+        discountType:type,
 
-        createdAt:new Date().toISOString()
+        discountValue:discount,
 
-    })
-    .then(()=>{
+        /* Compatibility field for percentage-based website code */
+        discountPercent:
+        type==="percentage"
+        ?discount
+        :0,
 
-        showToast(
-            `🎉 Coupon '${name}' (${discount}% OFF) Created!`
-        );
+        createdAt:
+        new Date().toISOString()
 
-        document
-        .getElementById("createCouponForm")
-        .reset();
+    },err=>{
 
-    })
-    .catch(error=>{
+        if(!err){
 
-        showToast(
-            "Error: "+error.message,
-            "error"
-        );
+            showToast(
+                `🎉 Coupon ${name} created!`,
+                "success"
+            );
+
+            document
+            .getElementById("createCouponForm")
+            .reset();
+
+            selectDiscountType("percentage");
+
+        }else{
+
+            showToast(
+                "Error: "+err.message,
+                "error"
+            );
+
+        }
 
     });
 
@@ -2794,18 +2531,15 @@ couponsRef.on("value",snapshot=>{
 
     const data=snapshot.val()||{};
 
-    const list=document.getElementById(
-        "activeCouponsList"
-    );
+    const list=
+    document.getElementById("activeCouponsList");
 
     const keys=Object.keys(data);
 
-    if(keys.length===0){
+    if(!keys.length){
 
         list.innerHTML=
-        `<div class="empty-state">
-            No active coupons found.
-        </div>`;
+        "<p style='color:#666;text-align:center;'>No active coupons.</p>";
 
         return;
     }
@@ -2816,51 +2550,43 @@ couponsRef.on("value",snapshot=>{
 
         const c=data[code];
 
+        let discountText="";
+
+        if(c.discountType==="flat"){
+
+            discountText=
+            "₹"+(c.discountValue||0)+" OFF";
+
+        }else{
+
+            discountText=
+            (c.discountPercent||c.discountValue||0)+"% OFF";
+
+        }
+
         html+=`
 
         <div class="coupon-item">
 
             <div>
 
-                <strong
-                    style="
-                    color:#10b981;
-                    font-size:.95rem;
-                    letter-spacing:1px;
-                    "
-                >
+                <strong style="color:#10b981;">
                     ${escapeHtml(c.code||code)}
                 </strong>
 
-                <span
-                    style="
-                    font-size:.8rem;
-                    color:#aaa;
-                    margin-left:10px;
-                    "
-                >
-                    (${Number(c.discountPercent)||0}% OFF)
+                <span style="color:#aaa;font-size:.72rem;margin-left:7px;">
+                    ${discountText}
                 </span>
 
             </div>
 
             <button
-                onclick="deleteCoupon('${escapeHtml(code)}')"
-                style="
-                    width:auto;
-                    padding:5px 12px;
-                    background:#ff3333;
-                    color:#fff;
-                    font-size:.7rem;
-                    margin:0;
-                "
-            >
-                DELETE
+            onclick="deleteCoupon('${escapeHtml(code)}')"
+            style="width:auto;padding:6px 9px;background:#ff3333;color:#fff;margin:0;font-size:.62rem;">
+            DELETE
             </button>
 
-        </div>
-
-        `;
+        </div>`;
 
     });
 
@@ -2871,583 +2597,469 @@ couponsRef.on("value",snapshot=>{
 
 function deleteCoupon(code){
 
-    if(!confirm(`Delete coupon '${code}'?`)){
-        return;
-    }
+    if(
+        confirm(
+            `Delete coupon '${code}'?`
+        )
+    ){
 
-    couponsRef
-    .child(code)
-    .remove()
-    .then(()=>{
+        couponsRef
+        .child(code)
+        .remove();
 
         showToast(
-            `🗑️ Coupon '${code}' deleted!`,
+            "🗑️ Coupon deleted!",
             "info"
         );
 
-    });
-
-}
-
-
-/* =========================================================
-   MEDIA SYSTEM
-========================================================= */
-
-let selectedMediaType="instagram";
-
-let allMedia={};
-
-
-const mediaTypeNames={
-
-    instagram:"📸 Instagram",
-
-    whatsapp:"💬 WhatsApp",
-
-    sms:"📱 SMS",
-
-    photos:"🖼️ Photos",
-
-    videos:"🎬 Videos"
-
-};
-
-
-function selectMediaType(type,button){
-
-    selectedMediaType=type;
-
-    document
-    .querySelectorAll(".media-category-btn")
-    .forEach(btn=>{
-        btn.classList.remove("active");
-    });
-
-    if(button){
-        button.classList.add("active");
     }
 
-    document.getElementById(
-        "mediaListTitle"
-    ).innerText=
-    mediaTypeNames[type]||type;
+}
 
-    resetMediaForm();
 
-    renderMedia();
+/* =====================================================
+   MEDIA - IMAGE GALLERY
+===================================================== */
+
+function previewMediaImage(input,id){
+
+    const file=input.files[0];
+
+    if(!file)return;
+
+    const img=
+    document.getElementById(id);
+
+    img.src=
+    URL.createObjectURL(file);
+
+    img.style.display="block";
 
 }
 
 
-mediaRef.on("value",snapshot=>{
+function previewMediaVideo(input){
 
-    allMedia=snapshot.val()||{};
+    const file=input.files[0];
 
-    renderMedia();
+    if(!file)return;
 
-});
+    const video=
+    document.getElementById("videoPreview");
 
+    video.src=
+    URL.createObjectURL(file);
 
-function getCurrentMediaData(){
-
-    const data=allMedia[selectedMediaType]||{};
-
-    return data;
+    video.style.display="block";
 
 }
 
 
-function renderMedia(){
+async function addMediaPhoto(){
 
-    const list=document.getElementById("mediaList");
+    const file=
+    document
+    .getElementById("mediaPhotoFile")
+    .files[0];
 
-    const data=getCurrentMediaData();
+    const title=
+    document
+    .getElementById("mediaPhotoTitle")
+    .value
+    .trim();
 
-    const keys=Object.keys(data);
+    if(!file){
 
-    if(keys.length===0){
-
-        list.innerHTML=
-        `<div class="empty-state">
-            ${mediaTypeNames[selectedMediaType]||"Media"}
-            ke liye abhi koi data nahi hai.
-        </div>`;
+        showToast(
+            "📷 पहले Gallery से image select करें!",
+            "error"
+        );
 
         return;
     }
 
-    let html="";
+    const image=
+    await fileToBase64(file);
 
-    keys.reverse().forEach(key=>{
+    mediaRef
+    .child("photos")
+    .push({
 
-        const item=data[key]||{};
+        title:title||"Photo",
 
-        const title=
-        item.title||
-        item.name||
-        "Untitled";
+        image:image,
 
-        const url=
-        item.url||
-        item.link||
-        "";
+        createdAt:
+        new Date().toISOString()
 
-        const description=
-        item.description||
-        item.message||
-        "";
+    },err=>{
 
-        const fileUrl=
-        item.fileUrl||
-        item.image||
-        item.video||
-        "";
+        if(!err){
 
-        let preview="";
+            showToast(
+                "🖼️ Photo added!",
+                "success"
+            );
 
-        if(
-            selectedMediaType==="photos" &&
-            fileUrl
-        ){
+            document
+            .getElementById("mediaPhotoFile")
+            .value="";
 
-            preview=`
-            <div class="media-preview">
-                <img
-                    src="${escapeHtml(fileUrl)}"
-                    onerror="this.style.display='none'"
-                >
-            </div>
-            `;
+            document
+            .getElementById("mediaPhotoTitle")
+            .value="";
+
+            document
+            .getElementById("photoPreview")
+            .style.display="none";
 
         }
-
-        if(
-            selectedMediaType==="videos" &&
-            fileUrl
-        ){
-
-            preview=`
-            <div class="media-preview">
-                <video
-                    src="${escapeHtml(fileUrl)}"
-                    controls
-                ></video>
-            </div>
-            `;
-
-        }
-
-        html+=`
-
-        <div class="media-item">
-
-            <div class="media-item-top">
-
-                <div style="flex:1;">
-
-                    <div class="media-title">
-                        ${escapeHtml(title)}
-                    </div>
-
-                    ${
-                        description
-                        ?
-                        `<div class="media-description">
-                            ${escapeHtml(description)}
-                        </div>`
-                        :""
-                    }
-
-                    ${
-                        url
-                        ?
-                        `<div class="media-url">
-                            ${escapeHtml(url)}
-                        </div>`
-                        :""
-                    }
-
-                </div>
-
-                <div class="media-actions">
-
-                    <button
-                        class="btn-edit"
-                        onclick="editMedia('${key}')"
-                    >
-                        EDIT
-                    </button>
-
-                    <button
-                        class="btn-delete"
-                        onclick="deleteMedia('${key}')"
-                    >
-                        DELETE
-                    </button>
-
-                </div>
-
-            </div>
-
-            ${preview}
-
-        </div>
-
-        `;
 
     });
-
-    list.innerHTML=html;
 
 }
 
 
-/* =========================================================
-   ADD / EDIT MEDIA
-========================================================= */
+async function addMediaVideo(){
 
-document
-.getElementById("mediaForm")
-.addEventListener("submit",e=>{
-
-    e.preventDefault();
+    const file=
+    document
+    .getElementById("mediaVideoFile")
+    .files[0];
 
     const title=
-    document.getElementById("mediaTitle")
-    .value.trim();
+    document
+    .getElementById("mediaVideoTitle")
+    .value
+    .trim();
 
-    const url=
-    document.getElementById("mediaUrl")
-    .value.trim();
-
-    const description=
-    document.getElementById("mediaDescription")
-    .value.trim();
-
-    const fileUrl=
-    document.getElementById("mediaFileUrl")
-    .value.trim();
-
-    const editKey=
-    document.getElementById("mediaEditKey").value;
-
-    const data={
-
-        title:title,
-
-        url:url,
-
-        description:description,
-
-        fileUrl:fileUrl,
-
-        type:selectedMediaType,
-
-        updatedAt:new Date().toISOString()
-
-    };
-
-    let request;
-
-    if(editKey){
-
-        request=
-        mediaRef
-        .child(selectedMediaType)
-        .child(editKey)
-        .update(data);
-
-    }else{
-
-        data.createdAt=
-        new Date().toISOString();
-
-        request=
-        mediaRef
-        .child(selectedMediaType)
-        .push(data);
-
-    }
-
-    request
-    .then(()=>{
+    if(!file){
 
         showToast(
-            editKey
-            ?"✏️ Media Updated!"
-            :"✅ Media Added!"
-        );
-
-        resetMediaForm();
-
-    })
-    .catch(error=>{
-
-        showToast(
-            "Media error: "+error.message,
+            "🎥 पहले Gallery से video select करें!",
             "error"
         );
 
-    });
+        return;
+    }
 
-});
+    const video=
+    await fileToBase64(file);
 
+    mediaRef
+    .child("videos")
+    .push({
 
-function editMedia(key){
+        title:title||"Video",
 
-    const data=
-    allMedia[selectedMediaType] &&
-    allMedia[selectedMediaType][key];
+        video:video,
 
-    if(!data)return;
+        createdAt:
+        new Date().toISOString()
 
-    document.getElementById(
-        "mediaEditKey"
-    ).value=key;
+    },err=>{
 
-    document.getElementById(
-        "mediaTitle"
-    ).value=data.title||data.name||"";
+        if(!err){
 
-    document.getElementById(
-        "mediaUrl"
-    ).value=data.url||data.link||"";
+            showToast(
+                "🎥 Video added!",
+                "success"
+            );
 
-    document.getElementById(
-        "mediaDescription"
-    ).value=
-    data.description||
-    data.message||
-    "";
+            document
+            .getElementById("mediaVideoFile")
+            .value="";
 
-    document.getElementById(
-        "mediaFileUrl"
-    ).value=
-    data.fileUrl||
-    data.image||
-    data.video||
-    "";
+            document
+            .getElementById("mediaVideoTitle")
+            .value="";
 
-    document.getElementById(
-        "mediaSubmitBtn"
-    ).innerText="UPDATE MEDIA";
+            document
+            .getElementById("videoPreview")
+            .style.display="none";
 
-    document
-    .getElementById("mediaForm")
-    .scrollIntoView({
-        behavior:"smooth",
-        block:"start"
+        }
+
     });
 
 }
 
 
-function resetMediaForm(){
+/* =====================================================
+   MEDIA TEXT CONTROLS
+===================================================== */
 
-    document
-    .getElementById("mediaForm")
-    .reset();
+function saveMediaText(type){
 
-    document.getElementById(
-        "mediaEditKey"
-    ).value="";
+    let value="";
 
-    document.getElementById(
-        "mediaSubmitBtn"
-    ).innerText="ADD MEDIA";
+    if(type==="instagram"){
 
-}
+        value=
+        document
+        .getElementById("instagramValue")
+        .value
+        .trim();
 
+    }
 
-function deleteMedia(key){
+    if(type==="whatsapp"){
 
-    if(
-        !confirm(
-            "Is media item ko delete karna hai?"
-        )
-    ){
+        value=
+        document
+        .getElementById("whatsappValue")
+        .value
+        .trim();
+
+    }
+
+    if(type==="sms"){
+
+        value=
+        document
+        .getElementById("smsValue")
+        .value
+        .trim();
+
+    }
+
+    if(!value){
+
+        showToast(
+            "⚠️ Value खाली है!",
+            "error"
+        );
+
         return;
     }
 
     mediaRef
-    .child(selectedMediaType)
-    .child(key)
-    .remove()
-    .then(()=>{
+    .child("links")
+    .child(type)
+    .set({
+
+        value:value,
+
+        updatedAt:
+        new Date().toISOString()
+
+    },err=>{
+
+        if(!err){
+
+            showToast(
+                "✅ "+type.toUpperCase()+" saved!",
+                "success"
+            );
+
+        }else{
+
+            showToast(
+                "Error: "+err.message,
+                "error"
+            );
+
+        }
+
+    });
+
+}
+
+
+/* =====================================================
+   LOAD MEDIA
+===================================================== */
+
+function loadMedia(){
+
+    mediaRef.once("value",snapshot=>{
+
+        const data=snapshot.val()||{};
+
+        const list=
+        document.getElementById("mediaList");
+
+        let html="";
+
+        if(data.links){
+
+            Object.keys(data.links)
+            .forEach(key=>{
+
+                const value=
+                data.links[key].value||"";
+
+                html+=`
+
+                <div class="media-list-item">
+
+                    <strong>
+                        ${key.toUpperCase()}
+                    </strong>
+
+                    <div style="color:#888;font-size:.7rem;margin-top:4px;">
+                        ${escapeHtml(value)}
+                    </div>
+
+                </div>`;
+
+                if(key==="instagram"){
+                    document
+                    .getElementById("instagramValue")
+                    .value=value;
+                }
+
+                if(key==="whatsapp"){
+                    document
+                    .getElementById("whatsappValue")
+                    .value=value;
+                }
+
+                if(key==="sms"){
+                    document
+                    .getElementById("smsValue")
+                    .value=value;
+                }
+
+            });
+
+        }
+
+        if(data.photos){
+
+            Object.keys(data.photos)
+            .forEach(key=>{
+
+                const p=data.photos[key];
+
+                html+=`
+
+                <div class="media-list-item">
+
+                    <img src="${p.image||""}">
+
+                    <strong>
+                        ${escapeHtml(p.title||"Photo")}
+                    </strong>
+
+                    <button
+                    onclick="deleteMedia('photos','${key}')"
+                    style="width:auto;float:right;background:#ff3333;color:#fff;margin:0;padding:5px 8px;">
+                    DELETE
+                    </button>
+
+                </div>`;
+
+            });
+
+        }
+
+        if(data.videos){
+
+            Object.keys(data.videos)
+            .forEach(key=>{
+
+                const v=data.videos[key];
+
+                html+=`
+
+                <div class="media-list-item">
+
+                    <video
+                    src="${v.video||""}"
+                    controls>
+                    </video>
+
+                    <strong>
+                        ${escapeHtml(v.title||"Video")}
+                    </strong>
+
+                    <button
+                    onclick="deleteMedia('videos','${key}')"
+                    style="width:auto;float:right;background:#ff3333;color:#fff;margin:0;padding:5px 8px;">
+                    DELETE
+                    </button>
+
+                </div>`;
+
+            });
+
+        }
+
+        if(!html){
+
+            html=
+            "<p style='color:#666;text-align:center;'>No media saved.</p>";
+
+        }
+
+        list.innerHTML=html;
+
+    });
+
+}
+
+
+function deleteMedia(type,key){
+
+    if(
+        confirm(
+            "Delete this media?"
+        )
+    ){
+
+        mediaRef
+        .child(type)
+        .child(key)
+        .remove();
 
         showToast(
             "🗑️ Media deleted!",
             "info"
         );
 
-    })
-    .catch(error=>{
+        loadMedia();
 
-        showToast(
-            "Delete error: "+error.message,
-            "error"
-        );
+    }
+
+}
+
+
+/* =====================================================
+   ORDERS
+===================================================== */
+
+let allOrders={};
+
+function loadOrders(){
+
+    ordersRef.once("value",snapshot=>{
+
+        allOrders=snapshot.val()||{};
+
+        renderOrders(allOrders);
 
     });
 
 }
 
 
-/* =========================================================
-   ORDERS SYSTEM
-========================================================= */
-
-let allOrders={};
-
 ordersRef.on("value",snapshot=>{
 
     allOrders=snapshot.val()||{};
 
-    document.getElementById(
-        "statOrders"
-    ).innerText=
-    Object.keys(allOrders).length;
+    if(
+        document
+        .getElementById("ordersSection")
+        .classList
+        .contains("active-section")
+    ){
 
-    renderOrders(allOrders);
+        renderOrders(allOrders);
+
+    }
 
 });
-
-
-function getOrderCustomer(order){
-
-    const customer=
-    order.customer||
-    order.customerInfo||
-    order.user||
-    {};
-
-    return {
-
-        name:
-        customer.name||
-        order.customerName||
-        order.name||
-        order.fullName||
-        "-",
-
-        phone:
-        customer.phone||
-        customer.mobile||
-        order.phone||
-        order.mobile||
-        "-",
-
-        email:
-        customer.email||
-        order.email||
-        "-",
-
-        address:
-        customer.address||
-        order.address||
-        order.shippingAddress||
-        "-"
-
-    };
-
-}
-
-
-function getOrderProducts(order){
-
-    if(Array.isArray(order.items)){
-        return order.items;
-    }
-
-    if(Array.isArray(order.products)){
-        return order.products;
-    }
-
-    if(Array.isArray(order.cart)){
-        return order.cart;
-    }
-
-    if(order.items && typeof order.items==="object"){
-        return Object.values(order.items);
-    }
-
-    if(order.products && typeof order.products==="object"){
-        return Object.values(order.products);
-    }
-
-    return [];
-
-}
-
-
-function getOrderTotal(order){
-
-    if(order.total!==undefined){
-        return Number(order.total)||0;
-    }
-
-    if(order.grandTotal!==undefined){
-        return Number(order.grandTotal)||0;
-    }
-
-    if(order.totalAmount!==undefined){
-        return Number(order.totalAmount)||0;
-    }
-
-    const products=getOrderProducts(order);
-
-    return products.reduce((sum,item)=>{
-
-        const price=
-        Number(
-            item.price||
-            item.productPrice||
-            0
-        );
-
-        const qty=
-        Number(
-            item.quantity||
-            item.qty||
-            1
-        );
-
-        return sum+(price*qty);
-
-    },0);
-
-}
-
-
-function normalizeOrderStatus(order){
-
-    return String(
-        order.status||
-        order.orderStatus||
-        "pending"
-    ).toLowerCase();
-
-}
-
-
-function getStatusClass(status){
-
-    if(status==="confirmed")
-        return "status-confirmed";
-
-    if(status==="shipped")
-        return "status-shipped";
-
-    if(status==="delivered")
-        return "status-delivered";
-
-    if(status==="cancelled")
-        return "status-cancelled";
-
-    return "status-pending";
-
-}
 
 
 function renderOrders(data){
@@ -3455,556 +3067,245 @@ function renderOrders(data){
     const list=
     document.getElementById("ordersList");
 
-    const keys=Object.keys(data);
+    const keys=
+    Object.keys(data).reverse();
 
-    if(keys.length===0){
+    if(!keys.length){
 
         list.innerHTML=
-        `<div class="empty-state">
-            🛒 Abhi koi order nahi mila.
-        </div>`;
+        "<p style='color:#666;text-align:center;'>No orders found.</p>";
 
         return;
     }
-
-    keys.sort((a,b)=>{
-
-        const da=
-        new Date(
-            data[a].createdAt||
-            data[a].timestamp||
-            0
-        ).getTime();
-
-        const dbb=
-        new Date(
-            data[b].createdAt||
-            data[b].timestamp||
-            0
-        ).getTime();
-
-        return dbb-da;
-
-    });
 
     let html="";
 
     keys.forEach(key=>{
 
-        const order=data[key]||{};
+        const o=data[key]||{};
 
         const customer=
-        getOrderCustomer(order);
+        o.customer||
+        o.customerDetails||
+        {};
 
-        const products=
-        getOrderProducts(order);
+        const product=
+        o.product||
+        o.productDetails||
+        {};
 
-        const total=
-        getOrderTotal(order);
+        const name=
+        customer.name||
+        o.customerName||
+        o.name||
+        "N/A";
+
+        const phone=
+        customer.phone||
+        customer.mobile||
+        o.phone||
+        o.mobile||
+        "N/A";
+
+        const email=
+        customer.email||
+        o.email||
+        "N/A";
+
+        const address=
+        customer.address||
+        o.address||
+        "N/A";
+
+        const productName=
+        product.name||
+        o.productName||
+        o.product||
+        "N/A";
+
+        const size=
+        product.size||
+        o.size||
+        "N/A";
+
+        const quantity=
+        product.quantity||
+        o.quantity||
+        1;
+
+        const amount=
+        o.totalAmount||
+        o.total||
+        o.amount||
+        product.price||
+        0;
 
         const status=
-        normalizeOrderStatus(order);
-
-        const created=
-        order.createdAt||
-        order.timestamp||
-        order.date||
-        "";
-
-        let dateText="-";
-
-        if(created){
-
-            const date=
-            new Date(
-                typeof created==="number"
-                ?created
-                :created
-            );
-
-            if(!isNaN(date.getTime())){
-                dateText=
-                date.toLocaleString();
-            }
-
-        }
-
-
-        let productsHtml="";
-
-        if(products.length===0){
-
-            productsHtml=
-            `<div class="small-muted">
-                Product details unavailable
-            </div>`;
-
-        }else{
-
-            products.forEach(item=>{
-
-                const name=
-                item.name||
-                item.productName||
-                item.title||
-                "Product";
-
-                const size=
-                item.size||
-                "-";
-
-                const qty=
-                item.quantity||
-                item.qty||
-                1;
-
-                const price=
-                Number(
-                    item.price||
-                    item.productPrice||
-                    0
-                );
-
-                productsHtml+=`
-
-                <div class="order-product-row">
-
-                    <span>
-                        ${escapeHtml(name)}
-                        <br>
-                        <small style="color:#666;">
-                            Size: ${escapeHtml(size)}
-                            |
-                            Qty: ${qty}
-                        </small>
-                    </span>
-
-                    <strong>
-                        ₹${price*Number(qty)}
-                    </strong>
-
-                </div>
-
-                `;
-
-            });
-
-        }
-
+        o.status||
+        "Pending";
 
         html+=`
 
-        <div
-            class="order-card"
-            data-order-key="${escapeHtml(key)}"
-            data-order-search="
-                ${escapeHtml(
-                    (
-                        customer.name+
-                        " "+
-                        customer.phone+
-                        " "+
-                        customer.email+
-                        " "+
-                        key
-                    ).toLowerCase()
-                )}
-            "
-            data-order-status="${escapeHtml(status)}"
-        >
+        <div class="order-item">
 
             <div class="order-header">
 
-                <div>
+                <span class="order-id">
+                    ORDER: ${escapeHtml(key)}
+                </span>
 
-                    <div class="order-id">
-                        🛒 ORDER #${escapeHtml(key)}
-                    </div>
-
-                    <div class="order-date">
-                        ${escapeHtml(dateText)}
-                    </div>
-
-                </div>
-
-                <span
-                    class="order-status ${getStatusClass(status)}"
-                >
-                    ${escapeHtml(status.toUpperCase())}
+                <span class="order-status">
+                    ${escapeHtml(status)}
                 </span>
 
             </div>
 
+            <div class="order-info">
 
-            <div class="customer-box">
+                👤 <b>Customer:</b>
+                ${escapeHtml(name)}
 
-                <div class="customer-row">
+                <br>
 
-                    <span>👤 Customer</span>
+                📱 <b>Mobile:</b>
+                ${escapeHtml(phone)}
 
-                    <span>
-                        ${escapeHtml(customer.name)}
-                    </span>
+                <br>
 
-                </div>
+                📧 <b>Email:</b>
+                ${escapeHtml(email)}
 
-                <div class="customer-row">
+                <br>
 
-                    <span>📱 Mobile</span>
+                📍 <b>Address:</b>
+                ${escapeHtml(address)}
 
-                    <span>
-                        ${escapeHtml(customer.phone)}
-                    </span>
+                <div class="order-product">
 
-                </div>
+                    🛍️ ${escapeHtml(productName)}
 
-                <div class="customer-row">
+                    <br>
 
-                    <span>📧 Email</span>
+                    Size: ${escapeHtml(size)}
+                    &nbsp; | &nbsp;
+                    Qty: ${escapeHtml(quantity)}
 
-                    <span>
-                        ${escapeHtml(customer.email)}
-                    </span>
+                    <br>
 
-                </div>
-
-                <div class="customer-row">
-
-                    <span>📍 Address</span>
-
-                    <span>
-                        ${escapeHtml(customer.address)}
-                    </span>
+                    💰 Total: ₹${escapeHtml(amount)}
 
                 </div>
 
             </div>
 
+            <select
+            onchange="updateOrderStatus('${key}',this.value)"
+            style="margin-top:10px;">
 
-            <div class="order-products">
+                <option
+                ${status==="Pending"?"selected":""}>
+                Pending
+                </option>
 
-                ${productsHtml}
+                <option
+                ${status==="Confirmed"?"selected":""}>
+                Confirmed
+                </option>
 
-            </div>
+                <option
+                ${status==="Shipped"?"selected":""}>
+                Shipped
+                </option>
 
+                <option
+                ${status==="Delivered"?"selected":""}>
+                Delivered
+                </option>
 
-            <div class="order-total">
+                <option
+                ${status==="Cancelled"?"selected":""}>
+                Cancelled
+                </option>
 
-                <span>TOTAL</span>
+            </select>
 
-                <span style="color:#40c057;">
-                    ₹${total}
-                </span>
-
-            </div>
-
-
-            <div class="order-actions">
-
-                <button
-                    class="btn-blue"
-                    onclick="changeOrderStatus('${key}','confirmed')"
-                >
-                    CONFIRM
-                </button>
-
-                <button
-                    style="background:#6366f1;color:#fff;"
-                    onclick="changeOrderStatus('${key}','shipped')"
-                >
-                    SHIPPED
-                </button>
-
-                <button
-                    class="btn-green"
-                    onclick="changeOrderStatus('${key}','delivered')"
-                >
-                    DELIVERED
-                </button>
-
-                <button
-                    class="btn-red"
-                    onclick="changeOrderStatus('${key}','cancelled')"
-                >
-                    CANCEL
-                </button>
-
-                <button
-                    class="btn-gray"
-                    onclick="viewOrderDetails('${key}')"
-                >
-                    DETAILS
-                </button>
-
-            </div>
-
-        </div>
-
-        `;
+        </div>`;
 
     });
 
     list.innerHTML=html;
 
-    filterOrders();
+}
+
+
+function updateOrderStatus(key,status){
+
+    ordersRef
+    .child(key)
+    .child("status")
+    .set(status,err=>{
+
+        if(!err){
+
+            showToast(
+                "✅ Order status updated!",
+                "success"
+            );
+
+        }else{
+
+            showToast(
+                "Error updating order!",
+                "error"
+            );
+
+        }
+
+    });
 
 }
 
 
 function filterOrders(){
 
-    const query=
-    document.getElementById(
-        "orderSearch"
-    ).value.toLowerCase().trim();
-
-    const status=
-    document.getElementById(
-        "orderStatusFilter"
-    ).value;
-
+    const q=
     document
-    .querySelectorAll(".order-card")
-    .forEach(card=>{
+    .getElementById("orderSearch")
+    .value
+    .toLowerCase()
+    .trim();
 
-        const search=
-        card.dataset.orderSearch||"";
+    const filtered={};
 
-        const cardStatus=
-        card.dataset.orderStatus||"pending";
+    Object.keys(allOrders)
+    .forEach(key=>{
 
-        const matchesSearch=
-        !query ||
-        search.includes(query);
+        const text=
+        JSON.stringify(allOrders[key])
+        .toLowerCase();
 
-        const matchesStatus=
-        status==="all" ||
-        cardStatus===status;
+        if(
+            key.toLowerCase().includes(q)
+            ||
+            text.includes(q)
+        ){
 
-        card.style.display=
-        matchesSearch&&matchesStatus
-        ?"block"
-        :"none";
+            filtered[key]=allOrders[key];
 
-    });
-
-}
-
-
-function changeOrderStatus(key,status){
-
-    if(!allOrders[key])return;
-
-    ordersRef
-    .child(key)
-    .update({
-
-        status:status,
-
-        updatedAt:new Date().toISOString()
-
-    })
-    .then(()=>{
-
-        showToast(
-            "✅ Order status: "+
-            status.toUpperCase()
-        );
-
-    })
-    .catch(error=>{
-
-        showToast(
-            "Order update error: "+
-            error.message,
-            "error"
-        );
+        }
 
     });
 
-}
-
-
-/* =========================================================
-   ORDER DETAILS
-========================================================= */
-
-function viewOrderDetails(key){
-
-    const order=allOrders[key];
-
-    if(!order)return;
-
-    const customer=
-    getOrderCustomer(order);
-
-    const products=
-    getOrderProducts(order);
-
-    const total=
-    getOrderTotal(order);
-
-    let productsHtml="";
-
-    products.forEach(item=>{
-
-        productsHtml+=`
-
-        <div
-            style="
-            padding:10px 0;
-            border-bottom:1px solid #222;
-            "
-        >
-
-            <strong>
-                ${escapeHtml(
-                    item.name||
-                    item.productName||
-                    item.title||
-                    "Product"
-                )}
-            </strong>
-
-            <br>
-
-            <span
-                style="color:#888;font-size:.75rem;"
-            >
-                Size:
-                ${escapeHtml(item.size||"-")}
-                |
-                Quantity:
-                ${item.quantity||item.qty||1}
-                |
-                Price:
-                ₹${Number(
-                    item.price||
-                    item.productPrice||
-                    0
-                )}
-            </span>
-
-        </div>
-
-        `;
-
-    });
-
-
-    document.getElementById(
-        "orderModalContent"
-    ).innerHTML=`
-
-        <div class="customer-box">
-
-            <div class="customer-row">
-                <span>Order ID</span>
-                <span>${escapeHtml(key)}</span>
-            </div>
-
-            <div class="customer-row">
-                <span>Name</span>
-                <span>${escapeHtml(customer.name)}</span>
-            </div>
-
-            <div class="customer-row">
-                <span>Phone</span>
-                <span>${escapeHtml(customer.phone)}</span>
-            </div>
-
-            <div class="customer-row">
-                <span>Email</span>
-                <span>${escapeHtml(customer.email)}</span>
-            </div>
-
-            <div class="customer-row">
-                <span>Address</span>
-                <span>${escapeHtml(customer.address)}</span>
-            </div>
-
-        </div>
-
-        <h3 style="margin:15px 0 10px;">
-            PRODUCTS
-        </h3>
-
-        <div>
-            ${productsHtml||`
-                <div class="empty-state">
-                    Product details unavailable
-                </div>
-            `}
-        </div>
-
-        <div class="order-total">
-
-            <span>TOTAL</span>
-
-            <span style="color:#40c057;">
-                ₹${total}
-            </span>
-
-        </div>
-
-        <h3 style="margin:20px 0 10px;">
-            RAW ORDER DATA
-        </h3>
-
-        <pre
-            style="
-            background:#050505;
-            border:1px solid #222;
-            padding:12px;
-            border-radius:8px;
-            overflow:auto;
-            white-space:pre-wrap;
-            word-break:break-word;
-            color:#aaa;
-            font-size:.7rem;
-            "
-        >${escapeHtml(
-            JSON.stringify(order,null,2)
-        )}</pre>
-
-    `;
-
-    document.getElementById(
-        "orderModal"
-    ).style.display="flex";
+    renderOrders(filtered);
 
 }
 
 
-function closeOrderModal(){
+/* =====================================================
+   INITIAL
+===================================================== */
 
-    document.getElementById(
-        "orderModal"
-    ).style.display="none";
-
-}
-
-
-function closeOrderModalBg(e){
-
-    if(e.target.id==="orderModal"){
-        closeOrderModal();
-    }
-
-}
-
-
-/* =========================================================
-   START
-========================================================= */
-
-console.log(
-    "VORNEX Admin Panel Loaded"
-);
-
-console.log(
-    "Default admin password: 0000"
-);
+selectDiscountType("percentage");
 
 </script>
 
