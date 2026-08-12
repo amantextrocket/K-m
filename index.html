@@ -4344,6 +4344,1523 @@ document.getElementById("cartDrawer")
 
 renderCart();
 
+  /* =========================================================
+   VORNEX FINAL REQUIREMENTS PATCH
+   ONLY INDEX.HTML — NO OTHER FILE REQUIRED
+   ========================================================= */
+
+/* ---------- 1. BRAND / ANNOUNCEMENT ---------- */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const announcement = document.querySelector(".announcement-bar");
+
+    if (announcement) {
+        announcement.innerHTML = `
+            ⚡ FREE EXPRESS SHIPPING ON ORDERS ABOVE ₹999
+            &nbsp; | &nbsp;
+            <strong>UPTO 20% OFF ON COUPONS</strong> ⚡
+        `;
+    }
+
+    const logo = document.querySelector(".logo");
+
+    if (logo && !logo.querySelector(".vornex-edge-title")) {
+        logo.insertAdjacentHTML(
+            "beforeend",
+            `
+            <small class="vornex-edge-title">
+                OWN YOUR EDGE.
+            </small>
+            `
+        );
+    }
+
+});
+
+
+/* =========================================================
+   2. PREMIUM VISUAL FIXES
+   ========================================================= */
+
+(function () {
+
+    const style = document.createElement("style");
+
+    style.innerHTML = `
+
+    /* ==============================================
+       WISHLIST PREMIUM RED ANIMATION
+       ============================================== */
+
+    .product-card .wishlist-btn {
+        transition:
+            transform .35s cubic-bezier(.175,.885,.32,1.275),
+            background .25s ease,
+            box-shadow .35s ease;
+    }
+
+    .product-card .wishlist-btn.active {
+        background:#ff163d !important;
+        color:#fff !important;
+        transform:scale(1.16);
+        box-shadow:
+            0 0 0 6px rgba(255,22,61,.12),
+            0 0 30px rgba(255,22,61,.65);
+    }
+
+    .product-card .wishlist-btn.active i {
+        animation:vornexHeartPremium .55s cubic-bezier(.175,.885,.32,1.275);
+    }
+
+    @keyframes vornexHeartPremium {
+        0% {
+            transform:scale(.35) rotate(-20deg);
+        }
+
+        45% {
+            transform:scale(1.45) rotate(8deg);
+        }
+
+        75% {
+            transform:scale(.9) rotate(-3deg);
+        }
+
+        100% {
+            transform:scale(1) rotate(0);
+        }
+    }
+
+
+    /* ==============================================
+       ADD TO BAG PREMIUM YELLOW
+       ============================================== */
+
+    .add-btn.added,
+    .detail-action-btn.cart-active {
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffe66b,
+                #ffd400
+            ) !important;
+
+        color:#000 !important;
+
+        box-shadow:
+            0 0 15px rgba(255,212,0,.25),
+            0 0 35px rgba(255,212,0,.2),
+            inset 0 1px 0 rgba(255,255,255,.6);
+
+        transform:scale(1.025);
+
+        animation:vornexBagPremium .45s
+            cubic-bezier(.175,.885,.32,1.275);
+    }
+
+    @keyframes vornexBagPremium {
+
+        0% {
+            transform:scale(.94);
+        }
+
+        45% {
+            transform:scale(1.07);
+        }
+
+        100% {
+            transform:scale(1.025);
+        }
+
+    }
+
+
+    /* ==============================================
+       PRODUCT DETAIL — FULL SCROLL FIX
+       ============================================== */
+
+    #productDetailView {
+
+        position:fixed !important;
+
+        inset:0 !important;
+
+        height:100dvh !important;
+
+        max-height:100dvh !important;
+
+        overflow-y:auto !important;
+
+        overflow-x:hidden !important;
+
+        -webkit-overflow-scrolling:touch !important;
+
+        overscroll-behavior-y:auto !important;
+
+        touch-action:pan-y !important;
+
+        padding-bottom:0 !important;
+    }
+
+
+    #productDetailView .detail-info {
+
+        padding-bottom:
+            calc(
+                150px +
+                env(safe-area-inset-bottom)
+            ) !important;
+
+    }
+
+
+    /* ==============================================
+       IPHONE GLASS BOTTOM ACTIONS
+       ============================================== */
+
+    #productDetailView .detail-actions {
+
+        min-height:78px;
+
+        padding:
+            10px
+            12px
+            calc(
+                10px +
+                env(safe-area-inset-bottom)
+            );
+
+        background:
+            rgba(10,10,10,.62);
+
+        backdrop-filter:blur(28px)
+            saturate(180%);
+
+        -webkit-backdrop-filter:
+            blur(28px)
+            saturate(180%);
+
+        border-top:
+            1px solid
+            rgba(255,255,255,.14);
+
+        box-shadow:
+            0 -15px 40px
+            rgba(0,0,0,.35);
+
+    }
+
+
+    #productDetailView .detail-action-btn {
+
+        min-height:64px !important;
+
+        border-radius:20px !important;
+
+        background:
+            rgba(255,255,255,.10) !important;
+
+        border:
+            1px solid
+            rgba(255,255,255,.18) !important;
+
+        backdrop-filter:blur(22px);
+
+        -webkit-backdrop-filter:blur(22px);
+
+        box-shadow:
+            inset 0 1px 0
+            rgba(255,255,255,.15),
+            0 8px 25px
+            rgba(0,0,0,.25);
+
+        transition:
+            transform .25s ease,
+            background .3s ease,
+            box-shadow .3s ease;
+
+    }
+
+
+    #productDetailView
+    .detail-action-btn:active {
+
+        transform:scale(.95);
+
+    }
+
+
+    #productDetailView
+    .detail-action-btn.cart-active {
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,230,80,.95),
+                rgba(255,205,0,.92)
+            ) !important;
+
+        color:#000 !important;
+
+    }
+
+
+    #productDetailView
+    #detailBuyBtn.buy-active {
+
+        background:
+            rgba(255,255,255,.95) !important;
+
+        color:#000 !important;
+
+        box-shadow:
+            0 0 30px
+            rgba(255,255,255,.18);
+
+    }
+
+
+    /* ==============================================
+       DETAIL QUANTITY PREMIUM
+       ============================================== */
+
+    #productDetailView .qty-box {
+
+        width:190px;
+
+        min-height:54px;
+
+        border-radius:18px;
+
+        background:
+            rgba(255,255,255,.07);
+
+        backdrop-filter:blur(20px);
+
+    }
+
+
+    #productDetailView .qty-box button {
+
+        width:46px;
+        height:46px;
+
+        border-radius:14px;
+
+        transition:
+            transform .2s ease,
+            background .2s ease;
+
+    }
+
+
+    #productDetailView .qty-box button:active {
+
+        transform:scale(.88);
+
+        background:
+            rgba(255,212,0,.25);
+
+    }
+
+
+    /* ==============================================
+       MENU — BACKGROUND MUST NOT SCROLL
+       ============================================== */
+
+    body.menu-open {
+
+        overflow:hidden !important;
+
+        position:fixed !important;
+
+        width:100% !important;
+
+    }
+
+
+    #drawerOverlay {
+
+        position:fixed !important;
+
+        inset:0 !important;
+
+        overflow:hidden !important;
+
+        touch-action:none !important;
+
+    }
+
+
+    #iosMenuDrawer {
+
+        position:fixed !important;
+
+        top:0 !important;
+
+        bottom:0 !important;
+
+        height:100dvh !important;
+
+        overflow:hidden !important;
+
+    }
+
+
+    #iosMenuDrawer .drawer-content {
+
+        height:
+            calc(100dvh - 75px) !important;
+
+        max-height:
+            calc(100dvh - 75px) !important;
+
+        overflow-y:auto !important;
+
+        overflow-x:hidden !important;
+
+        overscroll-behavior:contain !important;
+
+        -webkit-overflow-scrolling:touch !important;
+
+        touch-action:pan-y !important;
+
+    }
+
+
+    /* ==============================================
+       LOGIN PREMIUM
+       ============================================== */
+
+    #loginModal .auth-choice {
+
+        gap:12px;
+
+    }
+
+
+    #loginModal .auth-option {
+
+        min-height:58px !important;
+
+        border-radius:18px !important;
+
+        font-weight:900;
+
+        letter-spacing:.5px;
+
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease;
+
+    }
+
+
+    #loginModal .auth-option:active {
+
+        transform:scale(.96);
+
+    }
+
+
+    #loginModal .auth-option.phone {
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #eeeeee
+            ) !important;
+
+        color:#000 !important;
+
+        box-shadow:
+            0 10px 30px
+            rgba(255,255,255,.08);
+
+    }
+
+
+    #loginModal .auth-option.google {
+
+        background:
+            linear-gradient(
+                135deg,
+                #1c1c1c,
+                #0d0d0d
+            ) !important;
+
+        color:#fff !important;
+
+    }
+
+
+    #loginModal .auth-or {
+
+        margin:8px 0 !important;
+
+        font-size:.7rem;
+
+        letter-spacing:2px;
+
+    }
+
+
+    #loginModal .otp-btn {
+
+        min-height:52px !important;
+
+        border-radius:16px !important;
+
+        background:#ffd400 !important;
+
+        color:#000 !important;
+
+        font-weight:900;
+
+        box-shadow:
+            0 10px 25px
+            rgba(255,212,0,.18);
+
+    }
+
+
+    /* ==============================================
+       CHECKOUT PREMIUM
+       ============================================== */
+
+    #checkoutModal .modal-content {
+
+        border-radius:28px !important;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(30,30,30,.94),
+                rgba(8,8,8,.97)
+            ) !important;
+
+        border:
+            1px solid
+            rgba(255,255,255,.12);
+
+        box-shadow:
+            0 30px 90px
+            rgba(0,0,0,.65),
+            inset 0 1px 0
+            rgba(255,255,255,.08);
+
+        backdrop-filter:blur(30px);
+
+        -webkit-backdrop-filter:blur(30px);
+
+    }
+
+
+    #checkoutModal .checkout-summary-box {
+
+        border-radius:20px;
+
+        background:
+            rgba(255,255,255,.055);
+
+        border:
+            1px solid
+            rgba(255,255,255,.09);
+
+        padding:16px;
+
+    }
+
+
+    #checkoutModal .coupon-apply-box {
+
+        display:flex;
+
+        gap:8px;
+
+    }
+
+
+    #checkoutModal
+    .coupon-apply-box input {
+
+        min-width:0;
+
+        border-radius:14px !important;
+
+        background:
+            rgba(255,255,255,.06);
+
+        border:
+            1px solid
+            rgba(255,255,255,.12);
+
+    }
+
+
+    #checkoutModal
+    .coupon-apply-box button {
+
+        min-width:92px;
+
+        border-radius:14px;
+
+        background:#ffd400;
+
+        color:#000;
+
+        font-weight:900;
+
+    }
+
+
+    #checkoutModal .submit-order-btn {
+
+        min-height:58px;
+
+        border-radius:18px;
+
+        font-weight:900;
+
+        box-shadow:
+            0 12px 30px
+            rgba(255,212,0,.15);
+
+    }
+
+
+    /* ==============================================
+       BOTTOM BUY BAR
+       ============================================== */
+
+    .glass-bottom-bar {
+
+        bottom:
+            calc(
+                12px +
+                env(safe-area-inset-bottom)
+            ) !important;
+
+        z-index:1800 !important;
+
+        backdrop-filter:blur(24px);
+
+        -webkit-backdrop-filter:blur(24px);
+
+    }
+
+
+    .glass-buy-btn {
+
+        min-height:54px !important;
+
+        border-radius:18px !important;
+
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease;
+
+    }
+
+
+    .glass-buy-btn:active {
+
+        transform:scale(.96);
+
+    }
+
+
+    /* ==============================================
+       OWN YOUR EDGE
+       ============================================== */
+
+    .vornex-edge-title {
+
+        display:block !important;
+
+        font-size:.42rem !important;
+
+        letter-spacing:3px !important;
+
+        text-align:center !important;
+
+        margin-top:-3px !important;
+
+        opacity:.7 !important;
+
+        font-weight:800 !important;
+
+    }
+
+
+    /* ==============================================
+       MOBILE DETAIL
+       ============================================== */
+
+    @media(max-width:600px) {
+
+        #productDetailView
+        .detail-image-wrap {
+
+            height:56vh !important;
+
+            min-height:350px;
+
+        }
+
+
+        #productDetailView
+        .detail-info {
+
+            padding-left:15px;
+
+            padding-right:15px;
+
+            padding-bottom:165px !important;
+
+        }
+
+
+        #productDetailView
+        .detail-action-btn {
+
+            min-height:64px !important;
+
+            font-size:.68rem;
+
+        }
+
+    }
+
+    `;
+
+    document.head.appendChild(style);
+
+})();
+
+
+/* =========================================================
+   3. FIX DETAIL QUANTITY
+   ========================================================= */
+
+(function () {
+
+    const originalChangeDetailQty =
+        window.changeDetailQty;
+
+    window.changeDetailQty = function (amount) {
+
+        if (typeof originalChangeDetailQty === "function") {
+
+            originalChangeDetailQty(amount);
+
+        } else {
+
+            detailQty += Number(amount) || 0;
+
+            if (detailQty < 1)
+                detailQty = 1;
+
+            if (detailQty > 20)
+                detailQty = 20;
+
+            setText(
+                "detailQty",
+                detailQty
+            );
+
+        }
+
+        const value =
+            document.getElementById("detailQty");
+
+        if (value) {
+
+            value.textContent =
+                String(detailQty);
+
+        }
+
+    };
+
+})();
+
+
+/* =========================================================
+   4. FIX ADD TO BAG STATE
+   ========================================================= */
+
+(function () {
+
+    const originalAdd =
+        window.addCurrentDetailToCart;
+
+    window.addCurrentDetailToCart = function () {
+
+        if (typeof originalAdd === "function") {
+
+            originalAdd();
+
+        } else {
+
+            if (!currentProduct)
+                return;
+
+            addToCart(
+                currentProduct.id,
+                detailQty,
+                selectedSize
+            );
+
+        }
+
+        const btn =
+            document.getElementById(
+                "detailAddBtn"
+            );
+
+        if (!btn)
+            return;
+
+        btn.classList.add(
+            "cart-active"
+        );
+
+        btn.innerHTML =
+            '<i class="fa-solid fa-check"></i> ADDED TO BAG';
+
+        clearTimeout(
+            btn.__vornexTimer
+        );
+
+        btn.__vornexTimer =
+            setTimeout(() => {
+
+                btn.classList.remove(
+                    "cart-active"
+                );
+
+                btn.innerHTML =
+                    '<i class="fa-solid fa-bag-shopping"></i> ADD TO BAG';
+
+            },1800);
+
+    };
+
+})();
+
+
+/* =========================================================
+   5. FIX BUY NOW
+   ========================================================= */
+
+(function () {
+
+    const originalBuy =
+        window.buyCurrentProduct;
+
+    window.buyCurrentProduct = function () {
+
+        if (typeof originalBuy === "function") {
+
+            originalBuy();
+
+        } else {
+
+            if (!currentProduct)
+                return;
+
+            addToCart(
+                currentProduct.id,
+                detailQty,
+                selectedSize
+            );
+
+            closeProductDetail();
+
+            setTimeout(
+                openCheckoutModal,
+                250
+            );
+
+        }
+
+    };
+
+})();
+
+
+/* =========================================================
+   6. COUPON — SUPPORT MULTIPLE FIREBASE FORMATS
+   ========================================================= */
+
+(function () {
+
+    const originalCalculateDiscount =
+        window.calculateDiscount;
+
+    window.calculateDiscount = function (subtotal) {
+
+        if (!currentCoupon)
+            return 0;
+
+        const type =
+            String(
+                currentCoupon.type ||
+                ""
+            ).toLowerCase();
+
+        /* FLAT */
+
+        if (
+            type === "flat" ||
+            currentCoupon.flatDiscount != null
+        ) {
+
+            const flat =
+                Number(
+                    currentCoupon.flatDiscount ??
+                    currentCoupon.discount ??
+                    0
+                );
+
+            return Math.min(
+                flat,
+                subtotal
+            );
+
+        }
+
+        /* PERCENTAGE */
+
+        const percent =
+            Number(
+                currentCoupon.discountPercent ??
+                currentCoupon.percentage ??
+                currentCoupon.percent ??
+                currentCoupon.discount ??
+                0
+            );
+
+        return Math.min(
+            subtotal * percent / 100,
+            subtotal
+        );
+
+    };
+
+})();
+
+
+/* =========================================================
+   7. COUPON APPLY — FORCE UPPERCASE + SYNC
+   ========================================================= */
+
+(function () {
+
+    const originalApply =
+        window.applyCheckoutCoupon;
+
+    window.applyCheckoutCoupon = function () {
+
+        const input =
+            document.getElementById(
+                "checkoutCoupon"
+            );
+
+        if (input) {
+
+            input.value =
+                input.value
+                    .trim()
+                    .toUpperCase();
+
+        }
+
+        if (
+            typeof originalApply ===
+            "function"
+        ) {
+
+            originalApply();
+
+        }
+
+        renderCart();
+
+        renderCheckout();
+
+    };
+
+})();
+
+
+/* =========================================================
+   8. HERO MEDIA — FIREBASE COMPATIBILITY
+   ========================================================= */
+
+(function () {
+
+    const originalHero =
+        window.renderHeroMedia;
+
+    window.renderHeroMedia =
+        function (data) {
+
+            if (
+                typeof originalHero ===
+                "function"
+            ) {
+
+                originalHero(data);
+
+                return;
+
+            }
+
+            const layer =
+                document.getElementById(
+                    "heroMediaLayer"
+                );
+
+            if (!layer || !data)
+                return;
+
+            const type =
+                String(
+                    data.type ||
+                    "image"
+                ).toLowerCase();
+
+            if (
+                type === "video"
+            ) {
+
+                const url =
+                    data.url ||
+                    data.videoUrl ||
+                    data.src ||
+                    "";
+
+                if (!url)
+                    return;
+
+                layer.innerHTML = `
+                    <video
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata">
+                        <source
+                            src="${escapeHtml(url)}">
+                    </video>
+                `;
+
+                return;
+
+            }
+
+            let images = [];
+
+            if (
+                type === "slideshow" ||
+                type === "slider"
+            ) {
+
+                images =
+                    normalizeMediaImages(
+                        data.images ||
+                        data.media ||
+                        data.slides
+                    );
+
+            }
+
+            if (!images.length) {
+
+                const single =
+                    data.url ||
+                    data.image ||
+                    data.imageUrl ||
+                    "";
+
+                if (single)
+                    images = [single];
+
+            }
+
+            if (!images.length)
+                return;
+
+            heroImages = images;
+            heroIndex = 0;
+
+            layer.innerHTML = `
+                <img
+                    src="${escapeHtml(images[0])}"
+                    alt="VORNEX HERO">
+            `;
+
+            clearInterval(heroTimer);
+
+            if (images.length > 1) {
+
+                heroTimer =
+                    setInterval(() => {
+
+                        heroIndex =
+                            (
+                                heroIndex + 1
+                            ) % images.length;
+
+                        layer.innerHTML = `
+                            <img
+                                src="${escapeHtml(
+                                    images[heroIndex]
+                                )}"
+                                alt="VORNEX HERO">
+                        `;
+
+                    },4000);
+
+            }
+
+        };
+
+})();
+
+
+/* =========================================================
+   9. THEME — FORCE WORKING
+   ========================================================= */
+
+(function () {
+
+    const originalSetTheme =
+        window.setTheme;
+
+    window.setTheme = function (theme) {
+
+        const validThemes = [
+            "dark",
+            "neon",
+            "gold",
+            "emerald",
+            "violet",
+            "amber"
+        ];
+
+        if (
+            !validThemes.includes(theme)
+        ) {
+
+            theme = "dark";
+
+        }
+
+        document.body.classList.remove(
+            "theme-neon",
+            "theme-gold",
+            "theme-emerald",
+            "theme-violet",
+            "theme-amber"
+        );
+
+        if (theme !== "dark") {
+
+            document.body.classList.add(
+                "theme-" + theme
+            );
+
+        }
+
+        localStorage.setItem(
+            "vornex_theme",
+            theme
+        );
+
+        if (
+            typeof Toastify ===
+            "function"
+        ) {
+
+            toast(
+                "Theme: " +
+                theme.toUpperCase()
+            );
+
+        }
+
+    };
+
+})();
+
+
+/* =========================================================
+   10. MENU BACKDROP — TAP TO CLOSE
+   ========================================================= */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const overlay =
+            document.getElementById(
+                "drawerOverlay"
+            );
+
+        const drawer =
+            document.getElementById(
+                "iosMenuDrawer"
+            );
+
+        if (
+            !overlay ||
+            !drawer
+        )
+            return;
+
+        if (
+            overlay.classList.contains(
+                "active"
+            ) &&
+            event.target === overlay
+        ) {
+
+            closeMenuOnly();
+
+        }
+
+    },
+    true
+);
+
+
+/* =========================================================
+   11. PREVENT MENU TOUCH FROM SCROLLING PAGE
+   ========================================================= */
+
+document.addEventListener(
+    "touchmove",
+    function (event) {
+
+        const drawer =
+            document.getElementById(
+                "iosMenuDrawer"
+            );
+
+        if (
+            drawer &&
+            drawer.classList.contains(
+                "active"
+            )
+        ) {
+
+            const content =
+                drawer.querySelector(
+                    ".drawer-content"
+                );
+
+            if (
+                content &&
+                content.contains(
+                    event.target
+                )
+            ) {
+
+                return;
+
+            }
+
+            event.preventDefault();
+
+        }
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   12. DETAIL RIGHT SWIPE = BACK
+   ========================================================= */
+
+(function () {
+
+    let startX = 0;
+    let startY = 0;
+
+    document.addEventListener(
+        "touchstart",
+        function (event) {
+
+            const detail =
+                document.getElementById(
+                    "productDetailView"
+                );
+
+            if (
+                !detail ||
+                !detail.classList.contains(
+                    "active"
+                )
+            )
+                return;
+
+            startX =
+                event.touches[0].clientX;
+
+            startY =
+                event.touches[0].clientY;
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+    document.addEventListener(
+        "touchend",
+        function (event) {
+
+            const detail =
+                document.getElementById(
+                    "productDetailView"
+                );
+
+            if (
+                !detail ||
+                !detail.classList.contains(
+                    "active"
+                )
+            )
+                return;
+
+            const endX =
+                event.changedTouches[0].clientX;
+
+            const endY =
+                event.changedTouches[0].clientY;
+
+            const dx =
+                endX - startX;
+
+            const dy =
+                endY - startY;
+
+            if (
+                dx > 100 &&
+                Math.abs(dx) >
+                Math.abs(dy)
+            ) {
+
+                closeProductDetail();
+
+            }
+
+        },
+        {
+            passive:true
+        }
+    );
+
+})();
+
+
+/* =========================================================
+   13. X BUTTON = ONLY ONE STEP BACK
+   ========================================================= */
+
+(function () {
+
+    const originalClose =
+        window.closeModalStepBack;
+
+    window.closeModalStepBack =
+        function (id) {
+
+            const modal =
+                document.getElementById(id);
+
+            if (!modal)
+                return;
+
+            modal.classList.remove(
+                "active"
+            );
+
+            /* restore body */
+
+            if (
+                !document.querySelector(
+                    ".custom-modal.active"
+                ) &&
+                !document.getElementById(
+                    "productDetailView"
+                )?.classList.contains(
+                    "active"
+                )
+            ) {
+
+                document.body.style.overflow =
+                    "";
+
+            }
+
+        };
+
+})();
+
+
+/* =========================================================
+   14. PRODUCT CARD — LIKE ANIMATION STATE
+   ========================================================= */
+
+(function () {
+
+    const originalToggle =
+        window.toggleWishlist;
+
+    window.toggleWishlist =
+        function (id) {
+
+            if (
+                typeof originalToggle ===
+                "function"
+            ) {
+
+                originalToggle(id);
+
+            }
+
+            setTimeout(() => {
+
+                const button =
+                    document.querySelector(
+                        `.wishlist-btn[onclick*="${id}"]`
+                    );
+
+                if (button) {
+
+                    const liked =
+                        wishlist.some(
+                            p => p.id === id
+                        );
+
+                    button.classList.toggle(
+                        "active",
+                        liked
+                    );
+
+                    const icon =
+                        button.querySelector(
+                            "i"
+                        );
+
+                    if (icon) {
+
+                        icon.className =
+                            liked
+                                ? "fa-solid fa-heart"
+                                : "fa-regular fa-heart";
+
+                    }
+
+                }
+
+                if (
+                    currentProduct &&
+                    currentProduct.id === id
+                ) {
+
+                    updateDetailHeart();
+
+                }
+
+            },50);
+
+        };
+
+})();
+
+
+/* =========================================================
+   15. KEEP CART / WISHLIST SYNCHRONIZED
+   ========================================================= */
+
+window.addEventListener(
+    "storage",
+    function () {
+
+        try {
+
+            cart =
+                JSON.parse(
+                    localStorage.getItem(
+                        "vornex_cart"
+                    )
+                ) || [];
+
+            wishlist =
+                JSON.parse(
+                    localStorage.getItem(
+                        "vornex_wishlist"
+                    )
+                ) || [];
+
+            renderCart();
+            renderWishlist();
+            updateBadges();
+
+        } catch (error) {
+
+            console.error(
+                "VORNEX storage sync:",
+                error
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   16. FINAL INITIAL SYNC
+   ========================================================= */
+
+setTimeout(
+    function () {
+
+        try {
+
+            updateBadges();
+
+            renderCart();
+
+            renderWishlist();
+
+            restoreTheme();
+
+        } catch (error) {
+
+            console.error(
+                "VORNEX final sync:",
+                error
+            );
+
+        }
+
+    },
+    800
+);
+  
 </script>
 
 </body>
