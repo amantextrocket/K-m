@@ -4,7 +4,7 @@
 
 // 1. Firebase Initialization (Aapke aman.html waale Firebase Config se match karein)
 const firebaseConfig = {
-    databaseURL: "https://your-firebase-database-url.firebaseio.com" // 👈 Isko apne aman.html waale Database URL se badal dein
+    databaseURL: "https://vornex-b7a62-default-rtdb.firebaseio.com", // 👈 Isko apne aman.html waale Database URL se badal dein
 };
 
 if (!firebase.apps.length) {
