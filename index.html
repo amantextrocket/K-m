@@ -6251,7 +6251,296 @@ setTimeout(
 
 
 })();
-  
+  <script>
+/* =========================================================
+   VORNEX MENU BUTTON COMPATIBILITY FIX
+   MENU -> PAGE -> X = MENU
+   ========================================================= */
+
+(function () {
+
+    window.vornexMenuOrigin = false;
+
+    function openFromMenu(callback) {
+
+        window.vornexMenuOrigin = true;
+
+        if (typeof closeMenuOnly === "function") {
+            closeMenuOnly();
+        } else if (typeof toggleMenuDrawer === "function") {
+            toggleMenuDrawer(false);
+        }
+
+        setTimeout(function () {
+            try {
+                callback();
+            } catch (error) {
+                console.error(
+                    "VORNEX menu navigation error:",
+                    error
+                );
+            }
+        }, 80);
+    }
+
+
+    /* LOGIN */
+
+    window.openLogin = function () {
+
+        openFromMenu(function () {
+
+            if (
+                typeof openModal === "function" &&
+                document.getElementById("loginModal")
+            ) {
+                openModal("loginModal");
+            } else if (
+                typeof openLoginInterface === "function"
+            ) {
+                openLoginInterface();
+            }
+
+        });
+
+    };
+
+
+    /* ACCOUNT */
+
+    window.openAccount = function () {
+
+        openFromMenu(function () {
+
+            if (
+                typeof updateAccountUI === "function" &&
+                typeof auth !== "undefined" &&
+                auth.currentUser
+            ) {
+                try {
+                    updateAccountUI(auth.currentUser);
+                } catch (e) {}
+            }
+
+            if (
+                typeof openModal === "function" &&
+                document.getElementById("accountModal")
+            ) {
+                openModal("accountModal");
+            } else if (
+                typeof openAccountInterface === "function"
+            ) {
+                openAccountInterface();
+            }
+
+        });
+
+    };
+
+
+    /* ORDERS */
+
+    window.openOrders = function () {
+
+        openFromMenu(function () {
+
+            if (
+                typeof openModal === "function" &&
+                document.getElementById("ordersModal")
+            ) {
+                openModal("ordersModal");
+            }
+
+            if (
+                typeof loadCustomerOrders === "function"
+            ) {
+                setTimeout(
+                    loadCustomerOrders,
+                    100
+                );
+            }
+
+        });
+
+    };
+
+
+    /* WISHLIST */
+
+    window.openWishlist = function () {
+
+        openFromMenu(function () {
+
+            if (
+                typeof renderWishlist === "function"
+            ) {
+                renderWishlist();
+            }
+
+            if (
+                typeof openModal === "function" &&
+                document.getElementById("wishlistModal")
+            ) {
+                openModal("wishlistModal");
+            }
+
+        });
+
+    };
+
+
+    /* CART */
+
+    window.openCart = function () {
+
+        openFromMenu(function () {
+
+            if (
+                typeof renderCart === "function"
+            ) {
+                renderCart();
+            }
+
+            if (
+                typeof openModal === "function" &&
+                document.getElementById("cartModal")
+            ) {
+                openModal("cartModal");
+            } else if (
+                typeof openCartFromMenu === "function"
+            ) {
+                openCartFromMenu();
+            }
+
+        });
+
+    };
+
+
+    /* =====================================================
+       SMART X / BACK
+       ===================================================== */
+
+    const oldCloseModalStepBack =
+        window.closeModalStepBack;
+
+
+    window.closeModalStepBack = function (id) {
+
+        const modal =
+            document.getElementById(id);
+
+        if (!modal) {
+            return;
+        }
+
+
+        /* LOGIN INTERNAL STEP */
+
+        if (id === "loginModal") {
+
+            const phoneBox =
+                document.getElementById(
+                    "phoneLoginBox"
+                );
+
+            const choices =
+                document.getElementById(
+                    "loginChoices"
+                );
+
+            if (
+                phoneBox &&
+                phoneBox.style.display !== "none"
+            ) {
+
+                phoneBox.style.display =
+                    "none";
+
+                if (choices) {
+                    choices.style.display =
+                        "block";
+                }
+
+                return;
+            }
+        }
+
+
+        /* CLOSE CURRENT MODAL */
+
+        modal.classList.remove("active");
+
+        modal.style.display = "none";
+
+
+        /* =================================================
+           IF OPENED FROM MENU
+           RESTORE MENU
+           ================================================= */
+
+        if (window.vornexMenuOrigin) {
+
+            window.vornexMenuOrigin =
+                false;
+
+            setTimeout(function () {
+
+                const drawer =
+                    document.getElementById(
+                        "iosMenuDrawer"
+                    ) ||
+                    document.querySelector(
+                        ".ios-drawer"
+                    );
+
+                const overlay =
+                    document.getElementById(
+                        "drawerOverlay"
+                    );
+
+                if (drawer) {
+                    drawer.classList.add(
+                        "active"
+                    );
+                }
+
+                if (overlay) {
+                    overlay.classList.add(
+                        "active"
+                    );
+                }
+
+                document.body.classList.add(
+                    "menu-open"
+                );
+
+            }, 50);
+
+            return;
+        }
+
+
+        /* FALLBACK */
+
+        if (
+            typeof oldCloseModalStepBack ===
+            "function"
+        ) {
+
+            try {
+                oldCloseModalStepBack(id);
+            } catch (error) {
+                console.error(error);
+            }
+
+        }
+
+    };
+
+
+})();
+</script>
 </script>
 
 </body>
