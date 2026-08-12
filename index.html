@@ -5860,6 +5860,397 @@ setTimeout(
     },
     800
 );
+
+    /* =========================================================
+   VORNEX — SMART ONE STEP BACK SYSTEM
+   MENU → INTERFACE → X = BACK TO MENU
+   ========================================================= */
+
+(function () {
+
+    let vornexPreviousScreen = null;
+
+    /* -------------------------------------------------------
+       Remember that interface was opened from MENU
+       ------------------------------------------------------- */
+
+    function rememberMenuOrigin() {
+        vornexPreviousScreen = "menu";
+    }
+
+    /* -------------------------------------------------------
+       LOGIN
+       ------------------------------------------------------- */
+
+    const oldOpenLoginInterface =
+        window.openLoginInterface;
+
+    window.openLoginInterface = function () {
+
+        rememberMenuOrigin();
+
+        closeMenuOnly();
+
+        openModal("loginModal");
+
+        /* Always start from login choices */
+        const choices =
+            document.getElementById("loginChoices");
+
+        const phoneBox =
+            document.getElementById("phoneLoginBox");
+
+        if (choices) {
+            choices.style.display = "block";
+        }
+
+        if (phoneBox) {
+            phoneBox.style.display = "none";
+        }
+
+    };
+
+
+    /* -------------------------------------------------------
+       ACCOUNT
+       ------------------------------------------------------- */
+
+    const oldOpenAccountInterface =
+        window.openAccountInterface;
+
+    window.openAccountInterface = function () {
+
+        rememberMenuOrigin();
+
+        closeMenuOnly();
+
+        if (
+            typeof updateAccountUI === "function" &&
+            typeof auth !== "undefined" &&
+            auth.currentUser
+        ) {
+            updateAccountUI(auth.currentUser);
+        }
+
+        openModal("accountModal");
+
+    };
+
+
+    /* -------------------------------------------------------
+       ORDERS
+       ------------------------------------------------------- */
+
+    const oldOpenOrdersInterface =
+        window.openOrdersInterface;
+
+    window.openOrdersInterface = function () {
+
+        rememberMenuOrigin();
+
+        closeMenuOnly();
+
+        openModal("ordersModal");
+
+    };
+
+
+    /* -------------------------------------------------------
+       WISHLIST
+       ------------------------------------------------------- */
+
+    const oldOpenWishlistFromMenu =
+        window.openWishlistFromMenu;
+
+    window.openWishlistFromMenu = function () {
+
+        rememberMenuOrigin();
+
+        closeMenuOnly();
+
+        if (
+            typeof renderWishlist === "function"
+        ) {
+            renderWishlist();
+        }
+
+        openModal("wishlistModal");
+
+    };
+
+
+    /* -------------------------------------------------------
+       CART / BAG
+       ------------------------------------------------------- */
+
+    const oldOpenCartFromMenu =
+        window.openCartFromMenu;
+
+    window.openCartFromMenu = function () {
+
+        rememberMenuOrigin();
+
+        closeMenuOnly();
+
+        const drawer =
+            document.getElementById("cartDrawer");
+
+        if (drawer) {
+            drawer.classList.add("active");
+        }
+
+        if (
+            typeof renderCart === "function"
+        ) {
+            renderCart();
+        }
+
+    };
+
+
+    /* -------------------------------------------------------
+       SMART X BUTTON
+       ------------------------------------------------------- */
+
+    window.closeModalStepBack = function (id) {
+
+        const modal =
+            document.getElementById(id);
+
+        if (!modal) {
+            return;
+        }
+
+
+        /* ===================================================
+           LOGIN INTERNAL STEP
+
+           LOGIN OPTIONS
+              ↓
+           PHONE LOGIN
+              ↓
+           MENU
+           =================================================== */
+
+        if (id === "loginModal") {
+
+            const choices =
+                document.getElementById("loginChoices");
+
+            const phoneBox =
+                document.getElementById("phoneLoginBox");
+
+            if (
+                phoneBox &&
+                phoneBox.style.display !== "none"
+            ) {
+
+                phoneBox.style.display = "none";
+
+                if (choices) {
+                    choices.style.display = "block";
+                }
+
+                return;
+            }
+        }
+
+
+        /* ===================================================
+           CLOSE CURRENT INTERFACE
+           =================================================== */
+
+        modal.classList.remove("active");
+
+
+        /* ===================================================
+           RESTORE MENU IF THIS INTERFACE
+           WAS OPENED FROM MENU
+           =================================================== */
+
+        if (
+            vornexPreviousScreen === "menu"
+        ) {
+
+            vornexPreviousScreen = null;
+
+            const drawer =
+                document.getElementById(
+                    "iosMenuDrawer"
+                );
+
+            const overlay =
+                document.getElementById(
+                    "drawerOverlay"
+                );
+
+            if (drawer) {
+                drawer.classList.add("active");
+            }
+
+            if (overlay) {
+                overlay.classList.add("active");
+            }
+
+            document.body.classList.add(
+                "menu-open"
+            );
+
+            return;
+        }
+
+
+        /* ===================================================
+           OTHERWISE NORMAL CLOSE
+           =================================================== */
+
+        document.body.style.overflow = "";
+
+    };
+
+
+    /* -------------------------------------------------------
+       BACKGROUND TAP = SAME ONE STEP BACK
+       ------------------------------------------------------- */
+
+    window.closeModalOnBg = function (
+        event,
+        id
+    ) {
+
+        if (
+            event &&
+            event.target &&
+            event.target.id === id
+        ) {
+
+            window.closeModalStepBack(id);
+
+        }
+
+    };
+
+
+    /* -------------------------------------------------------
+       CART X BUTTON
+
+       If cart was opened from menu:
+       CART → X → MENU
+       ------------------------------------------------------- */
+
+    const oldCloseCartDrawer =
+        window.closeCartDrawer;
+
+    window.closeCartDrawer = function () {
+
+        const drawer =
+            document.getElementById(
+                "cartDrawer"
+            );
+
+        if (drawer) {
+            drawer.classList.remove(
+                "active"
+            );
+        }
+
+        if (
+            vornexPreviousScreen === "menu"
+        ) {
+
+            vornexPreviousScreen = null;
+
+            const menu =
+                document.getElementById(
+                    "iosMenuDrawer"
+                );
+
+            const overlay =
+                document.getElementById(
+                    "drawerOverlay"
+                );
+
+            if (menu) {
+                menu.classList.add("active");
+            }
+
+            if (overlay) {
+                overlay.classList.add("active");
+            }
+
+            document.body.classList.add(
+                "menu-open"
+            );
+
+        }
+
+    };
+
+
+    /* -------------------------------------------------------
+       SAFETY:
+       MENU OPENED FROM NORMAL HOME
+       SHOULD NOT KEEP OLD HISTORY
+       ------------------------------------------------------- */
+
+    const oldToggleMenuDrawer =
+        window.toggleMenuDrawer;
+
+    window.toggleMenuDrawer = function (open) {
+
+        if (open) {
+
+            vornexPreviousScreen = null;
+
+            const drawer =
+                document.getElementById(
+                    "iosMenuDrawer"
+                );
+
+            const overlay =
+                document.getElementById(
+                    "drawerOverlay"
+                );
+
+            if (drawer) {
+                drawer.classList.add("active");
+            }
+
+            if (overlay) {
+                overlay.classList.add("active");
+            }
+
+            document.body.classList.add(
+                "menu-open"
+            );
+
+        } else {
+
+            closeMenuOnly();
+
+            vornexPreviousScreen = null;
+
+        }
+
+    };
+
+
+    /* -------------------------------------------------------
+       MENU BACKDROP
+
+       Background touch = menu closes normally
+       ------------------------------------------------------- */
+
+    window.closeMenuFromBackdrop = function () {
+
+        vornexPreviousScreen = null;
+
+        closeMenuOnly();
+
+    };
+
+
+})();
   
 </script>
 
