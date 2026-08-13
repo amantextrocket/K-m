@@ -1292,7 +1292,7 @@ a{
                 <div class="theme-chip theme-gold" onclick="setTheme('gold')">GOLD</div>
                 <div class="theme-chip theme-emerald" onclick="setTheme('emerald')">EMERALD</div>
                 <div class="theme-chip theme-violet" onclick="setTheme('violet')">VIOLET</div>
-                <div class="theme-chip theme-amber" onclick="setTheme('amber')">AMBER</div>
+                <div class="theme-chip theme-light" onclick="setTheme('light')">LIGHT</div>
             </div>
         </div>
 
@@ -2256,6 +2256,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     updateBadges();
 
     updateAuthUI();
+
+    loadSavedTheme();
 
 });
 
@@ -3547,25 +3549,47 @@ async function submitOrder(e){
                 return `${i + 1}. ${item.name}${item.size ? " | Size: " + item.size : ""} | Qty: ${item.qty || 1} | ₹${Number(item.price || 0) * Number(item.qty || 1)}`;
             }).join("\n");
 
-            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            const emailParams = {
+                /* Variables matching the EmailJS template */
+                email: order.customer.email || "",
+                name: order.customer.name,
+                phone: order.customer.phone,
+                pincode: order.customer.pincode,
+                city: order.customer.city,
+                state: order.customer.state,
+                address: order.customer.address,
+                products: emailItems,
+                total: order.total,
+                time: new Date(order.createdAt).toLocaleString("en-IN"),
+
+                /* Extra variables kept for compatibility */
                 order_id: order.orderId,
                 customer_name: order.customer.name,
                 customer_phone: order.customer.phone,
                 customer_email: order.customer.email || "",
                 delivery_address: order.customer.address,
-                city: order.customer.city,
-                state: order.customer.state,
-                pincode: order.customer.pincode,
                 items: emailItems,
                 subtotal: `₹${order.subtotal}`,
                 discount: `₹${order.discount}`,
-                total: `₹${order.total}`,
                 coupon: order.coupon || "None",
                 payment_method: order.paymentMethod,
                 payment_status: order.paymentStatus,
                 order_status: order.status,
                 created_at: order.createdAt
-            });
+            };
+
+            /* The template currently uses {{email}} as its recipient.
+               Send to the customer's logged-in Gmail when available. */
+            if(order.customer.email){
+                await emailjs.send(
+                    EMAILJS_SERVICE_ID,
+                    EMAILJS_TEMPLATE_ID,
+                    emailParams
+                );
+            } else {
+                console.warn("Customer email not available; EmailJS notification was not sent.");
+                emailSent=false;
+            }
 
         }catch(emailError){
 
@@ -4321,25 +4345,37 @@ function toggleAccordion(id){
 
 function setTheme(theme){
 
-    if(theme==="dark"){
+    const themes=["dark","neon","gold","emerald","violet","light"];
 
-        document.body.style.filter="none";
-
+    if(!themes.includes(theme)){
+        theme="dark";
     }
 
-    if(theme==="gold"){
-
-        document.documentElement.style
-            .setProperty("--theme","gold");
-
-    }
-
-    showToast(
-        "Theme: "+theme.toUpperCase(),
-        "info"
+    document.body.classList.remove(
+        "theme-dark-active",
+        "theme-neon-active",
+        "theme-gold-active",
+        "theme-emerald-active",
+        "theme-violet-active",
+        "theme-light-active"
     );
 
+    document.body.classList.add("theme-"+theme+"-active");
+
+    localStorage.setItem("vornex_theme",theme);
+
+    showToast("Theme: "+theme.toUpperCase(),"info");
+
 }
+
+function loadSavedTheme(){
+
+    const saved=localStorage.getItem("vornex_theme")||"dark";
+
+    setTheme(saved);
+
+}
+
 
 
 /* =========================================================
@@ -4391,6 +4427,133 @@ document.getElementById("cartDrawer")
     .addEventListener("touchstart",()=>{});
 
 renderCart();
+
+
+
+/* =========================================================
+   VORNEX THEME ENGINE + PREMIUM VISUAL LAYER
+   ========================================================= */
+(function(){
+    const style=document.createElement("style");
+    style.innerHTML=`
+
+    .theme-light-active{
+        background:#f4f5f7 !important;
+        color:#111 !important;
+    }
+
+    .theme-light-active .filter-bar{
+        background:rgba(255,255,255,.88) !important;
+        border-bottom:1px solid #e5e7eb !important;
+    }
+
+    .theme-light-active .product-card,
+    .theme-light-active .modal-card,
+    .theme-light-active .cart-drawer,
+    .theme-light-active .custom-modal .modal-card,
+    .theme-light-active .coupon-item,
+    .theme-light-active .wishlist-product,
+    .theme-light-active .checkout-summary{
+        background:#fff !important;
+        color:#111 !important;
+        border-color:#e5e7eb !important;
+    }
+
+    .theme-light-active .p-title,
+    .theme-light-active .p-price,
+    .theme-light-active .modal-header h3,
+    .theme-light-active .cart-item-name,
+    .theme-light-active .account-name,
+    .theme-light-active .checkout-summary-item{
+        color:#111 !important;
+    }
+
+    .theme-light-active .p-category,
+    .theme-light-active .coupon-desc,
+    .theme-light-active .account-sub,
+    .theme-light-active .wishlist-info p{
+        color:#6b7280 !important;
+    }
+
+    .theme-light-active .cat-btn,
+    .theme-light-active .theme-chip,
+    .theme-light-active .size-btn,
+    .theme-light-active .search-wrapper input{
+        background:#fff !important;
+        color:#111 !important;
+        border-color:#d1d5db !important;
+    }
+
+    .theme-light-active .cat-btn.active,
+    .theme-light-active .size-btn.selected,
+    .theme-light-active .add-btn,
+    .theme-light-active .checkout-btn,
+    .theme-light-active .apply-coupon{
+        background:#111 !important;
+        color:#fff !important;
+    }
+
+    .theme-light-active .hero-section{
+        background:radial-gradient(circle at 70% 20%,#ffffff,transparent 35%),linear-gradient(145deg,#f8fafc,#e5e7eb) !important;
+    }
+
+    .theme-light-active .hero-overlay{
+        background:linear-gradient(transparent 20%,rgba(255,255,255,.86)) !important;
+    }
+
+    .theme-light-active .hero-title,
+    .theme-light-active .hero-subtitle,
+    .theme-light-active .hero-tag{
+        color:#111 !important;
+    }
+
+    .theme-light-active .hero-btn{
+        background:#111 !important;
+        color:#fff !important;
+    }
+
+    .theme-light-active .menu-item-btn{
+        color:#111 !important;
+        border-color:#e5e7eb !important;
+    }
+
+    .theme-light-active .menu-drawer{
+        background:#fff !important;
+        color:#111 !important;
+    }
+
+    .theme-light-active .theme-picker-section h4{
+        color:#6b7280 !important;
+    }
+
+    .theme-light-active .summary-row{
+        color:#374151 !important;
+    }
+
+    /* Premium default polish */
+    .product-card{
+        box-shadow:0 10px 30px rgba(0,0,0,.18);
+        transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+    }
+    .product-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 18px 45px rgba(0,0,0,.28);
+        border-color:#3a3a3a;
+    }
+    .add-btn,.checkout-btn,.detail-buy-btn,.detail-cart-btn{
+        transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease;
+    }
+    .add-btn:hover,.checkout-btn:hover,.detail-buy-btn:hover,.detail-cart-btn:hover{
+        transform:translateY(-1px);
+        box-shadow:0 8px 25px rgba(0,0,0,.25);
+    }
+    .checkout-btn{
+        letter-spacing:1.5px;
+        font-weight:900;
+    }
+    `;
+    document.head.appendChild(style);
+})();
 
   /* =========================================================
    VORNEX FINAL REQUIREMENTS PATCH
