@@ -2937,8 +2937,10 @@ function updateBadges(){
     document.getElementById("menuCartCount").textContent=
         cartCount;
 
-    document.getElementById("cartTotalItems").textContent=
-        cartCount;
+    const cartTotalItems = document.getElementById("cartTotalItems");
+    if(cartTotalItems){
+        cartTotalItems.textContent = cartCount;
+    }
 
     document.getElementById("menuWishCount").textContent=
         wishlist.length;
