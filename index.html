@@ -1879,8 +1879,8 @@ a{
             <button
                 type="submit"
                 class="primary-btn"
-                style="background:#25d366;">
-                PLACE ORDER VIA WHATSAPP
+                style="background:#4285f4;">
+                PLACE ORDER VIA GMAIL
             </button>
 
             <button
@@ -2125,6 +2125,7 @@ a{
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
 <script>
@@ -2166,6 +2167,20 @@ const productsRef=db.ref("products");
 const couponsRef=db.ref("coupons");
 
 const ordersRef=db.ref("orders");
+
+/* =========================================================
+   VORNEX EMAIL NOTIFICATION (EMAILJS)
+   Fill these 3 values after creating EmailJS service/template.
+========================================================= */
+const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
+const EMAILJS_SERVICE_ID = "YOUR_EMAILJS_SERVICE_ID";
+const EMAILJS_TEMPLATE_ID = "YOUR_EMAILJS_TEMPLATE_ID";
+
+if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
+    emailjs.init({
+        publicKey: EMAILJS_PUBLIC_KEY
+    });
+}
 
 
 /* =========================================================
@@ -3514,15 +3529,36 @@ async function submitOrder(e){
             .child(orderId)
             .set(order);
 
-        const message=buildOrderMessage(order);
+        /* Send the order to your Gmail through EmailJS.
+           The recipient Gmail address is configured inside the EmailJS template. */
+        if (typeof emailjs === "undefined" || EMAILJS_PUBLIC_KEY === "YOUR_EMAILJS_PUBLIC_KEY" ||
+            EMAILJS_SERVICE_ID === "YOUR_EMAILJS_SERVICE_ID" || EMAILJS_TEMPLATE_ID === "YOUR_EMAILJS_TEMPLATE_ID") {
+            throw new Error("Gmail notification is not configured. Add EmailJS Public Key, Service ID and Template ID in index.html.");
+        }
 
-        const whatsappUrl=
-            "whatsapp://send?phone=918269444061&text="+
-            encodeURIComponent(message);
+        const emailItems = order.items.map((item, i) => {
+            return `${i + 1}. ${item.name}${item.size ? " | Size: " + item.size : ""} | Qty: ${item.qty || 1} | ₹${Number(item.price || 0) * Number(item.qty || 1)}`;
+        }).join("\n");
 
-        // iPhone: open the WhatsApp app directly.
-        // This avoids the wa.me browser/intermediate page.
-        window.location.href=whatsappUrl;
+        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            order_id: order.orderId,
+            customer_name: order.customer.name,
+            customer_phone: order.customer.phone,
+            customer_email: order.customer.email || "",
+            delivery_address: order.customer.address,
+            city: order.customer.city,
+            state: order.customer.state,
+            pincode: order.customer.pincode,
+            items: emailItems,
+            subtotal: `₹${order.subtotal}`,
+            discount: `₹${order.discount}`,
+            total: `₹${order.total}`,
+            coupon: order.coupon || "None",
+            payment_method: order.paymentMethod,
+            payment_status: order.paymentStatus,
+            order_status: order.status,
+            created_at: order.createdAt
+        });
 
         cart=[];
 
@@ -3541,7 +3577,7 @@ async function submitOrder(e){
             .classList.remove("active");
 
         showToast(
-            "✅ Order placed successfully!",
+            "✅ Order placed successfully! Order details sent to VORNEX Gmail.",
             "success"
         );
 
