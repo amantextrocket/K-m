@@ -3517,11 +3517,11 @@ async function submitOrder(e){
         const message=buildOrderMessage(order);
 
         const whatsappUrl=
-            "https://wa.me/918269444061?text="+
+            "whatsapp://send?phone=918269444061&text="+
             encodeURIComponent(message);
 
-        // iPhone/Safari can block window.open() after an async Firebase save.
-        // Navigate directly so the WhatsApp order message is not blocked.
+        // iPhone: open the WhatsApp app directly.
+        // This avoids the wa.me browser/intermediate page.
         window.location.href=whatsappUrl;
 
         cart=[];
