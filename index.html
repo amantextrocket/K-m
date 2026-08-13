@@ -5898,7 +5898,849 @@ setTimeout(
     },
     800
 );
-  
+
+<script>
+/* =========================================================
+   VORNEX FINAL FIX
+   1. MENU → INTERFACE → X = BACK TO MENU
+   2. INTERFACE → NEXT INTERFACE → X = ONE STEP BACK
+   3. THEME PREFERENCES = FULLY WORKING
+   ========================================================= */
+
+(function(){
+
+    /* =====================================================
+       ONE-STEP BACK SYSTEM
+       ===================================================== */
+
+    window.__vornexModalHistory = [];
+    window.__vornexPendingMenuBack = false;
+    window.__vornexCartFromMenu = false;
+
+    /* -----------------------------------------------------
+       SAVE MENU ORIGIN WHEN MENU BUTTON IS TAPPED
+       ----------------------------------------------------- */
+
+    const originalToggleMenuDrawer =
+        window.toggleMenuDrawer;
+
+    window.toggleMenuDrawer = function(open){
+
+        const drawer =
+            document.getElementById("iosMenuDrawer");
+
+        const wasMenuOpen =
+            drawer &&
+            drawer.classList.contains("active");
+
+        /*
+         * Menu is being closed because a menu item
+         * is about to open another interface.
+         *
+         * The original menu code closes the menu first,
+         * so we remember it here.
+         */
+        if(!open && wasMenuOpen){
+
+            window.__vornexPendingMenuBack = true;
+
+            clearTimeout(
+                window.__vornexPendingMenuTimer
+            );
+
+            window.__vornexPendingMenuTimer =
+                setTimeout(function(){
+
+                    window.__vornexPendingMenuBack =
+                        false;
+
+                },100);
+        }
+
+        if(typeof originalToggleMenuDrawer === "function"){
+
+            originalToggleMenuDrawer(open);
+
+        }else{
+
+            const overlay =
+                document.getElementById("drawerOverlay");
+
+            if(open){
+
+                if(drawer)
+                    drawer.classList.add("active");
+
+                if(overlay)
+                    overlay.classList.add("active");
+
+                document.body.classList.add(
+                    "menu-open"
+                );
+
+            }else{
+
+                if(drawer)
+                    drawer.classList.remove("active");
+
+                if(overlay)
+                    overlay.classList.remove("active");
+
+                document.body.classList.remove(
+                    "menu-open"
+                );
+            }
+        }
+    };
+
+
+    /* =====================================================
+       OPEN MODAL
+       ===================================================== */
+
+    const originalOpenModal =
+        window.openModal;
+
+    window.openModal = function(id){
+
+        /*
+         * Check whether another modal is currently open.
+         */
+        const currentModal =
+            document.querySelector(
+                ".custom-modal.active"
+            );
+
+        /*
+         * If menu was the previous screen,
+         * remember MENU as parent.
+         */
+        if(window.__vornexPendingMenuBack){
+
+            window.__vornexModalHistory.push({
+                modal:id,
+                parent:"menu"
+            });
+
+            window.__vornexPendingMenuBack =
+                false;
+
+        }
+
+        /*
+         * If another modal is already active,
+         * remember that modal as parent.
+         */
+        else if(
+            currentModal &&
+            currentModal.id !== id
+        ){
+
+            window.__vornexModalHistory.push({
+                modal:id,
+                parent:currentModal.id
+            });
+
+        }
+
+        /*
+         * Open normally.
+         */
+        if(typeof originalOpenModal === "function"){
+
+            originalOpenModal(id);
+
+        }else{
+
+            const modal =
+                document.getElementById(id);
+
+            if(modal)
+                modal.classList.add("active");
+        }
+
+    };
+
+
+    /* =====================================================
+       SMART X BUTTON
+       ===================================================== */
+
+    window.closeModalStepBack = function(id){
+
+        const modal =
+            document.getElementById(id);
+
+        if(!modal)
+            return;
+
+
+        /* -------------------------------------------------
+           LOGIN INTERNAL STEP
+           PHONE LOGIN → LOGIN OPTIONS
+           ------------------------------------------------- */
+
+        if(id === "loginModal"){
+
+            const choices =
+                document.getElementById(
+                    "loginChoices"
+                );
+
+            const phoneBox =
+                document.getElementById(
+                    "phoneLoginBox"
+                );
+
+            if(
+                phoneBox &&
+                phoneBox.style.display !== "none"
+            ){
+
+                phoneBox.style.display =
+                    "none";
+
+                if(choices){
+
+                    choices.style.display =
+                        "block";
+                }
+
+                return;
+            }
+        }
+
+
+        /* -------------------------------------------------
+           CLOSE CURRENT MODAL
+           ------------------------------------------------- */
+
+        modal.classList.remove(
+            "active"
+        );
+
+
+        /* -------------------------------------------------
+           FIND PARENT SCREEN
+           ------------------------------------------------- */
+
+        let parent = null;
+
+        for(
+            let i =
+                window.__vornexModalHistory.length - 1;
+            i >= 0;
+            i--
+        ){
+
+            const item =
+                window.__vornexModalHistory[i];
+
+            if(
+                item &&
+                item.modal === id
+            ){
+
+                parent =
+                    item.parent;
+
+                window.__vornexModalHistory
+                    .splice(i,1);
+
+                break;
+            }
+        }
+
+
+        /* -------------------------------------------------
+           BACK TO MENU
+           ------------------------------------------------- */
+
+        if(parent === "menu"){
+
+            const drawer =
+                document.getElementById(
+                    "iosMenuDrawer"
+                );
+
+            const overlay =
+                document.getElementById(
+                    "drawerOverlay"
+                );
+
+            if(drawer){
+
+                drawer.classList.add(
+                    "active"
+                );
+            }
+
+            if(overlay){
+
+                overlay.classList.add(
+                    "active"
+                );
+            }
+
+            document.body.classList.add(
+                "menu-open"
+            );
+
+            document.body.style.overflow =
+                "hidden";
+
+            return;
+        }
+
+
+        /* -------------------------------------------------
+           BACK TO PREVIOUS MODAL
+           ------------------------------------------------- */
+
+        if(parent){
+
+            const previousModal =
+                document.getElementById(
+                    parent
+                );
+
+            if(previousModal){
+
+                previousModal.classList.add(
+                    "active"
+                );
+
+                return;
+            }
+        }
+
+
+        /* -------------------------------------------------
+           NORMAL CLOSE → HOME
+           ------------------------------------------------- */
+
+        if(
+            !document.querySelector(
+                ".custom-modal.active"
+            )
+        ){
+
+            document.body.style.overflow =
+                "";
+        }
+
+    };
+
+
+    /* =====================================================
+       BACKGROUND TAP
+       ===================================================== */
+
+    window.closeModalOnBg = function(
+        event,
+        id
+    ){
+
+        if(
+            event &&
+            event.target &&
+            event.target.id === id
+        ){
+
+            window.closeModalStepBack(
+                id
+            );
+        }
+    };
+
+
+    /* =====================================================
+       CART FROM MENU
+       ===================================================== */
+
+    const originalOpenCartFromMenu =
+        window.openCartFromMenu;
+
+    window.openCartFromMenu =
+        function(){
+
+            window.__vornexCartFromMenu =
+                true;
+
+            if(
+                typeof originalOpenCartFromMenu ===
+                "function"
+            ){
+
+                originalOpenCartFromMenu();
+
+            }
+
+        };
+
+
+    /* =====================================================
+       CART CLOSE → MENU
+       ===================================================== */
+
+    const originalCloseCartDrawer =
+        window.closeCartDrawer;
+
+    window.closeCartDrawer =
+        function(){
+
+            if(
+                typeof originalCloseCartDrawer ===
+                "function"
+            ){
+
+                originalCloseCartDrawer();
+
+            }else{
+
+                const cart =
+                    document.getElementById(
+                        "cartDrawer"
+                    );
+
+                if(cart)
+                    cart.classList.remove(
+                        "active"
+                    );
+            }
+
+
+            if(
+                window.__vornexCartFromMenu
+            ){
+
+                window.__vornexCartFromMenu =
+                    false;
+
+                const menu =
+                    document.getElementById(
+                        "iosMenuDrawer"
+                    );
+
+                const overlay =
+                    document.getElementById(
+                        "drawerOverlay"
+                    );
+
+                if(menu)
+                    menu.classList.add(
+                        "active"
+                    );
+
+                if(overlay)
+                    overlay.classList.add(
+                        "active"
+                    );
+
+                document.body.classList.add(
+                    "menu-open"
+                );
+
+                document.body.style.overflow =
+                    "hidden";
+            }
+
+        };
+
+
+    /* =====================================================
+       THEME SYSTEM
+       ===================================================== */
+
+    const themeStyleId =
+        "vornex-live-theme-style";
+
+
+    function applyVornexTheme(theme){
+
+        const themes = {
+
+            dark:{
+                bg:"#070707",
+                panel:"#111111",
+                text:"#ffffff",
+                muted:"#888888",
+                accent:"#ffd400",
+                border:"rgba(255,255,255,.10)"
+            },
+
+            neon:{
+                bg:"#050805",
+                panel:"#0b120b",
+                text:"#f4fff4",
+                muted:"#7da27d",
+                accent:"#39ff14",
+                border:"rgba(57,255,20,.25)"
+            },
+
+            gold:{
+                bg:"#0b0903",
+                panel:"#151105",
+                text:"#fff9dc",
+                muted:"#aa9b69",
+                accent:"#ffd700",
+                border:"rgba(255,215,0,.28)"
+            },
+
+            emerald:{
+                bg:"#04100c",
+                panel:"#081a14",
+                text:"#edfff8",
+                muted:"#79a997",
+                accent:"#10b981",
+                border:"rgba(16,185,129,.28)"
+            },
+
+            violet:{
+                bg:"#090512",
+                panel:"#12091c",
+                text:"#faf5ff",
+                muted:"#9d8eaa",
+                accent:"#a78bfa",
+                border:"rgba(167,139,250,.28)"
+            },
+
+            amber:{
+                bg:"#110903",
+                panel:"#1b0f06",
+                text:"#fff7ed",
+                muted:"#ad8c6c",
+                accent:"#f59e0b",
+                border:"rgba(245,158,11,.28)"
+            }
+
+        };
+
+
+        if(!themes[theme])
+            theme = "dark";
+
+
+        const t =
+            themes[theme];
+
+
+        /*
+         * Remove old theme classes
+         */
+        document.body.classList.remove(
+            "theme-neon",
+            "theme-gold",
+            "theme-emerald",
+            "theme-violet",
+            "theme-amber"
+        );
+
+
+        /*
+         * Add current theme class
+         */
+        if(theme !== "dark"){
+
+            document.body.classList.add(
+                "theme-" + theme
+            );
+        }
+
+
+        /*
+         * CSS variables
+         */
+        document.documentElement
+            .style
+            .setProperty(
+                "--vornex-bg",
+                t.bg
+            );
+
+        document.documentElement
+            .style
+            .setProperty(
+                "--vornex-panel",
+                t.panel
+            );
+
+        document.documentElement
+            .style
+            .setProperty(
+                "--vornex-text",
+                t.text
+            );
+
+        document.documentElement
+            .style
+            .setProperty(
+                "--vornex-muted",
+                t.muted
+            );
+
+        document.documentElement
+            .style
+            .setProperty(
+                "--vornex-accent",
+                t.accent
+            );
+
+        document.documentElement
+            .style
+            .setProperty(
+                "--vornex-border",
+                t.border
+            );
+
+
+        /*
+         * Create visual theme CSS only once
+         */
+        let style =
+            document.getElementById(
+                themeStyleId
+            );
+
+
+        if(!style){
+
+            style =
+                document.createElement(
+                    "style"
+                );
+
+            style.id =
+                themeStyleId;
+
+            document.head.appendChild(
+                style
+            );
+        }
+
+
+        style.textContent = `
+
+            body{
+                background:${t.bg} !important;
+                color:${t.text};
+            }
+
+            body .ios-drawer{
+                background:${t.panel} !important;
+                color:${t.text} !important;
+                border-color:${t.border} !important;
+            }
+
+            body .drawer-overlay{
+                background:rgba(0,0,0,.72) !important;
+            }
+
+            body .menu-item-btn{
+                background:rgba(255,255,255,.045) !important;
+                color:${t.text} !important;
+                border-color:${t.border} !important;
+            }
+
+            body .theme-picker-section,
+            body .about-card{
+                background:rgba(255,255,255,.035) !important;
+                border-color:${t.border} !important;
+            }
+
+            body .theme-chip{
+                border-color:${t.border} !important;
+                transition:
+                    all .25s ease !important;
+            }
+
+            body .theme-chip:hover,
+            body .theme-chip.active{
+                background:${t.accent} !important;
+                color:#000 !important;
+                border-color:${t.accent} !important;
+                box-shadow:
+                    0 0 18px
+                    ${t.accent}55 !important;
+                transform:translateY(-2px);
+            }
+
+            body .custom-modal{
+                color:${t.text};
+            }
+
+            body .modal-card{
+                background:${t.panel} !important;
+                color:${t.text} !important;
+                border-color:${t.border} !important;
+            }
+
+            body .product-card{
+                background:${t.panel} !important;
+                border-color:${t.border} !important;
+            }
+
+            body .menu-item-btn i{
+                color:${t.accent};
+            }
+
+            body .small-action,
+            body .checkout-submit,
+            body .add-btn.added{
+                background:${t.accent} !important;
+                color:#000 !important;
+                border-color:${t.accent} !important;
+            }
+
+            body input:focus,
+            body textarea:focus,
+            body select:focus{
+                border-color:${t.accent} !important;
+                box-shadow:
+                    0 0 0 2px
+                    ${t.accent}22 !important;
+            }
+
+            body .order-id{
+                color:${t.accent} !important;
+            }
+
+        `;
+
+
+        /*
+         * Mark selected theme
+         */
+        document
+            .querySelectorAll(
+                ".theme-chip"
+            )
+            .forEach(function(chip){
+
+                chip.classList.remove(
+                    "active"
+                );
+
+                const onclick =
+                    chip.getAttribute(
+                        "onclick"
+                    ) || "";
+
+                if(
+                    onclick.indexOf(
+                        "'" + theme + "'"
+                    ) !== -1
+                ){
+
+                    chip.classList.add(
+                        "active"
+                    );
+                }
+
+            });
+
+
+        /*
+         * Save theme
+         */
+        localStorage.setItem(
+            "vornex_theme",
+            theme
+        );
+
+
+        /*
+         * Toast
+         */
+        if(
+            typeof showToast ===
+            "function"
+        ){
+
+            showToast(
+                "Theme: " +
+                theme.toUpperCase(),
+                "info"
+            );
+
+        }else if(
+            typeof toast ===
+            "function"
+        ){
+
+            toast(
+                "Theme: " +
+                theme.toUpperCase()
+            );
+        }
+
+    }
+
+
+    /* =====================================================
+       PUBLIC THEME FUNCTION
+       ===================================================== */
+
+    window.setTheme =
+        function(theme){
+
+            applyVornexTheme(
+                theme
+            );
+
+        };
+
+
+    /* =====================================================
+       LOAD SAVED THEME
+       ===================================================== */
+
+    const savedTheme =
+        localStorage.getItem(
+            "vornex_theme"
+        ) || "dark";
+
+
+    applyVornexTheme(
+        savedTheme
+    );
+
+
+    /* =====================================================
+       FINAL SAFETY
+       ===================================================== */
+
+    document.addEventListener(
+        "keydown",
+        function(event){
+
+            if(
+                event.key === "Escape"
+            ){
+
+                const activeModal =
+                    document.querySelector(
+                        ".custom-modal.active"
+                    );
+
+                if(activeModal){
+
+                    window.closeModalStepBack(
+                        activeModal.id
+                    );
+
+                    return;
+                }
+
+            }
+
+        }
+    );
+
+
+})();
+</script>
+    
 </script>
 
 </body>
