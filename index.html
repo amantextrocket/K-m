@@ -1211,7 +1211,7 @@ a{
 <body>
 
 <div class="announcement-bar">
-🔥 FREE EXPRESS SHIPPING ON ORDERS ABOVE ₹1999 | VORNEX STREETWEAR 🔥
+⚡ FREE EXPRESS SHIPPING ON ORDERS ABOVE ₹999 | UPTO 30% FLAT OFF ON COUPON ⚡
 </div>
 
 <header class="vornex-header">
@@ -1239,14 +1239,6 @@ a{
             <span class="btn-title">
                 <i class="fa-solid fa-user"></i>
                 <span id="menuAccountText">LOGIN</span>
-            </span>
-            <i class="fa-solid fa-chevron-right"></i>
-        </button>
-
-        <button class="menu-item-btn" onclick="openAccountPage()">
-            <span class="btn-title">
-                <i class="fa-solid fa-circle-user"></i>
-                ACCOUNT
             </span>
             <i class="fa-solid fa-chevron-right"></i>
         </button>
@@ -1292,7 +1284,7 @@ a{
                 <div class="theme-chip theme-gold" onclick="setTheme('gold')">GOLD</div>
                 <div class="theme-chip theme-emerald" onclick="setTheme('emerald')">EMERALD</div>
                 <div class="theme-chip theme-violet" onclick="setTheme('violet')">VIOLET</div>
-                <div class="theme-chip theme-amber" onclick="setTheme('amber')">AMBER</div>
+                <div class="theme-chip theme-light" onclick="setTheme('light')">LIGHT</div>
             </div>
         </div>
 
@@ -1317,6 +1309,8 @@ a{
 <!-- ================= HERO ================= -->
 
 <section class="hero-section">
+
+    <div class="hero-media-layer" id="heroMediaLayer" aria-hidden="true"></div>
 
     <div class="hero-overlay"></div>
 
@@ -1402,6 +1396,18 @@ a{
 
 </section>
 
+<button
+    id="homeCheckoutBtn"
+    class="home-checkout-glass"
+    type="button"
+    onclick="openCheckoutModal()">
+    <span>
+        <i class="fa-solid fa-bag-shopping"></i>
+        CHECKOUT
+    </span>
+    <strong id="homeCheckoutCount">0 ITEMS</strong>
+</button>
+
 <!-- ================= FOOTER ================= -->
 
 <footer class="site-footer">
@@ -1440,6 +1446,11 @@ a{
 
             <a href="#" onclick="openOrderTracking()">
                 Track Your Order
+            </a>
+
+            <a href="tel:+918269444061">
+                <i class="fa-solid fa-phone"></i>
+                +91 8269444061
             </a>
 
         </div>
@@ -1604,7 +1615,7 @@ a{
                     id="loginPhone"
                     type="tel"
                     maxlength="10"
-                    placeholder="9876543210">
+                    placeholder="ENTER">
             </div>
 
             <div id="recaptcha-container" class="recaptcha-wrap"></div>
@@ -1728,6 +1739,13 @@ a{
 
         </div>
 
+        <div class="orders-track-inline">
+            <button type="button" onclick="openOrderTrackingFromOrders()">
+                <i class="fa-solid fa-location-crosshairs"></i>
+                TRACK ORDER
+            </button>
+        </div>
+
         <div id="ordersList">
             Login to see your orders.
         </div>
@@ -1823,7 +1841,7 @@ a{
                     type="email"
                     required
                     autocomplete="email"
-                    placeholder="customer@gmail.com">
+                    placeholder="ENTER GMAIL/EMAIL ADDRESS">
 
             </div>
 
@@ -1836,13 +1854,13 @@ a{
                     type="tel"
                     maxlength="10"
                     required
-                    placeholder="9876543210">
+                    placeholder="ENTER">
 
             </div>
 
             <div class="input-group">
 
-                <label>PIN CODE</label>
+                <label>PIN CODE / AREA CODE</label>
 
                 <input
                     id="custPin"
@@ -2181,9 +2199,6 @@ const EMAILJS_PUBLIC_KEY = "v9Eb0FgIJVRRZLXLQ";
 const EMAILJS_SERVICE_ID = "service_ybh8s4h";
 const EMAILJS_TEMPLATE_ID = "template_ly3p6lu";
 
-/* Orders received on this Gmail */
-const ADMIN_ORDER_EMAIL = "vornexcloth@gmail.com";
-
 if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
     emailjs.init({
         publicKey: EMAILJS_PUBLIC_KEY
@@ -2272,6 +2287,8 @@ document.addEventListener("DOMContentLoaded",()=>{
     updateBadges();
 
     updateAuthUI();
+
+    loadSavedTheme();
 
 });
 
@@ -2366,18 +2383,9 @@ function renderProducts(products){
                 class="product-image-wrap"
                 onclick="openProductDetail('${p.id}')">
 
-                ${p.tag?`
-
-                    <span class="product-badge">
-
-                        ${escapeHtml(p.tag)}
-
-                    </span>
-
-                `:""}
-
                 <button
                     class="wishlist-btn ${liked?"active":""}"
+                    data-product-id="${escapeHtml(p.id)}"
                     onclick="event.stopPropagation();toggleWishlist('${p.id}')">
 
                     <i class="${liked?"fa-solid":"fa-regular"} fa-heart"></i>
@@ -2393,6 +2401,12 @@ function renderProducts(products){
 
             <div class="p-info">
 
+                ${p.tag?`
+                    <span class="product-badge product-badge-inline">
+                        ${escapeHtml(p.tag)}
+                    </span>
+                `:""}
+
                 <div class="p-title">
                     ${escapeHtml(p.name||"VORNEX PRODUCT")}
                 </div>
@@ -2407,6 +2421,7 @@ function renderProducts(products){
 
                 <button
                     class="add-btn"
+                    data-product-id="${escapeHtml(p.id)}"
                     ${out?"disabled":""}
                     style="${out?"opacity:.4":""}"
                     onclick="addToCart('${p.id}')">
@@ -2957,20 +2972,14 @@ function updateBadges(){
         (a,b)=>a+Number(b.qty||1),0
     );
 
-    const menuCartCount = document.getElementById("menuCartCount");
-    if(menuCartCount){
-        menuCartCount.textContent = cartCount;
-    }
+    document.getElementById("menuCartCount").textContent=
+        cartCount;
 
-    const cartTotalItems = document.getElementById("cartTotalItems");
-    if(cartTotalItems){
-        cartTotalItems.textContent = cartCount;
-    }
+    document.getElementById("cartTotalItems").textContent=
+        cartCount;
 
-    const menuWishCount = document.getElementById("menuWishCount");
-    if(menuWishCount){
-        menuWishCount.textContent = wishlist.length;
-    }
+    document.getElementById("menuWishCount").textContent=
+        wishlist.length;
 
 }
 
@@ -3225,11 +3234,7 @@ function applyCoupon(){
     }
 
     const foundKey=Object.keys(allCoupons)
-        .find(k=>{
-            const c=allCoupons[k] || {};
-            return String(k).toUpperCase()===code ||
-                   String(c.code||"").toUpperCase()===code;
-        });
+        .find(k=>k.toUpperCase()===code);
 
     if(!foundKey){
 
@@ -3301,6 +3306,11 @@ function openCheckoutModal(){
     }
 
     renderCheckoutSummary();
+
+    const emailInput=document.getElementById("custEmail");
+    if(emailInput && !emailInput.value && auth.currentUser && auth.currentUser.email){
+        emailInput.value=auth.currentUser.email;
+    }
 
     document.getElementById("checkoutModal")
         .classList.add("active");
@@ -3440,19 +3450,19 @@ async function submitOrder(e){
 
     }
 
+    const email=
+        document.getElementById("custEmail").value.trim();
+
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        showToast("Enter a valid Gmail / Email address","error");
+        return;
+    }
+
     const name=
         document.getElementById("custName").value.trim();
 
-    const customerEmail=
-        document.getElementById("custEmail").value.trim();
-
     const phone=
         document.getElementById("custPhone").value.trim();
-
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)){
-        showToast("Enter a valid customer Gmail / email address","error");
-        return;
-    }
 
     const pin=
         document.getElementById("custPin").value.trim();
@@ -3521,8 +3531,9 @@ async function submitOrder(e){
             uid:auth.currentUser?
                 auth.currentUser.uid:null,
 
-            email:customerEmail || (auth.currentUser ?
-                (auth.currentUser.email || "") : "")
+            email:email,
+
+            customer_email:email
 
         },
 
@@ -3564,71 +3575,99 @@ async function submitOrder(e){
             .child(orderId)
             .set(order);
 
-        /* 2. Send the order to BOTH:
-              - VORNEX admin Gmail
-              - Customer Gmail
-           The EmailJS template uses {{email}} as "To Email". */
+        /* 2. Send the order to BOTH the customer and VORNEX owner. */
+        let emailSent=true;
 
-        let adminEmailSent = false;
-        let customerEmailSent = false;
+        try{
 
-        if (typeof emailjs === "undefined") {
-            console.warn("EmailJS library is not loaded. Order is still saved.");
-        } else if (!EMAILJS_PUBLIC_KEY || !EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID) {
-            console.warn("EmailJS configuration is incomplete. Order is still saved.");
-        } else {
+            if (typeof emailjs === "undefined") {
+                throw new Error("EmailJS library is not loaded.");
+            }
+
+            if (!EMAILJS_PUBLIC_KEY || !EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID) {
+                throw new Error("EmailJS configuration is incomplete.");
+            }
 
             const emailItems = order.items.map((item, i) => {
                 return `${i + 1}. ${item.name}${item.size ? " | Size: " + item.size : ""} | Qty: ${item.qty || 1} | ₹${Number(item.price || 0) * Number(item.qty || 1)}`;
             }).join("\n");
 
-            const emailParams = {
-                /* IMPORTANT: EmailJS template "To Email" = {{email}} */
-                email: "",
+            const ownerEmail = "vornexcloth@gmail.com";
+
+            const baseEmailParams = {
+
+                /* Main template variables */
+                name: order.customer.name,
+                phone: order.customer.phone,
+                pincode: order.customer.pincode,
+                city: order.customer.city,
+                state: order.customer.state,
+                address: order.customer.address,
+                products: emailItems,
+                total: `₹${Number(order.total || 0).toLocaleString("en-IN")}`,
+                time: new Date(order.createdAt).toLocaleString("en-IN"),
+
+                /* Order variables */
                 order_id: order.orderId,
                 customer_name: order.customer.name,
                 customer_phone: order.customer.phone,
-                customer_email: order.customer.email || "",
+                customer_email: order.customer.email,
                 delivery_address: order.customer.address,
-                city: order.customer.city,
-                state: order.customer.state,
-                pincode: order.customer.pincode,
+                customer_address: order.customer.address,
+                full_name: order.customer.name,
+                fullName: order.customer.name,
+                customerName: order.customer.name,
+                customerPhone: order.customer.phone,
+                pin_code: order.customer.pincode,
                 items: emailItems,
-                products: emailItems,
-                subtotal: `₹${order.subtotal}`,
-                discount: `₹${order.discount}`,
-                total: `₹${order.total}`,
+                subtotal: `₹${Number(order.subtotal || 0).toLocaleString("en-IN")}`,
+                discount: `₹${Number(order.discount || 0).toLocaleString("en-IN")}`,
                 coupon: order.coupon || "None",
                 payment_method: order.paymentMethod,
                 payment_status: order.paymentStatus,
                 order_status: order.status,
                 created_at: order.createdAt,
-                time: new Date(order.createdAt).toLocaleString("en-IN")
+
+                /* Useful aliases for templates */
+                orderId: order.orderId,
+                order_total: `₹${Number(order.total || 0).toLocaleString("en-IN")}`,
+                deliveryAddress: order.customer.address,
+                customerPincode: order.customer.pincode,
+                customerCity: order.customer.city,
+                customerState: order.customer.state
             };
 
-            /* Admin notification */
-            try{
-                await emailjs.send(
-                    EMAILJS_SERVICE_ID,
-                    EMAILJS_TEMPLATE_ID,
-                    {...emailParams, email: ADMIN_ORDER_EMAIL}
-                );
-                adminEmailSent = true;
-            }catch(adminError){
-                console.error("Admin Gmail notification failed:", adminError);
-            }
+            /* EmailJS template's To Email field is {{email}}.
+               Therefore send once to customer and once to VORNEX owner. */
+            await emailjs.send(
+                EMAILJS_SERVICE_ID,
+                EMAILJS_TEMPLATE_ID,
+                {
+                    ...baseEmailParams,
+                    email: order.customer.email,
+                    recipient_email: order.customer.email,
+                    to_email: order.customer.email,
+                    reply_to: order.customer.email
+                }
+            );
 
-            /* Customer confirmation */
-            try{
-                await emailjs.send(
-                    EMAILJS_SERVICE_ID,
-                    EMAILJS_TEMPLATE_ID,
-                    {...emailParams, email: order.customer.email}
-                );
-                customerEmailSent = true;
-            }catch(customerError){
-                console.error("Customer Gmail notification failed:", customerError);
-            }
+            await emailjs.send(
+                EMAILJS_SERVICE_ID,
+                EMAILJS_TEMPLATE_ID,
+                {
+                    ...baseEmailParams,
+                    email: ownerEmail,
+                    recipient_email: ownerEmail,
+                    to_email: ownerEmail,
+                    reply_to: order.customer.email
+                }
+            );
+
+        }catch(emailError){
+
+            emailSent=false;
+            console.error("EmailJS notification failed:",emailError);
+
         }
 
         /* 3. Clear the cart only after the order is saved. */
@@ -3649,31 +3688,17 @@ async function submitOrder(e){
             .classList.remove("active");
 
         /* 4. Show the confirmation message after the order is confirmed. */
-        if(adminEmailSent && customerEmailSent){
+        if(emailSent){
 
             showToast(
-                `✅ Order Confirmed! Order ID: ${orderId}. Admin & customer emails sent.`,
-                "success"
-            );
-
-        }else if(adminEmailSent){
-
-            showToast(
-                `✅ Order Confirmed! Order ID: ${orderId}. Admin email sent; customer email could not be sent.`,
-                "success"
-            );
-
-        }else if(customerEmailSent){
-
-            showToast(
-                `✅ Order Confirmed! Order ID: ${orderId}. Customer email sent; admin email could not be sent.`,
+                `✅ Order Confirmed! Order ID: ${orderId}`,
                 "success"
             );
 
         }else{
 
             showToast(
-                `✅ Order Confirmed! Order ID: ${orderId}. Order saved successfully.`,
+                `✅ Order Confirmed! Order ID: ${orderId}. Email notification could not be sent.`,
                 "success"
             );
 
@@ -4392,24 +4417,37 @@ function toggleAccordion(id){
 
 function setTheme(theme){
 
-    const valid=["dark","neon","gold","emerald","violet","amber"];
-    if(!valid.includes(theme)) theme="dark";
+    const themes=["dark","neon","gold","emerald","violet","light"];
+
+    if(!themes.includes(theme)){
+        theme="dark";
+    }
 
     document.body.classList.remove(
-        "theme-neon","theme-gold","theme-emerald",
-        "theme-violet","theme-amber"
+        "theme-dark-active",
+        "theme-neon-active",
+        "theme-gold-active",
+        "theme-emerald-active",
+        "theme-violet-active",
+        "theme-light-active"
     );
 
-    if(theme!=="dark") document.body.classList.add("theme-"+theme);
+    document.body.classList.add("theme-"+theme+"-active");
 
     localStorage.setItem("vornex_theme",theme);
+
     showToast("Theme: "+theme.toUpperCase(),"info");
+
 }
 
-function restoreTheme(){
+function loadSavedTheme(){
+
     const saved=localStorage.getItem("vornex_theme")||"dark";
+
     setTheme(saved);
+
 }
+
 
 
 /* =========================================================
@@ -4463,29 +4501,2496 @@ document.getElementById("cartDrawer")
 renderCart();
 
 
-function closeMenuOnly(){
-    toggleMenuDrawer(false);
-}
 
-function updateDetailHeart(){
-    /* Current product-detail markup has no dedicated heart control.
-       Kept as a safe no-op for the existing wishlist animation patch. */
-}
+/* =========================================================
+   VORNEX THEME ENGINE + PREMIUM VISUAL LAYER
+   ========================================================= */
+(function(){
+    const style=document.createElement("style");
+    style.innerHTML=`
+
+    .theme-light-active{
+        background:#f4f5f7 !important;
+        color:#111 !important;
+    }
+
+    .theme-light-active .filter-bar{
+        background:rgba(255,255,255,.88) !important;
+        border-bottom:1px solid #e5e7eb !important;
+    }
+
+    .theme-light-active .product-card,
+    .theme-light-active .modal-card,
+    .theme-light-active .cart-drawer,
+    .theme-light-active .custom-modal .modal-card,
+    .theme-light-active .coupon-item,
+    .theme-light-active .wishlist-product,
+    .theme-light-active .checkout-summary{
+        background:#fff !important;
+        color:#111 !important;
+        border-color:#e5e7eb !important;
+    }
+
+    .theme-light-active .p-title,
+    .theme-light-active .p-price,
+    .theme-light-active .modal-header h3,
+    .theme-light-active .cart-item-name,
+    .theme-light-active .account-name,
+    .theme-light-active .checkout-summary-item{
+        color:#111 !important;
+    }
+
+    .theme-light-active .p-category,
+    .theme-light-active .coupon-desc,
+    .theme-light-active .account-sub,
+    .theme-light-active .wishlist-info p{
+        color:#6b7280 !important;
+    }
+
+    .theme-light-active .cat-btn,
+    .theme-light-active .theme-chip,
+    .theme-light-active .size-btn,
+    .theme-light-active .search-wrapper input{
+        background:#fff !important;
+        color:#111 !important;
+        border-color:#d1d5db !important;
+    }
+
+    .theme-light-active .cat-btn.active,
+    .theme-light-active .size-btn.selected,
+    .theme-light-active .add-btn,
+    .theme-light-active .checkout-btn,
+    .theme-light-active .apply-coupon{
+        background:#111 !important;
+        color:#fff !important;
+    }
+
+    .theme-light-active .hero-section{
+        background:radial-gradient(circle at 70% 20%,#ffffff,transparent 35%),linear-gradient(145deg,#f8fafc,#e5e7eb) !important;
+    }
+
+    .theme-light-active .hero-overlay{
+        background:linear-gradient(transparent 20%,rgba(255,255,255,.86)) !important;
+    }
+
+    .theme-light-active .hero-title,
+    .theme-light-active .hero-subtitle,
+    .theme-light-active .hero-tag{
+        color:#111 !important;
+    }
+
+    .theme-light-active .hero-btn{
+        background:#111 !important;
+        color:#fff !important;
+    }
+
+    .theme-light-active .menu-item-btn{
+        color:#111 !important;
+        border-color:#e5e7eb !important;
+    }
+
+    .theme-light-active .menu-drawer{
+        background:#fff !important;
+        color:#111 !important;
+    }
+
+    .theme-light-active .theme-picker-section h4{
+        color:#6b7280 !important;
+    }
+
+    .theme-light-active .summary-row{
+        color:#374151 !important;
+    }
+
+    /* Premium default polish */
+    .product-card{
+        box-shadow:0 10px 30px rgba(0,0,0,.18);
+        transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
+    }
+    .product-card:hover{
+        transform:translateY(-4px);
+        box-shadow:0 18px 45px rgba(0,0,0,.28);
+        border-color:#3a3a3a;
+    }
+    .add-btn,.checkout-btn,.detail-buy-btn,.detail-cart-btn{
+        transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease;
+    }
+    .add-btn:hover,.checkout-btn:hover,.detail-buy-btn:hover,.detail-cart-btn:hover{
+        transform:translateY(-1px);
+        box-shadow:0 8px 25px rgba(0,0,0,.25);
+    }
+    .checkout-btn{
+        letter-spacing:1.5px;
+        font-weight:900;
+    }
+    `;
+    document.head.appendChild(style);
+})();
+
+  /* =========================================================
+   VORNEX FINAL REQUIREMENTS PATCH
+   ONLY INDEX.HTML — NO OTHER FILE REQUIRED
+   ========================================================= */
+
+/* ---------- 1. BRAND / ANNOUNCEMENT ---------- */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const announcement = document.querySelector(".announcement-bar");
+
+    if (announcement) {
+        announcement.innerHTML = `
+            ⚡ FREE EXPRESS SHIPPING ON ORDERS ABOVE ₹999
+            &nbsp; | &nbsp;
+            <strong>UPTO 20% OFF ON COUPONS</strong> ⚡
+        `;
+    }
+
+    const logo = document.querySelector(".logo");
+
+    if (logo && !logo.querySelector(".vornex-edge-title")) {
+        logo.insertAdjacentHTML(
+            "beforeend",
+            `
+            <small class="vornex-edge-title">
+                OWN YOUR EDGE.
+            </small>
+            `
+        );
+    }
+
+});
 
 
 /* =========================================================
-   FINAL SAFE SYNC
+   2. PREMIUM VISUAL FIXES
    ========================================================= */
-setTimeout(function(){
-    try{
-        updateBadges();
-        renderCart();
-        renderWishlist();
-        restoreTheme();
-    }catch(error){
-        console.error("VORNEX final sync:",error);
+
+(function () {
+
+    const style = document.createElement("style");
+
+    style.innerHTML = `
+
+    /* ==============================================
+       WISHLIST PREMIUM RED ANIMATION
+       ============================================== */
+
+    .product-card .wishlist-btn {
+        transition:
+            transform .35s cubic-bezier(.175,.885,.32,1.275),
+            background .25s ease,
+            box-shadow .35s ease;
     }
-},800);
+
+    .product-card .wishlist-btn.active {
+        background:#ff163d !important;
+        color:#fff !important;
+        transform:scale(1.16);
+        box-shadow:
+            0 0 0 6px rgba(255,22,61,.12),
+            0 0 30px rgba(255,22,61,.65);
+    }
+
+    .product-card .wishlist-btn.active i {
+        animation:vornexHeartPremium .55s cubic-bezier(.175,.885,.32,1.275);
+    }
+
+    @keyframes vornexHeartPremium {
+        0% {
+            transform:scale(.35) rotate(-20deg);
+        }
+
+        45% {
+            transform:scale(1.45) rotate(8deg);
+        }
+
+        75% {
+            transform:scale(.9) rotate(-3deg);
+        }
+
+        100% {
+            transform:scale(1) rotate(0);
+        }
+    }
+
+
+    /* ==============================================
+       ADD TO BAG PREMIUM YELLOW
+       ============================================== */
+
+    .add-btn.added,
+    .detail-action-btn.cart-active {
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffe66b,
+                #ffd400
+            ) !important;
+
+        color:#000 !important;
+
+        box-shadow:
+            0 0 15px rgba(255,212,0,.25),
+            0 0 35px rgba(255,212,0,.2),
+            inset 0 1px 0 rgba(255,255,255,.6);
+
+        transform:scale(1.025);
+
+        animation:vornexBagPremium .45s
+            cubic-bezier(.175,.885,.32,1.275);
+    }
+
+    @keyframes vornexBagPremium {
+
+        0% {
+            transform:scale(.94);
+        }
+
+        45% {
+            transform:scale(1.07);
+        }
+
+        100% {
+            transform:scale(1.025);
+        }
+
+    }
+
+
+    /* ==============================================
+       PRODUCT DETAIL — FULL SCROLL FIX
+       ============================================== */
+
+    #productDetailView {
+
+        position:fixed !important;
+
+        inset:0 !important;
+
+        height:100dvh !important;
+
+        max-height:100dvh !important;
+
+        overflow-y:auto !important;
+
+        overflow-x:hidden !important;
+
+        -webkit-overflow-scrolling:touch !important;
+
+        overscroll-behavior-y:auto !important;
+
+        touch-action:pan-y !important;
+
+        padding-bottom:0 !important;
+    }
+
+
+    #productDetailView .detail-info {
+
+        padding-bottom:
+            calc(
+                150px +
+                env(safe-area-inset-bottom)
+            ) !important;
+
+    }
+
+
+    /* ==============================================
+       IPHONE GLASS BOTTOM ACTIONS
+       ============================================== */
+
+    #productDetailView .detail-actions {
+
+        min-height:78px;
+
+        padding:
+            10px
+            12px
+            calc(
+                10px +
+                env(safe-area-inset-bottom)
+            );
+
+        background:
+            rgba(10,10,10,.62);
+
+        backdrop-filter:blur(28px)
+            saturate(180%);
+
+        -webkit-backdrop-filter:
+            blur(28px)
+            saturate(180%);
+
+        border-top:
+            1px solid
+            rgba(255,255,255,.14);
+
+        box-shadow:
+            0 -15px 40px
+            rgba(0,0,0,.35);
+
+    }
+
+
+    #productDetailView .detail-action-btn {
+
+        min-height:64px !important;
+
+        border-radius:20px !important;
+
+        background:
+            rgba(255,255,255,.10) !important;
+
+        border:
+            1px solid
+            rgba(255,255,255,.18) !important;
+
+        backdrop-filter:blur(22px);
+
+        -webkit-backdrop-filter:blur(22px);
+
+        box-shadow:
+            inset 0 1px 0
+            rgba(255,255,255,.15),
+            0 8px 25px
+            rgba(0,0,0,.25);
+
+        transition:
+            transform .25s ease,
+            background .3s ease,
+            box-shadow .3s ease;
+
+    }
+
+
+    #productDetailView
+    .detail-action-btn:active {
+
+        transform:scale(.95);
+
+    }
+
+
+    #productDetailView
+    .detail-action-btn.cart-active {
+
+        background:
+            linear-gradient(
+                135deg,
+                rgba(255,230,80,.95),
+                rgba(255,205,0,.92)
+            ) !important;
+
+        color:#000 !important;
+
+    }
+
+
+    #productDetailView
+    #detailBuyBtn.buy-active {
+
+        background:
+            rgba(255,255,255,.95) !important;
+
+        color:#000 !important;
+
+        box-shadow:
+            0 0 30px
+            rgba(255,255,255,.18);
+
+    }
+
+
+    /* ==============================================
+       DETAIL QUANTITY PREMIUM
+       ============================================== */
+
+    #productDetailView .qty-box {
+
+        width:190px;
+
+        min-height:54px;
+
+        border-radius:18px;
+
+        background:
+            rgba(255,255,255,.07);
+
+        backdrop-filter:blur(20px);
+
+    }
+
+
+    #productDetailView .qty-box button {
+
+        width:46px;
+        height:46px;
+
+        border-radius:14px;
+
+        transition:
+            transform .2s ease,
+            background .2s ease;
+
+    }
+
+
+    #productDetailView .qty-box button:active {
+
+        transform:scale(.88);
+
+        background:
+            rgba(255,212,0,.25);
+
+    }
+
+
+    /* ==============================================
+       MENU — BACKGROUND MUST NOT SCROLL
+       ============================================== */
+
+    body.menu-open {
+
+        overflow:hidden !important;
+
+        position:fixed !important;
+
+        width:100% !important;
+
+    }
+
+
+    #drawerOverlay {
+
+        position:fixed !important;
+
+        inset:0 !important;
+
+        overflow:hidden !important;
+
+        touch-action:none !important;
+
+    }
+
+
+    #iosMenuDrawer {
+
+        position:fixed !important;
+
+        top:0 !important;
+
+        bottom:0 !important;
+
+        height:100dvh !important;
+
+        overflow:hidden !important;
+
+    }
+
+
+    #iosMenuDrawer .drawer-content {
+
+        height:
+            calc(100dvh - 75px) !important;
+
+        max-height:
+            calc(100dvh - 75px) !important;
+
+        overflow-y:auto !important;
+
+        overflow-x:hidden !important;
+
+        overscroll-behavior:contain !important;
+
+        -webkit-overflow-scrolling:touch !important;
+
+        touch-action:pan-y !important;
+
+    }
+
+
+    /* ==============================================
+       LOGIN PREMIUM
+       ============================================== */
+
+    #loginModal .auth-choice {
+
+        gap:12px;
+
+    }
+
+
+    #loginModal .auth-option {
+
+        min-height:58px !important;
+
+        border-radius:18px !important;
+
+        font-weight:900;
+
+        letter-spacing:.5px;
+
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease;
+
+    }
+
+
+    #loginModal .auth-option:active {
+
+        transform:scale(.96);
+
+    }
+
+
+    #loginModal .auth-option.phone {
+
+        background:
+            linear-gradient(
+                135deg,
+                #ffffff,
+                #eeeeee
+            ) !important;
+
+        color:#000 !important;
+
+        box-shadow:
+            0 10px 30px
+            rgba(255,255,255,.08);
+
+    }
+
+
+    #loginModal .auth-option.google {
+
+        background:
+            linear-gradient(
+                135deg,
+                #1c1c1c,
+                #0d0d0d
+            ) !important;
+
+        color:#fff !important;
+
+    }
+
+
+    #loginModal .auth-or {
+
+        margin:8px 0 !important;
+
+        font-size:.7rem;
+
+        letter-spacing:2px;
+
+    }
+
+
+    #loginModal .otp-btn {
+
+        min-height:52px !important;
+
+        border-radius:16px !important;
+
+        background:#ffd400 !important;
+
+        color:#000 !important;
+
+        font-weight:900;
+
+        box-shadow:
+            0 10px 25px
+            rgba(255,212,0,.18);
+
+    }
+
+
+    /* ==============================================
+       CHECKOUT PREMIUM
+       ============================================== */
+
+    #checkoutModal .modal-content {
+
+        border-radius:28px !important;
+
+        background:
+            linear-gradient(
+                145deg,
+                rgba(30,30,30,.94),
+                rgba(8,8,8,.97)
+            ) !important;
+
+        border:
+            1px solid
+            rgba(255,255,255,.12);
+
+        box-shadow:
+            0 30px 90px
+            rgba(0,0,0,.65),
+            inset 0 1px 0
+            rgba(255,255,255,.08);
+
+        backdrop-filter:blur(30px);
+
+        -webkit-backdrop-filter:blur(30px);
+
+    }
+
+
+    #checkoutModal .checkout-summary-box {
+
+        border-radius:20px;
+
+        background:
+            rgba(255,255,255,.055);
+
+        border:
+            1px solid
+            rgba(255,255,255,.09);
+
+        padding:16px;
+
+    }
+
+
+    #checkoutModal .coupon-apply-box {
+
+        display:flex;
+
+        gap:8px;
+
+    }
+
+
+    #checkoutModal
+    .coupon-apply-box input {
+
+        min-width:0;
+
+        border-radius:14px !important;
+
+        background:
+            rgba(255,255,255,.06);
+
+        border:
+            1px solid
+            rgba(255,255,255,.12);
+
+    }
+
+
+    #checkoutModal
+    .coupon-apply-box button {
+
+        min-width:92px;
+
+        border-radius:14px;
+
+        background:#ffd400;
+
+        color:#000;
+
+        font-weight:900;
+
+    }
+
+
+    #checkoutModal .submit-order-btn {
+
+        min-height:58px;
+
+        border-radius:18px;
+
+        font-weight:900;
+
+        box-shadow:
+            0 12px 30px
+            rgba(255,212,0,.15);
+
+    }
+
+
+    /* ==============================================
+       BOTTOM BUY BAR
+       ============================================== */
+
+    .glass-bottom-bar {
+
+        bottom:
+            calc(
+                12px +
+                env(safe-area-inset-bottom)
+            ) !important;
+
+        z-index:1800 !important;
+
+        backdrop-filter:blur(24px);
+
+        -webkit-backdrop-filter:blur(24px);
+
+    }
+
+
+    .glass-buy-btn {
+
+        min-height:54px !important;
+
+        border-radius:18px !important;
+
+        transition:
+            transform .25s ease,
+            box-shadow .25s ease;
+
+    }
+
+
+    .glass-buy-btn:active {
+
+        transform:scale(.96);
+
+    }
+
+
+    /* ==============================================
+       OWN YOUR EDGE
+       ============================================== */
+
+    .vornex-edge-title {
+
+        display:block !important;
+
+        font-size:.42rem !important;
+
+        letter-spacing:3px !important;
+
+        text-align:center !important;
+
+        margin-top:-3px !important;
+
+        opacity:.7 !important;
+
+        font-weight:800 !important;
+
+    }
+
+
+    /* ==============================================
+       MOBILE DETAIL
+       ============================================== */
+
+    @media(max-width:600px) {
+
+        #productDetailView
+        .detail-image-wrap {
+
+            height:56vh !important;
+
+            min-height:350px;
+
+        }
+
+
+        #productDetailView
+        .detail-info {
+
+            padding-left:15px;
+
+            padding-right:15px;
+
+            padding-bottom:165px !important;
+
+        }
+
+
+        #productDetailView
+        .detail-action-btn {
+
+            min-height:64px !important;
+
+            font-size:.68rem;
+
+        }
+
+    }
+
+    `;
+
+    document.head.appendChild(style);
+
+})();
+
+
+/* =========================================================
+   3. FIX DETAIL QUANTITY
+   ========================================================= */
+
+(function () {
+
+    const originalChangeDetailQty =
+        window.changeDetailQty;
+
+    window.changeDetailQty = function (amount) {
+
+        if (typeof originalChangeDetailQty === "function") {
+
+            originalChangeDetailQty(amount);
+
+        } else {
+
+            detailQty += Number(amount) || 0;
+
+            if (detailQty < 1)
+                detailQty = 1;
+
+            if (detailQty > 20)
+                detailQty = 20;
+
+            setText(
+                "detailQty",
+                detailQty
+            );
+
+        }
+
+        const value =
+            document.getElementById("detailQty");
+
+        if (value) {
+
+            value.textContent =
+                String(detailQty);
+
+        }
+
+    };
+
+})();
+
+
+/* =========================================================
+   4. FIX ADD TO BAG STATE
+   ========================================================= */
+
+(function () {
+
+    const originalAdd =
+        window.addCurrentDetailToCart;
+
+    window.addCurrentDetailToCart = function () {
+
+        if (typeof originalAdd === "function") {
+
+            originalAdd();
+
+        } else {
+
+            if (!currentProduct)
+                return;
+
+            addToCart(
+                currentProduct.id,
+                detailQty,
+                selectedSize
+            );
+
+        }
+
+        const btn =
+            document.getElementById(
+                "detailAddBtn"
+            );
+
+        if (!btn)
+            return;
+
+        btn.classList.add(
+            "cart-active"
+        );
+
+        btn.innerHTML =
+            '<i class="fa-solid fa-check"></i> ADDED TO BAG';
+
+        clearTimeout(
+            btn.__vornexTimer
+        );
+
+        btn.__vornexTimer =
+            setTimeout(() => {
+
+                btn.classList.remove(
+                    "cart-active"
+                );
+
+                btn.innerHTML =
+                    '<i class="fa-solid fa-bag-shopping"></i> ADD TO BAG';
+
+            },1800);
+
+    };
+
+})();
+
+
+/* =========================================================
+   5. FIX BUY NOW
+   ========================================================= */
+
+(function () {
+
+    const originalBuy =
+        window.buyCurrentProduct;
+
+    window.buyCurrentProduct = function () {
+
+        if (typeof originalBuy === "function") {
+
+            originalBuy();
+
+        } else {
+
+            if (!currentProduct)
+                return;
+
+            addToCart(
+                currentProduct.id,
+                detailQty,
+                selectedSize
+            );
+
+            closeProductDetail();
+
+            setTimeout(
+                openCheckoutModal,
+                250
+            );
+
+        }
+
+    };
+
+})();
+
+
+/* =========================================================
+   6. COUPON — SUPPORT MULTIPLE FIREBASE FORMATS
+   ========================================================= */
+
+(function () {
+
+    const originalCalculateDiscount =
+        window.calculateDiscount;
+
+    window.calculateDiscount = function (subtotal) {
+
+        if (!currentCoupon)
+            return 0;
+
+        const type =
+            String(
+                currentCoupon.type ||
+                ""
+            ).toLowerCase();
+
+        /* FLAT */
+
+        if (
+            type === "flat" ||
+            currentCoupon.flatDiscount != null
+        ) {
+
+            const flat =
+                Number(
+                    currentCoupon.flatDiscount ??
+                    currentCoupon.discount ??
+                    0
+                );
+
+            return Math.min(
+                flat,
+                subtotal
+            );
+
+        }
+
+        /* PERCENTAGE */
+
+        const percent =
+            Number(
+                currentCoupon.discountPercent ??
+                currentCoupon.percentage ??
+                currentCoupon.percent ??
+                currentCoupon.discount ??
+                0
+            );
+
+        return Math.min(
+            subtotal * percent / 100,
+            subtotal
+        );
+
+    };
+
+})();
+
+
+/* =========================================================
+   7. COUPON APPLY — FORCE UPPERCASE + SYNC
+   ========================================================= */
+
+(function () {
+
+    const originalApply =
+        window.applyCheckoutCoupon;
+
+    window.applyCheckoutCoupon = function () {
+
+        const input =
+            document.getElementById(
+                "checkoutCoupon"
+            );
+
+        if (input) {
+
+            input.value =
+                input.value
+                    .trim()
+                    .toUpperCase();
+
+        }
+
+        if (
+            typeof originalApply ===
+            "function"
+        ) {
+
+            originalApply();
+
+        }
+
+        renderCart();
+
+        renderCheckout();
+
+    };
+
+})();
+
+
+/* =========================================================
+   8. HERO MEDIA — FIREBASE COMPATIBILITY
+   ========================================================= */
+
+(function () {
+
+    const originalHero =
+        window.renderHeroMedia;
+
+    window.renderHeroMedia =
+        function (data) {
+
+            if (
+                typeof originalHero ===
+                "function"
+            ) {
+
+                originalHero(data);
+
+                return;
+
+            }
+
+            const layer =
+                document.getElementById(
+                    "heroMediaLayer"
+                );
+
+            if (!layer || !data)
+                return;
+
+            const type =
+                String(
+                    data.type ||
+                    "image"
+                ).toLowerCase();
+
+            if (
+                type === "video"
+            ) {
+
+                const url =
+                    data.url ||
+                    data.videoUrl ||
+                    data.src ||
+                    "";
+
+                if (!url)
+                    return;
+
+                layer.innerHTML = `
+                    <video
+                        autoplay
+                        muted
+                        loop
+                        playsinline
+                        preload="metadata">
+                        <source
+                            src="${escapeHtml(url)}">
+                    </video>
+                `;
+
+                return;
+
+            }
+
+            let images = [];
+
+            if (
+                type === "slideshow" ||
+                type === "slider"
+            ) {
+
+                images =
+                    normalizeMediaImages(
+                        data.images ||
+                        data.media ||
+                        data.slides
+                    );
+
+            }
+
+            if (!images.length) {
+
+                const single =
+                    data.url ||
+                    data.image ||
+                    data.imageUrl ||
+                    "";
+
+                if (single)
+                    images = [single];
+
+            }
+
+            if (!images.length)
+                return;
+
+            heroImages = images;
+            heroIndex = 0;
+
+            layer.innerHTML = `
+                <img
+                    src="${escapeHtml(images[0])}"
+                    alt="VORNEX HERO">
+            `;
+
+            clearInterval(heroTimer);
+
+            if (images.length > 1) {
+
+                heroTimer =
+                    setInterval(() => {
+
+                        heroIndex =
+                            (
+                                heroIndex + 1
+                            ) % images.length;
+
+                        layer.innerHTML = `
+                            <img
+                                src="${escapeHtml(
+                                    images[heroIndex]
+                                )}"
+                                alt="VORNEX HERO">
+                        `;
+
+                    },4000);
+
+            }
+
+        };
+
+})();
+
+
+/* =========================================================
+   9. THEME — FORCE WORKING
+   ========================================================= */
+
+(function () {
+
+    const originalSetTheme =
+        window.setTheme;
+
+    window.setTheme = function (theme) {
+
+        const validThemes = [
+            "dark",
+            "neon",
+            "gold",
+            "emerald",
+            "violet",
+            "amber"
+        ];
+
+        if (
+            !validThemes.includes(theme)
+        ) {
+
+            theme = "dark";
+
+        }
+
+        document.body.classList.remove(
+            "theme-neon",
+            "theme-gold",
+            "theme-emerald",
+            "theme-violet",
+            "theme-amber"
+        );
+
+        if (theme !== "dark") {
+
+            document.body.classList.add(
+                "theme-" + theme
+            );
+
+        }
+
+        localStorage.setItem(
+            "vornex_theme",
+            theme
+        );
+
+        if (
+            typeof Toastify ===
+            "function"
+        ) {
+
+            toast(
+                "Theme: " +
+                theme.toUpperCase()
+            );
+
+        }
+
+    };
+
+})();
+
+
+/* =========================================================
+   10. MENU BACKDROP — TAP TO CLOSE
+   ========================================================= */
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const overlay =
+            document.getElementById(
+                "drawerOverlay"
+            );
+
+        const drawer =
+            document.getElementById(
+                "iosMenuDrawer"
+            );
+
+        if (
+            !overlay ||
+            !drawer
+        )
+            return;
+
+        if (
+            overlay.classList.contains(
+                "active"
+            ) &&
+            event.target === overlay
+        ) {
+
+            closeMenuOnly();
+
+        }
+
+    },
+    true
+);
+
+
+/* =========================================================
+   11. PREVENT MENU TOUCH FROM SCROLLING PAGE
+   ========================================================= */
+
+document.addEventListener(
+    "touchmove",
+    function (event) {
+
+        const drawer =
+            document.getElementById(
+                "iosMenuDrawer"
+            );
+
+        if (
+            drawer &&
+            drawer.classList.contains(
+                "active"
+            )
+        ) {
+
+            const content =
+                drawer.querySelector(
+                    ".drawer-content"
+                );
+
+            if (
+                content &&
+                content.contains(
+                    event.target
+                )
+            ) {
+
+                return;
+
+            }
+
+            event.preventDefault();
+
+        }
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================================================
+   12. DETAIL RIGHT SWIPE = BACK
+   ========================================================= */
+
+(function () {
+
+    let startX = 0;
+    let startY = 0;
+
+    document.addEventListener(
+        "touchstart",
+        function (event) {
+
+            const detail =
+                document.getElementById(
+                    "productDetailView"
+                );
+
+            if (
+                !detail ||
+                !detail.classList.contains(
+                    "active"
+                )
+            )
+                return;
+
+            startX =
+                event.touches[0].clientX;
+
+            startY =
+                event.touches[0].clientY;
+
+        },
+        {
+            passive:true
+        }
+    );
+
+
+    document.addEventListener(
+        "touchend",
+        function (event) {
+
+            const detail =
+                document.getElementById(
+                    "productDetailView"
+                );
+
+            if (
+                !detail ||
+                !detail.classList.contains(
+                    "active"
+                )
+            )
+                return;
+
+            const endX =
+                event.changedTouches[0].clientX;
+
+            const endY =
+                event.changedTouches[0].clientY;
+
+            const dx =
+                endX - startX;
+
+            const dy =
+                endY - startY;
+
+            if (
+                dx > 100 &&
+                Math.abs(dx) >
+                Math.abs(dy)
+            ) {
+
+                closeProductDetail();
+
+            }
+
+        },
+        {
+            passive:true
+        }
+    );
+
+})();
+
+
+/* =========================================================
+   13. X BUTTON = ONLY ONE STEP BACK
+   ========================================================= */
+
+(function () {
+
+    const originalClose =
+        window.closeModalStepBack;
+
+    window.closeModalStepBack =
+        function (id) {
+
+            const modal =
+                document.getElementById(id);
+
+            if (!modal)
+                return;
+
+            modal.classList.remove(
+                "active"
+            );
+
+            /* restore body */
+
+            if (
+                !document.querySelector(
+                    ".custom-modal.active"
+                ) &&
+                !document.getElementById(
+                    "productDetailView"
+                )?.classList.contains(
+                    "active"
+                )
+            ) {
+
+                document.body.style.overflow =
+                    "";
+
+            }
+
+        };
+
+})();
+
+
+/* =========================================================
+   14. PRODUCT CARD — LIKE ANIMATION STATE
+   ========================================================= */
+
+(function () {
+
+    const originalToggle =
+        window.toggleWishlist;
+
+    window.toggleWishlist =
+        function (id) {
+
+            if (
+                typeof originalToggle ===
+                "function"
+            ) {
+
+                originalToggle(id);
+
+            }
+
+            setTimeout(() => {
+
+                const button =
+                    document.querySelector(
+                        `.wishlist-btn[onclick*="${id}"]`
+                    );
+
+                if (button) {
+
+                    const liked =
+                        wishlist.some(
+                            p => p.id === id
+                        );
+
+                    button.classList.toggle(
+                        "active",
+                        liked
+                    );
+
+                    const icon =
+                        button.querySelector(
+                            "i"
+                        );
+
+                    if (icon) {
+
+                        icon.className =
+                            liked
+                                ? "fa-solid fa-heart"
+                                : "fa-regular fa-heart";
+
+                    }
+
+                }
+
+                if (
+                    currentProduct &&
+                    currentProduct.id === id
+                ) {
+
+                    updateDetailHeart();
+
+                }
+
+            },50);
+
+        };
+
+})();
+
+
+/* =========================================================
+   15. KEEP CART / WISHLIST SYNCHRONIZED
+   ========================================================= */
+
+window.addEventListener(
+    "storage",
+    function () {
+
+        try {
+
+            cart =
+                JSON.parse(
+                    localStorage.getItem(
+                        "vornex_cart"
+                    )
+                ) || [];
+
+            wishlist =
+                JSON.parse(
+                    localStorage.getItem(
+                        "vornex_wishlist"
+                    )
+                ) || [];
+
+            renderCart();
+            renderWishlist();
+            updateBadges();
+
+        } catch (error) {
+
+            console.error(
+                "VORNEX storage sync:",
+                error
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   16. FINAL INITIAL SYNC
+   ========================================================= */
+
+setTimeout(
+    function () {
+
+        try {
+
+            updateBadges();
+
+            renderCart();
+
+            renderWishlist();
+
+            restoreTheme();
+
+        } catch (error) {
+
+            console.error(
+                "VORNEX final sync:",
+                error
+            );
+
+        }
+
+    },
+    800
+);
+  
+
+
+/* =========================================================
+   VORNEX REQUIREMENTS — FINAL USER REQUEST PATCH
+   INDEX.HTML ONLY
+========================================================= */
+(function(){
+
+    /* ---------- PREMIUM THEME ENGINE: EXACTLY 4 THEMES ---------- */
+
+    const themeStyle=document.createElement("style");
+    themeStyle.id="vornex-final-requirements-style";
+    themeStyle.textContent=`
+
+        /* ---------- HERO VIDEO ---------- */
+        .hero-section{
+            isolation:isolate;
+        }
+
+        .hero-media-layer{
+            position:absolute;
+            inset:0;
+            z-index:0;
+            overflow:hidden;
+            background:
+                radial-gradient(circle at 70% 20%,#2a2a2a,transparent 38%),
+                linear-gradient(145deg,#101010,#020202);
+        }
+
+        .hero-media-layer video,
+        .hero-media-layer img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            display:block;
+            filter:saturate(1.05) contrast(1.05);
+        }
+
+        .hero-media-layer video{
+            pointer-events:none;
+        }
+
+        .hero-overlay{
+            z-index:1 !important;
+        }
+
+        .hero-content{
+            z-index:2 !important;
+        }
+
+        /* ---------- PRODUCT BADGE: NEVER COVER PRODUCT ---------- */
+        .product-badge-inline{
+            position:static !important;
+            display:inline-flex !important;
+            width:max-content;
+            max-width:100%;
+            margin:0 0 7px 0 !important;
+            padding:5px 9px !important;
+            border-radius:999px !important;
+            font-size:7px !important;
+            letter-spacing:.7px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            background:rgba(255,255,255,.10) !important;
+            color:#fff !important;
+            border:1px solid rgba(255,255,255,.16);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+        }
+
+        .theme-light-active .product-badge-inline{
+            background:#111 !important;
+            color:#fff !important;
+            border-color:#111 !important;
+        }
+
+        /* ---------- LIKE ---------- */
+        .product-card .wishlist-btn{
+            will-change:transform;
+        }
+
+        .product-card .wishlist-btn.active{
+            background:linear-gradient(135deg,#ff3b5f,#e4002b) !important;
+            color:#fff !important;
+            border-color:rgba(255,255,255,.35) !important;
+        }
+
+        /* ---------- ADD TO BAG ---------- */
+        .product-card .add-btn.added{
+            background:linear-gradient(135deg,#fff16a,#ffd400) !important;
+            color:#000 !important;
+            box-shadow:0 0 0 1px rgba(255,255,255,.45),
+                       0 10px 35px rgba(255,212,0,.28) !important;
+            transform:scale(1.025);
+        }
+
+        /* ---------- HOME CHECKOUT ---------- */
+        .home-checkout-glass{
+            position:fixed;
+            left:14px;
+            right:14px;
+            bottom:calc(12px + env(safe-area-inset-bottom));
+            z-index:900;
+            min-height:62px;
+            padding:10px 16px;
+            border-radius:22px;
+            border:1px solid rgba(255,255,255,.22);
+            background:rgba(18,18,18,.72);
+            color:#fff;
+            backdrop-filter:blur(28px) saturate(180%);
+            -webkit-backdrop-filter:blur(28px) saturate(180%);
+            box-shadow:
+                0 18px 50px rgba(0,0,0,.48),
+                inset 0 1px 0 rgba(255,255,255,.12);
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            font-size:11px;
+            font-weight:900;
+            letter-spacing:1.2px;
+            transition:transform .25s ease,box-shadow .25s ease;
+        }
+
+        .home-checkout-glass:active{
+            transform:scale(.97);
+        }
+
+        .home-checkout-glass span{
+            display:flex;
+            align-items:center;
+            gap:9px;
+        }
+
+        .home-checkout-glass i{
+            color:#ffd400;
+        }
+
+        .home-checkout-glass strong{
+            font-size:8px;
+            opacity:.72;
+            letter-spacing:1px;
+        }
+
+        .theme-light-active .home-checkout-glass{
+            background:rgba(255,255,255,.78);
+            color:#111;
+            border-color:rgba(17,17,17,.14);
+            box-shadow:0 18px 50px rgba(0,0,0,.18);
+        }
+
+        .theme-light-active .home-checkout-glass i{
+            color:#111;
+        }
+
+        body.checkout-open #homeCheckoutBtn{
+            opacity:0;
+            pointer-events:none;
+            transform:translateY(20px);
+        }
+
+        /* ---------- CHECKOUT ---------- */
+        #checkoutModal .modal-card{
+            padding-bottom:calc(24px + env(safe-area-inset-bottom));
+        }
+
+        #checkoutModal .input-group input{
+            font-size:13px !important;
+        }
+
+        #checkoutModal .coupon-row{
+            align-items:stretch;
+        }
+
+        #checkoutModal .coupon-row input{
+            min-height:48px;
+        }
+
+        #checkoutModal .coupon-row button{
+            min-height:48px;
+            border-radius:14px !important;
+        }
+
+        /* ---------- DETAIL: BIGGER GLASS ACTIONS ---------- */
+        #productDetailModal .detail-actions{
+            min-height:92px !important;
+            padding:
+                12px 14px
+                calc(14px + env(safe-area-inset-bottom)) !important;
+            gap:10px !important;
+            background:rgba(12,12,12,.68) !important;
+            border-top:1px solid rgba(255,255,255,.16) !important;
+            backdrop-filter:blur(30px) saturate(180%) !important;
+            -webkit-backdrop-filter:blur(30px) saturate(180%) !important;
+            box-shadow:0 -18px 55px rgba(0,0,0,.45) !important;
+        }
+
+        #productDetailModal .detail-action-btn,
+        #productDetailModal .detail-cart-btn,
+        #productDetailModal .detail-buy-btn{
+            min-height:68px !important;
+            border-radius:22px !important;
+            font-size:11px !important;
+            font-weight:900 !important;
+            transition:transform .22s ease,box-shadow .22s ease,background .22s ease !important;
+        }
+
+        #productDetailModal .detail-cart-btn:active,
+        #productDetailModal .detail-buy-btn:active{
+            transform:scale(.95) !important;
+        }
+
+        /* ---------- PRODUCT IMAGE ZOOM / HOLD ---------- */
+        #productDetailModal .detail-slider{
+            touch-action:none !important;
+            cursor:zoom-in;
+        }
+
+        #productDetailModal .detail-slider img{
+            transform-origin:center center;
+            transition:transform .18s ease;
+            will-change:transform;
+            user-select:none;
+            -webkit-user-drag:none;
+        }
+
+        #productDetailModal .detail-slider.is-zoomed{
+            cursor:grab;
+        }
+
+        #productDetailModal .detail-slider.is-zoomed:active{
+            cursor:grabbing;
+        }
+
+        /* ---------- MENU ACCOUNT ---------- */
+        .account-menu{
+            display:grid !important;
+            grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+            gap:12px !important;
+        }
+
+        .account-menu button{
+            min-height:92px !important;
+            border-radius:22px !important;
+            display:flex !important;
+            flex-direction:column !important;
+            align-items:center !important;
+            justify-content:center !important;
+            gap:10px !important;
+            text-align:center !important;
+            padding:14px 8px !important;
+            border:1px solid rgba(255,255,255,.12) !important;
+            background:rgba(255,255,255,.055) !important;
+            backdrop-filter:blur(18px);
+            -webkit-backdrop-filter:blur(18px);
+            font-size:9px !important;
+            font-weight:900 !important;
+            transition:transform .22s ease,background .22s ease !important;
+        }
+
+        .account-menu button:active{
+            transform:scale(.95);
+        }
+
+        .account-menu button i{
+            font-size:22px !important;
+        }
+
+        .theme-light-active .account-menu button{
+            background:#fff !important;
+            color:#111 !important;
+            border-color:#e5e7eb !important;
+        }
+
+        /* ---------- YOUR ORDERS PREMIUM ---------- */
+        #ordersModal .modal-card{
+            width:min(94vw,620px) !important;
+            max-height:88dvh !important;
+            border-radius:30px !important;
+            padding:20px !important;
+        }
+
+        #ordersModal #ordersList{
+            max-height:58dvh;
+            overflow-y:auto;
+            padding:4px 2px 12px;
+        }
+
+        #ordersModal .order-card{
+            padding:18px !important;
+            margin:12px 0 !important;
+            border-radius:22px !important;
+            background:linear-gradient(145deg,rgba(255,255,255,.075),rgba(255,255,255,.025)) !important;
+            border:1px solid rgba(255,255,255,.12) !important;
+            box-shadow:0 15px 40px rgba(0,0,0,.25) !important;
+            font-size:12px !important;
+        }
+
+        #ordersModal .order-id{
+            font-size:14px !important;
+            font-weight:900 !important;
+            letter-spacing:.7px;
+        }
+
+        #ordersModal .order-status{
+            padding:6px 10px !important;
+            border-radius:999px !important;
+            font-size:8px !important;
+            font-weight:900 !important;
+            background:rgba(16,185,129,.16) !important;
+            color:#34d399 !important;
+        }
+
+        #ordersModal .order-date{
+            margin-top:8px !important;
+            font-size:9px !important;
+            opacity:.62;
+        }
+
+        #ordersModal .order-products{
+            margin-top:14px !important;
+            padding-top:12px !important;
+            border-top:1px solid rgba(255,255,255,.08) !important;
+            line-height:1.8 !important;
+            font-size:11px !important;
+        }
+
+        #ordersModal .order-total{
+            margin-top:14px !important;
+            font-size:15px !important;
+            font-weight:900 !important;
+        }
+
+        .orders-track-inline{
+            margin:10px 0 12px;
+        }
+
+        .orders-track-inline button{
+            width:100%;
+            min-height:52px;
+            border:1px solid rgba(255,255,255,.14);
+            border-radius:17px;
+            background:rgba(255,255,255,.07);
+            color:#fff;
+            backdrop-filter:blur(18px);
+            -webkit-backdrop-filter:blur(18px);
+            font-weight:900;
+            letter-spacing:1px;
+        }
+
+        .orders-track-inline button i{
+            margin-right:8px;
+            color:#ffd400;
+        }
+
+        .theme-light-active .orders-track-inline button{
+            color:#111;
+            background:#fff;
+            border-color:#e5e7eb;
+        }
+
+        /* ---------- FULL THEME: DARK ---------- */
+        body.theme-dark-active{
+            background:#050505 !important;
+            color:#fff !important;
+        }
+
+        body.theme-dark-active .vornex-header,
+        body.theme-dark-active .filter-bar,
+        body.theme-dark-active .cart-drawer,
+        body.theme-dark-active .modal-card,
+        body.theme-dark-active .product-detail-card,
+        body.theme-dark-active .ios-drawer,
+        body.theme-dark-active .site-footer{
+            background:#070707 !important;
+            color:#fff !important;
+        }
+
+        /* ---------- FULL THEME: LIGHT ---------- */
+        body.theme-light-active{
+            background:#f4f6f8 !important;
+            color:#111 !important;
+        }
+
+        body.theme-light-active .vornex-header{
+            background:rgba(255,255,255,.86) !important;
+            color:#111 !important;
+            border-bottom:1px solid #e5e7eb !important;
+        }
+
+        body.theme-light-active .product-card,
+        body.theme-light-active .modal-card,
+        body.theme-light-active .cart-drawer,
+        body.theme-light-active .product-detail-card,
+        body.theme-light-active .ios-drawer,
+        body.theme-light-active .site-footer{
+            background:#fff !important;
+            color:#111 !important;
+            border-color:#e5e7eb !important;
+        }
+
+        body.theme-light-active .p-title,
+        body.theme-light-active .p-price,
+        body.theme-light-active .modal-header h3,
+        body.theme-light-active .cart-item-name,
+        body.theme-light-active .account-name,
+        body.theme-light-active .detail-title,
+        body.theme-light-active .detail-price{
+            color:#111 !important;
+        }
+
+        body.theme-light-active .p-category,
+        body.theme-light-active .detail-description,
+        body.theme-light-active .footer-column a{
+            color:#6b7280 !important;
+        }
+
+        body.theme-light-active .search-wrapper input,
+        body.theme-light-active .cat-btn,
+        body.theme-light-active input,
+        body.theme-light-active textarea,
+        body.theme-light-active select{
+            background:#fff !important;
+            color:#111 !important;
+            border-color:#d1d5db !important;
+        }
+
+        body.theme-light-active .hero-section{
+            background:#e8ebef !important;
+        }
+
+        body.theme-light-active .hero-overlay{
+            background:linear-gradient(transparent 15%,rgba(255,255,255,.9)) !important;
+        }
+
+        body.theme-light-active .hero-title,
+        body.theme-light-active .hero-subtitle,
+        body.theme-light-active .hero-tag{
+            color:#111 !important;
+        }
+
+        body.theme-light-active .site-footer{
+            border-top-color:#e5e7eb !important;
+        }
+
+        /* ---------- FULL THEME: EMERALD ---------- */
+        body.theme-emerald-active{
+            background:#06100d !important;
+            color:#f5fffb !important;
+        }
+
+        body.theme-emerald-active .vornex-header,
+        body.theme-emerald-active .filter-bar,
+        body.theme-emerald-active .cart-drawer,
+        body.theme-emerald-active .modal-card,
+        body.theme-emerald-active .product-detail-card,
+        body.theme-emerald-active .ios-drawer,
+        body.theme-emerald-active .site-footer{
+            background:linear-gradient(145deg,#0b1713,#050b09) !important;
+            color:#f5fffb !important;
+            border-color:rgba(52,211,153,.18) !important;
+        }
+
+        body.theme-emerald-active .hero-section{
+            background:
+                radial-gradient(circle at 70% 20%,rgba(16,185,129,.30),transparent 38%),
+                linear-gradient(145deg,#0b2119,#020806) !important;
+        }
+
+        body.theme-emerald-active .hero-btn,
+        body.theme-emerald-active .checkout-btn,
+        body.theme-emerald-active .submit-order-btn{
+            background:linear-gradient(135deg,#34d399,#059669) !important;
+            color:#00140d !important;
+        }
+
+        body.theme-emerald-active .p-price,
+        body.theme-emerald-active .detail-price,
+        body.theme-emerald-active .summary-row.total span:last-child{
+            color:#34d399 !important;
+        }
+
+        /* ---------- FULL THEME: VIOLET ---------- */
+        body.theme-violet-active{
+            background:#0b0714 !important;
+            color:#fbf8ff !important;
+        }
+
+        body.theme-violet-active .vornex-header,
+        body.theme-violet-active .filter-bar,
+        body.theme-violet-active .cart-drawer,
+        body.theme-violet-active .modal-card,
+        body.theme-violet-active .product-detail-card,
+        body.theme-violet-active .ios-drawer,
+        body.theme-violet-active .site-footer{
+            background:linear-gradient(145deg,#160d24,#08050e) !important;
+            color:#fbf8ff !important;
+            border-color:rgba(167,139,250,.18) !important;
+        }
+
+        body.theme-violet-active .hero-section{
+            background:
+                radial-gradient(circle at 70% 20%,rgba(139,92,246,.34),transparent 38%),
+                linear-gradient(145deg,#1a1030,#05030a) !important;
+        }
+
+        body.theme-violet-active .hero-btn,
+        body.theme-violet-active .checkout-btn,
+        body.theme-violet-active .submit-order-btn{
+            background:linear-gradient(135deg,#c4b5fd,#8b5cf6) !important;
+            color:#10071f !important;
+        }
+
+        body.theme-violet-active .p-price,
+        body.theme-violet-active .detail-price,
+        body.theme-violet-active .summary-row.total span:last-child{
+            color:#c4b5fd !important;
+        }
+
+        /* ---------- MOBILE ---------- */
+        @media(max-width:600px){
+            .home-checkout-glass{
+                min-height:58px;
+                border-radius:20px;
+            }
+
+            #productDetailModal .detail-actions{
+                margin:0 8px;
+                border-radius:24px;
+                bottom:calc(8px + env(safe-area-inset-bottom));
+            }
+
+            #productDetailModal .detail-cart-btn,
+            #productDetailModal .detail-buy-btn{
+                min-height:70px !important;
+            }
+        }
+    `;
+    document.head.appendChild(themeStyle);
+
+    /* ---------- EXACTLY FOUR THEMES + PERSISTENCE ---------- */
+    const allowedThemes=["dark","light","emerald","violet"];
+
+    window.setTheme=function(theme){
+        if(!allowedThemes.includes(theme)){
+            theme="dark";
+        }
+
+        document.body.classList.remove(
+            "theme-dark-active",
+            "theme-light-active",
+            "theme-emerald-active",
+            "theme-violet-active",
+            "theme-neon-active",
+            "theme-gold-active",
+            "theme-amber-active"
+        );
+
+        document.body.classList.add("theme-"+theme+"-active");
+        localStorage.setItem("vornex_theme",theme);
+
+        showToast("Theme: "+theme.toUpperCase(),"info");
+    };
+
+    window.loadSavedTheme=function(){
+        const saved=localStorage.getItem("vornex_theme")||"dark";
+        setTheme(allowedThemes.includes(saved)?saved:"dark");
+    };
+
+    /* ---------- HOME CHECKOUT COUNT ---------- */
+    window.updateHomeCheckoutButton=function(){
+        const countEl=document.getElementById("homeCheckoutCount");
+        const btn=document.getElementById("homeCheckoutBtn");
+        if(!countEl || !btn) return;
+
+        const count=(cart||[]).reduce(
+            (sum,item)=>sum+Number(item.qty||1),0
+        );
+
+        countEl.textContent=count+" "+(count===1?"ITEM":"ITEMS");
+        btn.style.display="flex";
+    };
+
+    const originalUpdateBadges=window.updateBadges;
+    window.updateBadges=function(){
+        if(typeof originalUpdateBadges==="function"){
+            originalUpdateBadges();
+        }
+        updateHomeCheckoutButton();
+    };
+
+    /* ---------- ADD TO BAG ANIMATION ---------- */
+    const originalAddToCart=window.addToCart;
+    window.addToCart=function(id,size=""){
+        if(typeof originalAddToCart==="function"){
+            originalAddToCart(id,size);
+        }
+
+        setTimeout(()=>{
+            document
+                .querySelectorAll('.add-btn[data-product-id="'+CSS.escape(String(id))+'"]')
+                .forEach(btn=>{
+                    if(btn.disabled) return;
+
+                    btn.classList.add("added");
+                    const oldText=btn.innerHTML;
+
+                    btn.innerHTML='<i class="fa-solid fa-check"></i> ADDED TO BAG';
+
+                    clearTimeout(btn.__vornexBagTimer);
+                    btn.__vornexBagTimer=setTimeout(()=>{
+                        btn.classList.remove("added");
+                        btn.innerHTML=oldText.includes("OUT OF STOCK")
+                            ? oldText
+                            : "ADD TO BAG";
+                    },1800);
+                });
+        },60);
+    };
+
+    /* ---------- CHECKOUT BODY STATE ---------- */
+    const originalOpenCheckout=window.openCheckoutModal;
+    window.openCheckoutModal=function(){
+        if(typeof originalOpenCheckout==="function"){
+            originalOpenCheckout();
+        }
+
+        setTimeout(()=>{
+            const modal=document.getElementById("checkoutModal");
+            document.body.classList.toggle(
+                "checkout-open",
+                !!modal && modal.classList.contains("active")
+            );
+        },20);
+    };
+
+    /* ---------- MODAL / DRAWER STEP-BACK ---------- */
+    const modalStack=[];
+    const originalOpenModal=window.openModal;
+    window.openModal=function(id){
+        const active=document.querySelector(".custom-modal.active");
+        if(active && active.id!==id){
+            modalStack.push(active.id);
+            active.classList.remove("active");
+        }
+
+        if(typeof originalOpenModal==="function"){
+            originalOpenModal(id);
+        }else{
+            document.getElementById(id)?.classList.add("active");
+        }
+    };
+
+    const originalCloseModalStepBack=window.closeModalStepBack;
+    window.closeModalStepBack=function(id){
+        document.getElementById(id)?.classList.remove("active");
+
+        const previous=modalStack.pop();
+
+        if(previous){
+            document.getElementById(previous)?.classList.add("active");
+            document.body.style.overflow="";
+        }else{
+            document.body.style.overflow="";
+        }
+
+        if(id==="checkoutModal"){
+            document.body.classList.remove("checkout-open");
+        }
+    };
+
+    window.openOrderTrackingFromOrders=function(){
+        openModal("trackingModal");
+    };
+
+    /* ---------- ORDER LIST: TRACK BUTTON + PREMIUM DATA ---------- */
+    const originalLoadCustomerOrders=window.loadCustomerOrders;
+    window.loadCustomerOrders=function(){
+        if(typeof originalLoadCustomerOrders==="function"){
+            originalLoadCustomerOrders();
+        }
+    };
+
+    /* ---------- HERO VIDEO READY FOR USER'S FUTURE VIDEO ---------- */
+    const HERO_VIDEO_URL="";
+    window.setVornexHeroVideo=function(url){
+        const layer=document.getElementById("heroMediaLayer");
+        if(!layer) return;
+
+        const safeUrl=String(url||"").trim();
+
+        if(!safeUrl){
+            layer.innerHTML="";
+            return;
+        }
+
+        layer.innerHTML=`
+            <video autoplay muted loop playsinline preload="metadata">
+                <source src="${escapeHtml(safeUrl)}" type="video/mp4">
+            </video>
+        `;
+    };
+
+    if(HERO_VIDEO_URL){
+        setVornexHeroVideo(HERO_VIDEO_URL);
+    }
+
+    /* ---------- PRODUCT IMAGE: DOUBLE TAP / PINCH / HOLD ZOOM ---------- */
+    (function setupProductZoom(){
+        let state={
+            scale:1,
+            startDistance:0,
+            startScale:1,
+            lastTap:0,
+            holdTimer:null,
+            holding:false,
+            startX:0,
+            startY:0
+        };
+
+        function getImage(){
+            const slider=document.getElementById("detailSlider");
+            if(!slider) return null;
+            return slider.querySelector("img.active");
+        }
+
+        function applyZoom(scale){
+            const slider=document.getElementById("detailSlider");
+            const img=getImage();
+            if(!slider || !img) return;
+
+            state.scale=Math.max(1,Math.min(3,scale));
+            img.style.transform="scale("+state.scale+")";
+            slider.classList.toggle("is-zoomed",state.scale>1);
+        }
+
+        function distance(a,b){
+            const dx=a.clientX-b.clientX;
+            const dy=a.clientY-b.clientY;
+            return Math.sqrt(dx*dx+dy*dy);
+        }
+
+        document.addEventListener("touchstart",function(e){
+            const slider=document.getElementById("detailSlider");
+            const detail=document.getElementById("productDetailModal");
+
+            if(!slider || !detail ||
+               !detail.classList.contains("active") ||
+               !slider.contains(e.target)) return;
+
+            if(e.touches.length===2){
+                clearTimeout(state.holdTimer);
+                state.startDistance=distance(e.touches[0],e.touches[1]);
+                state.startScale=state.scale;
+                return;
+            }
+
+            if(e.touches.length===1){
+                state.startX=e.touches[0].clientX;
+                state.startY=e.touches[0].clientY;
+                state.holding=false;
+
+                clearTimeout(state.holdTimer);
+                state.holdTimer=setTimeout(()=>{
+                    state.holding=true;
+                    applyZoom(state.scale>1 ? 1 : 1.65);
+                },420);
+
+                const now=Date.now();
+                if(now-state.lastTap<280){
+                    clearTimeout(state.holdTimer);
+                    applyZoom(state.scale>1 ? 1 : 2);
+                }
+                state.lastTap=now;
+            }
+        },{passive:true});
+
+        document.addEventListener("touchmove",function(e){
+            const slider=document.getElementById("detailSlider");
+            const detail=document.getElementById("productDetailModal");
+
+            if(!slider || !detail ||
+               !detail.classList.contains("active") ||
+               !slider.contains(e.target)) return;
+
+            if(e.touches.length===2 && state.startDistance){
+                const ratio=distance(e.touches[0],e.touches[1])/state.startDistance;
+                applyZoom(state.startScale*ratio);
+                e.preventDefault();
+            }else if(e.touches.length===1){
+                const dx=Math.abs(e.touches[0].clientX-state.startX);
+                const dy=Math.abs(e.touches[0].clientY-state.startY);
+
+                if(dx>12 || dy>12){
+                    clearTimeout(state.holdTimer);
+                }
+            }
+        },{passive:false});
+
+        document.addEventListener("touchend",function(e){
+            const slider=document.getElementById("detailSlider");
+            const detail=document.getElementById("productDetailModal");
+
+            if(!slider || !detail ||
+               !detail.classList.contains("active") ||
+               !slider.contains(e.target)) return;
+
+            clearTimeout(state.holdTimer);
+
+            if(state.holding){
+                state.holding=false;
+            }
+
+            if(e.touches.length===0){
+                state.startDistance=0;
+            }
+        },{passive:true});
+
+        window.resetProductZoom=function(){
+            state.scale=1;
+            state.startDistance=0;
+            state.startScale=1;
+            state.holding=false;
+            clearTimeout(state.holdTimer);
+
+            document.querySelectorAll("#detailSlider img").forEach(img=>{
+                img.style.transform="scale(1)";
+            });
+
+            document.getElementById("detailSlider")?.classList.remove("is-zoomed");
+        };
+    })();
+
+    const originalCloseProductDetail=window.closeProductDetail;
+    window.closeProductDetail=function(){
+        resetProductZoom();
+        if(typeof originalCloseProductDetail==="function"){
+            originalCloseProductDetail();
+        }
+    };
+
+    /* ---------- UPDATE HOME BUTTON AFTER CART CHANGES ---------- */
+    setTimeout(updateHomeCheckoutButton,300);
+
+})();
+
 </script>
 
 </body>
