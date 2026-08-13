@@ -1879,16 +1879,8 @@ a{
             <button
                 type="submit"
                 class="primary-btn"
-                style="background:#4285f4;">
-                PLACE ORDER VIA GMAIL
-            </button>
-
-            <button
-                type="button"
-                class="primary-btn"
-                style="background:#facc15;"
-                onclick="placeOrderViaSMS()">
-                PLACE ORDER VIA SMS
+                style="background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;box-shadow:0 10px 30px rgba(37,99,235,.25);">
+                PLACE ORDER
             </button>
 
         </form>
@@ -2172,9 +2164,9 @@ const ordersRef=db.ref("orders");
    VORNEX EMAIL NOTIFICATION (EMAILJS)
    Fill these 3 values after creating EmailJS service/template.
 ========================================================= */
-const EMAILJS_PUBLIC_KEY = "YOUR_EMAILJS_PUBLIC_KEY";
-const EMAILJS_SERVICE_ID = "YOUR_EMAILJS_SERVICE_ID";
-const EMAILJS_TEMPLATE_ID = "YOUR_EMAILJS_TEMPLATE_ID";
+const EMAILJS_PUBLIC_KEY = "v9Eb0FgIJVRRZLXLQ";
+const EMAILJS_SERVICE_ID = "service_ybh8s4h";
+const EMAILJS_TEMPLATE_ID = "template_ly3p6lu";
 
 if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
     emailjs.init({
@@ -3523,43 +3515,66 @@ async function submitOrder(e){
 
     };
 
+    const submitButton=e.target.querySelector('button[type="submit"]');
+
+    if(submitButton){
+        submitButton.disabled=true;
+        submitButton.textContent="PLACING ORDER...";
+        submitButton.style.opacity=".7";
+    }
+
     try{
 
+        /* 1. Save the order first. */
         await ordersRef
             .child(orderId)
             .set(order);
 
-        /* Send the order to your Gmail through EmailJS.
-           The recipient Gmail address is configured inside the EmailJS template. */
-        if (typeof emailjs === "undefined" || EMAILJS_PUBLIC_KEY === "YOUR_EMAILJS_PUBLIC_KEY" ||
-            EMAILJS_SERVICE_ID === "YOUR_EMAILJS_SERVICE_ID" || EMAILJS_TEMPLATE_ID === "YOUR_EMAILJS_TEMPLATE_ID") {
-            throw new Error("Gmail notification is not configured. Add EmailJS Public Key, Service ID and Template ID in index.html.");
+        /* 2. Send the same order details to your Gmail through EmailJS. */
+        let emailSent=true;
+
+        try{
+
+            if (typeof emailjs === "undefined") {
+                throw new Error("EmailJS library is not loaded.");
+            }
+
+            if (!EMAILJS_PUBLIC_KEY || !EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID) {
+                throw new Error("EmailJS configuration is incomplete.");
+            }
+
+            const emailItems = order.items.map((item, i) => {
+                return `${i + 1}. ${item.name}${item.size ? " | Size: " + item.size : ""} | Qty: ${item.qty || 1} | ₹${Number(item.price || 0) * Number(item.qty || 1)}`;
+            }).join("\n");
+
+            await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                order_id: order.orderId,
+                customer_name: order.customer.name,
+                customer_phone: order.customer.phone,
+                customer_email: order.customer.email || "",
+                delivery_address: order.customer.address,
+                city: order.customer.city,
+                state: order.customer.state,
+                pincode: order.customer.pincode,
+                items: emailItems,
+                subtotal: `₹${order.subtotal}`,
+                discount: `₹${order.discount}`,
+                total: `₹${order.total}`,
+                coupon: order.coupon || "None",
+                payment_method: order.paymentMethod,
+                payment_status: order.paymentStatus,
+                order_status: order.status,
+                created_at: order.createdAt
+            });
+
+        }catch(emailError){
+
+            emailSent=false;
+            console.error("EmailJS notification failed:",emailError);
+
         }
 
-        const emailItems = order.items.map((item, i) => {
-            return `${i + 1}. ${item.name}${item.size ? " | Size: " + item.size : ""} | Qty: ${item.qty || 1} | ₹${Number(item.price || 0) * Number(item.qty || 1)}`;
-        }).join("\n");
-
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            order_id: order.orderId,
-            customer_name: order.customer.name,
-            customer_phone: order.customer.phone,
-            customer_email: order.customer.email || "",
-            delivery_address: order.customer.address,
-            city: order.customer.city,
-            state: order.customer.state,
-            pincode: order.customer.pincode,
-            items: emailItems,
-            subtotal: `₹${order.subtotal}`,
-            discount: `₹${order.discount}`,
-            total: `₹${order.total}`,
-            coupon: order.coupon || "None",
-            payment_method: order.paymentMethod,
-            payment_status: order.paymentStatus,
-            order_status: order.status,
-            created_at: order.createdAt
-        });
-
+        /* 3. Clear the cart only after the order is saved. */
         cart=[];
 
         currentCoupon=null;
@@ -3576,19 +3591,39 @@ async function submitOrder(e){
         document.getElementById("checkoutModal")
             .classList.remove("active");
 
-        showToast(
-            "✅ Order placed successfully! Order details sent to VORNEX Gmail.",
-            "success"
-        );
+        /* 4. Show the confirmation message after the order is confirmed. */
+        if(emailSent){
+
+            showToast(
+                `✅ Order Confirmed! Order ID: ${orderId}`,
+                "success"
+            );
+
+        }else{
+
+            showToast(
+                `✅ Order Confirmed! Order ID: ${orderId}. Email notification could not be sent.`,
+                "success"
+            );
+
+        }
 
     }catch(error){
 
         console.error(error);
 
         showToast(
-            "Order save failed: "+error.message,
+            "Order save failed: "+(error.message||"Please try again."),
             "error"
         );
+
+    }finally{
+
+        if(submitButton){
+            submitButton.disabled=false;
+            submitButton.textContent="PLACE ORDER";
+            submitButton.style.opacity="1";
+        }
 
     }
 
@@ -3639,31 +3674,6 @@ Please confirm this order.`;
 
 }
 
-
-function placeOrderViaSMS(){
-
-    if(!cart.length){
-
-        showToast("Cart is empty","error");
-
-        return;
-
-    }
-
-    const phone=
-        document.getElementById("custPhone").value.trim();
-
-    const name=
-        document.getElementById("custName").value.trim();
-
-    const message=
-        `VORNEX order from ${name}. Please contact me to confirm my order.`;
-
-    window.location.href=
-        "sms:+918269444061?body="+
-        encodeURIComponent(message);
-
-}
 
 
 /* =========================================================
