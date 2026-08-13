@@ -1292,7 +1292,7 @@ a{
                 <div class="theme-chip theme-gold" onclick="setTheme('gold')">GOLD</div>
                 <div class="theme-chip theme-emerald" onclick="setTheme('emerald')">EMERALD</div>
                 <div class="theme-chip theme-violet" onclick="setTheme('violet')">VIOLET</div>
-                <div class="theme-chip theme-light" onclick="setTheme('light')">LIGHT</div>
+                <div class="theme-chip theme-amber" onclick="setTheme('amber')">AMBER</div>
             </div>
         </div>
 
@@ -1816,6 +1816,19 @@ a{
 
             <div class="input-group">
 
+                <label>GMAIL / EMAIL ADDRESS</label>
+
+                <input
+                    id="custEmail"
+                    type="email"
+                    required
+                    autocomplete="email"
+                    placeholder="customer@gmail.com">
+
+            </div>
+
+            <div class="input-group">
+
                 <label>PHONE NUMBER</label>
 
                 <input
@@ -2168,6 +2181,9 @@ const EMAILJS_PUBLIC_KEY = "v9Eb0FgIJVRRZLXLQ";
 const EMAILJS_SERVICE_ID = "service_ybh8s4h";
 const EMAILJS_TEMPLATE_ID = "template_ly3p6lu";
 
+/* Orders received on this Gmail */
+const ADMIN_ORDER_EMAIL = "vornexcloth@gmail.com";
+
 if (typeof emailjs !== "undefined" && EMAILJS_PUBLIC_KEY !== "YOUR_EMAILJS_PUBLIC_KEY") {
     emailjs.init({
         publicKey: EMAILJS_PUBLIC_KEY
@@ -2256,8 +2272,6 @@ document.addEventListener("DOMContentLoaded",()=>{
     updateBadges();
 
     updateAuthUI();
-
-    loadSavedTheme();
 
 });
 
@@ -2943,14 +2957,20 @@ function updateBadges(){
         (a,b)=>a+Number(b.qty||1),0
     );
 
-    document.getElementById("menuCartCount").textContent=
-        cartCount;
+    const menuCartCount = document.getElementById("menuCartCount");
+    if(menuCartCount){
+        menuCartCount.textContent = cartCount;
+    }
 
-    document.getElementById("cartTotalItems").textContent=
-        cartCount;
+    const cartTotalItems = document.getElementById("cartTotalItems");
+    if(cartTotalItems){
+        cartTotalItems.textContent = cartCount;
+    }
 
-    document.getElementById("menuWishCount").textContent=
-        wishlist.length;
+    const menuWishCount = document.getElementById("menuWishCount");
+    if(menuWishCount){
+        menuWishCount.textContent = wishlist.length;
+    }
 
 }
 
@@ -3205,7 +3225,11 @@ function applyCoupon(){
     }
 
     const foundKey=Object.keys(allCoupons)
-        .find(k=>k.toUpperCase()===code);
+        .find(k=>{
+            const c=allCoupons[k] || {};
+            return String(k).toUpperCase()===code ||
+                   String(c.code||"").toUpperCase()===code;
+        });
 
     if(!foundKey){
 
@@ -3419,8 +3443,16 @@ async function submitOrder(e){
     const name=
         document.getElementById("custName").value.trim();
 
+    const customerEmail=
+        document.getElementById("custEmail").value.trim();
+
     const phone=
         document.getElementById("custPhone").value.trim();
+
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)){
+        showToast("Enter a valid customer Gmail / email address","error");
+        return;
+    }
 
     const pin=
         document.getElementById("custPin").value.trim();
@@ -3489,8 +3521,8 @@ async function submitOrder(e){
             uid:auth.currentUser?
                 auth.currentUser.uid:null,
 
-            email:auth.currentUser?
-                auth.currentUser.email||"": ""
+            email:customerEmail || (auth.currentUser ?
+                (auth.currentUser.email || "") : "")
 
         },
 
@@ -3532,70 +3564,71 @@ async function submitOrder(e){
             .child(orderId)
             .set(order);
 
-        /* 2. Send the same order details to your Gmail through EmailJS. */
-        let emailSent=true;
+        /* 2. Send the order to BOTH:
+              - VORNEX admin Gmail
+              - Customer Gmail
+           The EmailJS template uses {{email}} as "To Email". */
 
-        try{
+        let adminEmailSent = false;
+        let customerEmailSent = false;
 
-            if (typeof emailjs === "undefined") {
-                throw new Error("EmailJS library is not loaded.");
-            }
-
-            if (!EMAILJS_PUBLIC_KEY || !EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID) {
-                throw new Error("EmailJS configuration is incomplete.");
-            }
+        if (typeof emailjs === "undefined") {
+            console.warn("EmailJS library is not loaded. Order is still saved.");
+        } else if (!EMAILJS_PUBLIC_KEY || !EMAILJS_SERVICE_ID || !EMAILJS_TEMPLATE_ID) {
+            console.warn("EmailJS configuration is incomplete. Order is still saved.");
+        } else {
 
             const emailItems = order.items.map((item, i) => {
                 return `${i + 1}. ${item.name}${item.size ? " | Size: " + item.size : ""} | Qty: ${item.qty || 1} | ₹${Number(item.price || 0) * Number(item.qty || 1)}`;
             }).join("\n");
 
             const emailParams = {
-                /* Variables matching the EmailJS template */
-                email: order.customer.email || "",
-                name: order.customer.name,
-                phone: order.customer.phone,
-                pincode: order.customer.pincode,
-                city: order.customer.city,
-                state: order.customer.state,
-                address: order.customer.address,
-                products: emailItems,
-                total: order.total,
-                time: new Date(order.createdAt).toLocaleString("en-IN"),
-
-                /* Extra variables kept for compatibility */
+                /* IMPORTANT: EmailJS template "To Email" = {{email}} */
+                email: "",
                 order_id: order.orderId,
                 customer_name: order.customer.name,
                 customer_phone: order.customer.phone,
                 customer_email: order.customer.email || "",
                 delivery_address: order.customer.address,
+                city: order.customer.city,
+                state: order.customer.state,
+                pincode: order.customer.pincode,
                 items: emailItems,
+                products: emailItems,
                 subtotal: `₹${order.subtotal}`,
                 discount: `₹${order.discount}`,
+                total: `₹${order.total}`,
                 coupon: order.coupon || "None",
                 payment_method: order.paymentMethod,
                 payment_status: order.paymentStatus,
                 order_status: order.status,
-                created_at: order.createdAt
+                created_at: order.createdAt,
+                time: new Date(order.createdAt).toLocaleString("en-IN")
             };
 
-            /* The template currently uses {{email}} as its recipient.
-               Send to the customer's logged-in Gmail when available. */
-            if(order.customer.email){
+            /* Admin notification */
+            try{
                 await emailjs.send(
                     EMAILJS_SERVICE_ID,
                     EMAILJS_TEMPLATE_ID,
-                    emailParams
+                    {...emailParams, email: ADMIN_ORDER_EMAIL}
                 );
-            } else {
-                console.warn("Customer email not available; EmailJS notification was not sent.");
-                emailSent=false;
+                adminEmailSent = true;
+            }catch(adminError){
+                console.error("Admin Gmail notification failed:", adminError);
             }
 
-        }catch(emailError){
-
-            emailSent=false;
-            console.error("EmailJS notification failed:",emailError);
-
+            /* Customer confirmation */
+            try{
+                await emailjs.send(
+                    EMAILJS_SERVICE_ID,
+                    EMAILJS_TEMPLATE_ID,
+                    {...emailParams, email: order.customer.email}
+                );
+                customerEmailSent = true;
+            }catch(customerError){
+                console.error("Customer Gmail notification failed:", customerError);
+            }
         }
 
         /* 3. Clear the cart only after the order is saved. */
@@ -3616,17 +3649,31 @@ async function submitOrder(e){
             .classList.remove("active");
 
         /* 4. Show the confirmation message after the order is confirmed. */
-        if(emailSent){
+        if(adminEmailSent && customerEmailSent){
 
             showToast(
-                `✅ Order Confirmed! Order ID: ${orderId}`,
+                `✅ Order Confirmed! Order ID: ${orderId}. Admin & customer emails sent.`,
+                "success"
+            );
+
+        }else if(adminEmailSent){
+
+            showToast(
+                `✅ Order Confirmed! Order ID: ${orderId}. Admin email sent; customer email could not be sent.`,
+                "success"
+            );
+
+        }else if(customerEmailSent){
+
+            showToast(
+                `✅ Order Confirmed! Order ID: ${orderId}. Customer email sent; admin email could not be sent.`,
                 "success"
             );
 
         }else{
 
             showToast(
-                `✅ Order Confirmed! Order ID: ${orderId}. Email notification could not be sent.`,
+                `✅ Order Confirmed! Order ID: ${orderId}. Order saved successfully.`,
                 "success"
             );
 
@@ -4345,37 +4392,24 @@ function toggleAccordion(id){
 
 function setTheme(theme){
 
-    const themes=["dark","neon","gold","emerald","violet","light"];
-
-    if(!themes.includes(theme)){
-        theme="dark";
-    }
+    const valid=["dark","neon","gold","emerald","violet","amber"];
+    if(!valid.includes(theme)) theme="dark";
 
     document.body.classList.remove(
-        "theme-dark-active",
-        "theme-neon-active",
-        "theme-gold-active",
-        "theme-emerald-active",
-        "theme-violet-active",
-        "theme-light-active"
+        "theme-neon","theme-gold","theme-emerald",
+        "theme-violet","theme-amber"
     );
 
-    document.body.classList.add("theme-"+theme+"-active");
+    if(theme!=="dark") document.body.classList.add("theme-"+theme);
 
     localStorage.setItem("vornex_theme",theme);
-
     showToast("Theme: "+theme.toUpperCase(),"info");
-
 }
 
-function loadSavedTheme(){
-
+function restoreTheme(){
     const saved=localStorage.getItem("vornex_theme")||"dark";
-
     setTheme(saved);
-
 }
-
 
 
 /* =========================================================
@@ -4429,1649 +4463,29 @@ document.getElementById("cartDrawer")
 renderCart();
 
 
+function closeMenuOnly(){
+    toggleMenuDrawer(false);
+}
 
-/* =========================================================
-   VORNEX THEME ENGINE + PREMIUM VISUAL LAYER
-   ========================================================= */
-(function(){
-    const style=document.createElement("style");
-    style.innerHTML=`
-
-    .theme-light-active{
-        background:#f4f5f7 !important;
-        color:#111 !important;
-    }
-
-    .theme-light-active .filter-bar{
-        background:rgba(255,255,255,.88) !important;
-        border-bottom:1px solid #e5e7eb !important;
-    }
-
-    .theme-light-active .product-card,
-    .theme-light-active .modal-card,
-    .theme-light-active .cart-drawer,
-    .theme-light-active .custom-modal .modal-card,
-    .theme-light-active .coupon-item,
-    .theme-light-active .wishlist-product,
-    .theme-light-active .checkout-summary{
-        background:#fff !important;
-        color:#111 !important;
-        border-color:#e5e7eb !important;
-    }
-
-    .theme-light-active .p-title,
-    .theme-light-active .p-price,
-    .theme-light-active .modal-header h3,
-    .theme-light-active .cart-item-name,
-    .theme-light-active .account-name,
-    .theme-light-active .checkout-summary-item{
-        color:#111 !important;
-    }
-
-    .theme-light-active .p-category,
-    .theme-light-active .coupon-desc,
-    .theme-light-active .account-sub,
-    .theme-light-active .wishlist-info p{
-        color:#6b7280 !important;
-    }
-
-    .theme-light-active .cat-btn,
-    .theme-light-active .theme-chip,
-    .theme-light-active .size-btn,
-    .theme-light-active .search-wrapper input{
-        background:#fff !important;
-        color:#111 !important;
-        border-color:#d1d5db !important;
-    }
-
-    .theme-light-active .cat-btn.active,
-    .theme-light-active .size-btn.selected,
-    .theme-light-active .add-btn,
-    .theme-light-active .checkout-btn,
-    .theme-light-active .apply-coupon{
-        background:#111 !important;
-        color:#fff !important;
-    }
-
-    .theme-light-active .hero-section{
-        background:radial-gradient(circle at 70% 20%,#ffffff,transparent 35%),linear-gradient(145deg,#f8fafc,#e5e7eb) !important;
-    }
-
-    .theme-light-active .hero-overlay{
-        background:linear-gradient(transparent 20%,rgba(255,255,255,.86)) !important;
-    }
-
-    .theme-light-active .hero-title,
-    .theme-light-active .hero-subtitle,
-    .theme-light-active .hero-tag{
-        color:#111 !important;
-    }
-
-    .theme-light-active .hero-btn{
-        background:#111 !important;
-        color:#fff !important;
-    }
-
-    .theme-light-active .menu-item-btn{
-        color:#111 !important;
-        border-color:#e5e7eb !important;
-    }
-
-    .theme-light-active .menu-drawer{
-        background:#fff !important;
-        color:#111 !important;
-    }
-
-    .theme-light-active .theme-picker-section h4{
-        color:#6b7280 !important;
-    }
-
-    .theme-light-active .summary-row{
-        color:#374151 !important;
-    }
-
-    /* Premium default polish */
-    .product-card{
-        box-shadow:0 10px 30px rgba(0,0,0,.18);
-        transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease;
-    }
-    .product-card:hover{
-        transform:translateY(-4px);
-        box-shadow:0 18px 45px rgba(0,0,0,.28);
-        border-color:#3a3a3a;
-    }
-    .add-btn,.checkout-btn,.detail-buy-btn,.detail-cart-btn{
-        transition:transform .2s ease,box-shadow .2s ease,opacity .2s ease;
-    }
-    .add-btn:hover,.checkout-btn:hover,.detail-buy-btn:hover,.detail-cart-btn:hover{
-        transform:translateY(-1px);
-        box-shadow:0 8px 25px rgba(0,0,0,.25);
-    }
-    .checkout-btn{
-        letter-spacing:1.5px;
-        font-weight:900;
-    }
-    `;
-    document.head.appendChild(style);
-})();
-
-  /* =========================================================
-   VORNEX FINAL REQUIREMENTS PATCH
-   ONLY INDEX.HTML — NO OTHER FILE REQUIRED
-   ========================================================= */
-
-/* ---------- 1. BRAND / ANNOUNCEMENT ---------- */
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const announcement = document.querySelector(".announcement-bar");
-
-    if (announcement) {
-        announcement.innerHTML = `
-            ⚡ FREE EXPRESS SHIPPING ON ORDERS ABOVE ₹999
-            &nbsp; | &nbsp;
-            <strong>UPTO 20% OFF ON COUPONS</strong> ⚡
-        `;
-    }
-
-    const logo = document.querySelector(".logo");
-
-    if (logo && !logo.querySelector(".vornex-edge-title")) {
-        logo.insertAdjacentHTML(
-            "beforeend",
-            `
-            <small class="vornex-edge-title">
-                OWN YOUR EDGE.
-            </small>
-            `
-        );
-    }
-
-});
+function updateDetailHeart(){
+    /* Current product-detail markup has no dedicated heart control.
+       Kept as a safe no-op for the existing wishlist animation patch. */
+}
 
 
 /* =========================================================
-   2. PREMIUM VISUAL FIXES
+   FINAL SAFE SYNC
    ========================================================= */
-
-(function () {
-
-    const style = document.createElement("style");
-
-    style.innerHTML = `
-
-    /* ==============================================
-       WISHLIST PREMIUM RED ANIMATION
-       ============================================== */
-
-    .product-card .wishlist-btn {
-        transition:
-            transform .35s cubic-bezier(.175,.885,.32,1.275),
-            background .25s ease,
-            box-shadow .35s ease;
-    }
-
-    .product-card .wishlist-btn.active {
-        background:#ff163d !important;
-        color:#fff !important;
-        transform:scale(1.16);
-        box-shadow:
-            0 0 0 6px rgba(255,22,61,.12),
-            0 0 30px rgba(255,22,61,.65);
-    }
-
-    .product-card .wishlist-btn.active i {
-        animation:vornexHeartPremium .55s cubic-bezier(.175,.885,.32,1.275);
-    }
-
-    @keyframes vornexHeartPremium {
-        0% {
-            transform:scale(.35) rotate(-20deg);
-        }
-
-        45% {
-            transform:scale(1.45) rotate(8deg);
-        }
-
-        75% {
-            transform:scale(.9) rotate(-3deg);
-        }
-
-        100% {
-            transform:scale(1) rotate(0);
-        }
-    }
-
-
-    /* ==============================================
-       ADD TO BAG PREMIUM YELLOW
-       ============================================== */
-
-    .add-btn.added,
-    .detail-action-btn.cart-active {
-
-        background:
-            linear-gradient(
-                135deg,
-                #ffe66b,
-                #ffd400
-            ) !important;
-
-        color:#000 !important;
-
-        box-shadow:
-            0 0 15px rgba(255,212,0,.25),
-            0 0 35px rgba(255,212,0,.2),
-            inset 0 1px 0 rgba(255,255,255,.6);
-
-        transform:scale(1.025);
-
-        animation:vornexBagPremium .45s
-            cubic-bezier(.175,.885,.32,1.275);
-    }
-
-    @keyframes vornexBagPremium {
-
-        0% {
-            transform:scale(.94);
-        }
-
-        45% {
-            transform:scale(1.07);
-        }
-
-        100% {
-            transform:scale(1.025);
-        }
-
-    }
-
-
-    /* ==============================================
-       PRODUCT DETAIL — FULL SCROLL FIX
-       ============================================== */
-
-    #productDetailView {
-
-        position:fixed !important;
-
-        inset:0 !important;
-
-        height:100dvh !important;
-
-        max-height:100dvh !important;
-
-        overflow-y:auto !important;
-
-        overflow-x:hidden !important;
-
-        -webkit-overflow-scrolling:touch !important;
-
-        overscroll-behavior-y:auto !important;
-
-        touch-action:pan-y !important;
-
-        padding-bottom:0 !important;
-    }
-
-
-    #productDetailView .detail-info {
-
-        padding-bottom:
-            calc(
-                150px +
-                env(safe-area-inset-bottom)
-            ) !important;
-
-    }
-
-
-    /* ==============================================
-       IPHONE GLASS BOTTOM ACTIONS
-       ============================================== */
-
-    #productDetailView .detail-actions {
-
-        min-height:78px;
-
-        padding:
-            10px
-            12px
-            calc(
-                10px +
-                env(safe-area-inset-bottom)
-            );
-
-        background:
-            rgba(10,10,10,.62);
-
-        backdrop-filter:blur(28px)
-            saturate(180%);
-
-        -webkit-backdrop-filter:
-            blur(28px)
-            saturate(180%);
-
-        border-top:
-            1px solid
-            rgba(255,255,255,.14);
-
-        box-shadow:
-            0 -15px 40px
-            rgba(0,0,0,.35);
-
-    }
-
-
-    #productDetailView .detail-action-btn {
-
-        min-height:64px !important;
-
-        border-radius:20px !important;
-
-        background:
-            rgba(255,255,255,.10) !important;
-
-        border:
-            1px solid
-            rgba(255,255,255,.18) !important;
-
-        backdrop-filter:blur(22px);
-
-        -webkit-backdrop-filter:blur(22px);
-
-        box-shadow:
-            inset 0 1px 0
-            rgba(255,255,255,.15),
-            0 8px 25px
-            rgba(0,0,0,.25);
-
-        transition:
-            transform .25s ease,
-            background .3s ease,
-            box-shadow .3s ease;
-
-    }
-
-
-    #productDetailView
-    .detail-action-btn:active {
-
-        transform:scale(.95);
-
-    }
-
-
-    #productDetailView
-    .detail-action-btn.cart-active {
-
-        background:
-            linear-gradient(
-                135deg,
-                rgba(255,230,80,.95),
-                rgba(255,205,0,.92)
-            ) !important;
-
-        color:#000 !important;
-
-    }
-
-
-    #productDetailView
-    #detailBuyBtn.buy-active {
-
-        background:
-            rgba(255,255,255,.95) !important;
-
-        color:#000 !important;
-
-        box-shadow:
-            0 0 30px
-            rgba(255,255,255,.18);
-
-    }
-
-
-    /* ==============================================
-       DETAIL QUANTITY PREMIUM
-       ============================================== */
-
-    #productDetailView .qty-box {
-
-        width:190px;
-
-        min-height:54px;
-
-        border-radius:18px;
-
-        background:
-            rgba(255,255,255,.07);
-
-        backdrop-filter:blur(20px);
-
-    }
-
-
-    #productDetailView .qty-box button {
-
-        width:46px;
-        height:46px;
-
-        border-radius:14px;
-
-        transition:
-            transform .2s ease,
-            background .2s ease;
-
-    }
-
-
-    #productDetailView .qty-box button:active {
-
-        transform:scale(.88);
-
-        background:
-            rgba(255,212,0,.25);
-
-    }
-
-
-    /* ==============================================
-       MENU — BACKGROUND MUST NOT SCROLL
-       ============================================== */
-
-    body.menu-open {
-
-        overflow:hidden !important;
-
-        position:fixed !important;
-
-        width:100% !important;
-
-    }
-
-
-    #drawerOverlay {
-
-        position:fixed !important;
-
-        inset:0 !important;
-
-        overflow:hidden !important;
-
-        touch-action:none !important;
-
-    }
-
-
-    #iosMenuDrawer {
-
-        position:fixed !important;
-
-        top:0 !important;
-
-        bottom:0 !important;
-
-        height:100dvh !important;
-
-        overflow:hidden !important;
-
-    }
-
-
-    #iosMenuDrawer .drawer-content {
-
-        height:
-            calc(100dvh - 75px) !important;
-
-        max-height:
-            calc(100dvh - 75px) !important;
-
-        overflow-y:auto !important;
-
-        overflow-x:hidden !important;
-
-        overscroll-behavior:contain !important;
-
-        -webkit-overflow-scrolling:touch !important;
-
-        touch-action:pan-y !important;
-
-    }
-
-
-    /* ==============================================
-       LOGIN PREMIUM
-       ============================================== */
-
-    #loginModal .auth-choice {
-
-        gap:12px;
-
-    }
-
-
-    #loginModal .auth-option {
-
-        min-height:58px !important;
-
-        border-radius:18px !important;
-
-        font-weight:900;
-
-        letter-spacing:.5px;
-
-        transition:
-            transform .25s ease,
-            box-shadow .25s ease;
-
-    }
-
-
-    #loginModal .auth-option:active {
-
-        transform:scale(.96);
-
-    }
-
-
-    #loginModal .auth-option.phone {
-
-        background:
-            linear-gradient(
-                135deg,
-                #ffffff,
-                #eeeeee
-            ) !important;
-
-        color:#000 !important;
-
-        box-shadow:
-            0 10px 30px
-            rgba(255,255,255,.08);
-
-    }
-
-
-    #loginModal .auth-option.google {
-
-        background:
-            linear-gradient(
-                135deg,
-                #1c1c1c,
-                #0d0d0d
-            ) !important;
-
-        color:#fff !important;
-
-    }
-
-
-    #loginModal .auth-or {
-
-        margin:8px 0 !important;
-
-        font-size:.7rem;
-
-        letter-spacing:2px;
-
-    }
-
-
-    #loginModal .otp-btn {
-
-        min-height:52px !important;
-
-        border-radius:16px !important;
-
-        background:#ffd400 !important;
-
-        color:#000 !important;
-
-        font-weight:900;
-
-        box-shadow:
-            0 10px 25px
-            rgba(255,212,0,.18);
-
-    }
-
-
-    /* ==============================================
-       CHECKOUT PREMIUM
-       ============================================== */
-
-    #checkoutModal .modal-content {
-
-        border-radius:28px !important;
-
-        background:
-            linear-gradient(
-                145deg,
-                rgba(30,30,30,.94),
-                rgba(8,8,8,.97)
-            ) !important;
-
-        border:
-            1px solid
-            rgba(255,255,255,.12);
-
-        box-shadow:
-            0 30px 90px
-            rgba(0,0,0,.65),
-            inset 0 1px 0
-            rgba(255,255,255,.08);
-
-        backdrop-filter:blur(30px);
-
-        -webkit-backdrop-filter:blur(30px);
-
-    }
-
-
-    #checkoutModal .checkout-summary-box {
-
-        border-radius:20px;
-
-        background:
-            rgba(255,255,255,.055);
-
-        border:
-            1px solid
-            rgba(255,255,255,.09);
-
-        padding:16px;
-
-    }
-
-
-    #checkoutModal .coupon-apply-box {
-
-        display:flex;
-
-        gap:8px;
-
-    }
-
-
-    #checkoutModal
-    .coupon-apply-box input {
-
-        min-width:0;
-
-        border-radius:14px !important;
-
-        background:
-            rgba(255,255,255,.06);
-
-        border:
-            1px solid
-            rgba(255,255,255,.12);
-
-    }
-
-
-    #checkoutModal
-    .coupon-apply-box button {
-
-        min-width:92px;
-
-        border-radius:14px;
-
-        background:#ffd400;
-
-        color:#000;
-
-        font-weight:900;
-
-    }
-
-
-    #checkoutModal .submit-order-btn {
-
-        min-height:58px;
-
-        border-radius:18px;
-
-        font-weight:900;
-
-        box-shadow:
-            0 12px 30px
-            rgba(255,212,0,.15);
-
-    }
-
-
-    /* ==============================================
-       BOTTOM BUY BAR
-       ============================================== */
-
-    .glass-bottom-bar {
-
-        bottom:
-            calc(
-                12px +
-                env(safe-area-inset-bottom)
-            ) !important;
-
-        z-index:1800 !important;
-
-        backdrop-filter:blur(24px);
-
-        -webkit-backdrop-filter:blur(24px);
-
-    }
-
-
-    .glass-buy-btn {
-
-        min-height:54px !important;
-
-        border-radius:18px !important;
-
-        transition:
-            transform .25s ease,
-            box-shadow .25s ease;
-
-    }
-
-
-    .glass-buy-btn:active {
-
-        transform:scale(.96);
-
-    }
-
-
-    /* ==============================================
-       OWN YOUR EDGE
-       ============================================== */
-
-    .vornex-edge-title {
-
-        display:block !important;
-
-        font-size:.42rem !important;
-
-        letter-spacing:3px !important;
-
-        text-align:center !important;
-
-        margin-top:-3px !important;
-
-        opacity:.7 !important;
-
-        font-weight:800 !important;
-
-    }
-
-
-    /* ==============================================
-       MOBILE DETAIL
-       ============================================== */
-
-    @media(max-width:600px) {
-
-        #productDetailView
-        .detail-image-wrap {
-
-            height:56vh !important;
-
-            min-height:350px;
-
-        }
-
-
-        #productDetailView
-        .detail-info {
-
-            padding-left:15px;
-
-            padding-right:15px;
-
-            padding-bottom:165px !important;
-
-        }
-
-
-        #productDetailView
-        .detail-action-btn {
-
-            min-height:64px !important;
-
-            font-size:.68rem;
-
-        }
-
-    }
-
-    `;
-
-    document.head.appendChild(style);
-
-})();
-
-
-/* =========================================================
-   3. FIX DETAIL QUANTITY
-   ========================================================= */
-
-(function () {
-
-    const originalChangeDetailQty =
-        window.changeDetailQty;
-
-    window.changeDetailQty = function (amount) {
-
-        if (typeof originalChangeDetailQty === "function") {
-
-            originalChangeDetailQty(amount);
-
-        } else {
-
-            detailQty += Number(amount) || 0;
-
-            if (detailQty < 1)
-                detailQty = 1;
-
-            if (detailQty > 20)
-                detailQty = 20;
-
-            setText(
-                "detailQty",
-                detailQty
-            );
-
-        }
-
-        const value =
-            document.getElementById("detailQty");
-
-        if (value) {
-
-            value.textContent =
-                String(detailQty);
-
-        }
-
-    };
-
-})();
-
-
-/* =========================================================
-   4. FIX ADD TO BAG STATE
-   ========================================================= */
-
-(function () {
-
-    const originalAdd =
-        window.addCurrentDetailToCart;
-
-    window.addCurrentDetailToCart = function () {
-
-        if (typeof originalAdd === "function") {
-
-            originalAdd();
-
-        } else {
-
-            if (!currentProduct)
-                return;
-
-            addToCart(
-                currentProduct.id,
-                detailQty,
-                selectedSize
-            );
-
-        }
-
-        const btn =
-            document.getElementById(
-                "detailAddBtn"
-            );
-
-        if (!btn)
-            return;
-
-        btn.classList.add(
-            "cart-active"
-        );
-
-        btn.innerHTML =
-            '<i class="fa-solid fa-check"></i> ADDED TO BAG';
-
-        clearTimeout(
-            btn.__vornexTimer
-        );
-
-        btn.__vornexTimer =
-            setTimeout(() => {
-
-                btn.classList.remove(
-                    "cart-active"
-                );
-
-                btn.innerHTML =
-                    '<i class="fa-solid fa-bag-shopping"></i> ADD TO BAG';
-
-            },1800);
-
-    };
-
-})();
-
-
-/* =========================================================
-   5. FIX BUY NOW
-   ========================================================= */
-
-(function () {
-
-    const originalBuy =
-        window.buyCurrentProduct;
-
-    window.buyCurrentProduct = function () {
-
-        if (typeof originalBuy === "function") {
-
-            originalBuy();
-
-        } else {
-
-            if (!currentProduct)
-                return;
-
-            addToCart(
-                currentProduct.id,
-                detailQty,
-                selectedSize
-            );
-
-            closeProductDetail();
-
-            setTimeout(
-                openCheckoutModal,
-                250
-            );
-
-        }
-
-    };
-
-})();
-
-
-/* =========================================================
-   6. COUPON — SUPPORT MULTIPLE FIREBASE FORMATS
-   ========================================================= */
-
-(function () {
-
-    const originalCalculateDiscount =
-        window.calculateDiscount;
-
-    window.calculateDiscount = function (subtotal) {
-
-        if (!currentCoupon)
-            return 0;
-
-        const type =
-            String(
-                currentCoupon.type ||
-                ""
-            ).toLowerCase();
-
-        /* FLAT */
-
-        if (
-            type === "flat" ||
-            currentCoupon.flatDiscount != null
-        ) {
-
-            const flat =
-                Number(
-                    currentCoupon.flatDiscount ??
-                    currentCoupon.discount ??
-                    0
-                );
-
-            return Math.min(
-                flat,
-                subtotal
-            );
-
-        }
-
-        /* PERCENTAGE */
-
-        const percent =
-            Number(
-                currentCoupon.discountPercent ??
-                currentCoupon.percentage ??
-                currentCoupon.percent ??
-                currentCoupon.discount ??
-                0
-            );
-
-        return Math.min(
-            subtotal * percent / 100,
-            subtotal
-        );
-
-    };
-
-})();
-
-
-/* =========================================================
-   7. COUPON APPLY — FORCE UPPERCASE + SYNC
-   ========================================================= */
-
-(function () {
-
-    const originalApply =
-        window.applyCheckoutCoupon;
-
-    window.applyCheckoutCoupon = function () {
-
-        const input =
-            document.getElementById(
-                "checkoutCoupon"
-            );
-
-        if (input) {
-
-            input.value =
-                input.value
-                    .trim()
-                    .toUpperCase();
-
-        }
-
-        if (
-            typeof originalApply ===
-            "function"
-        ) {
-
-            originalApply();
-
-        }
-
+setTimeout(function(){
+    try{
+        updateBadges();
         renderCart();
-
-        renderCheckout();
-
-    };
-
-})();
-
-
-/* =========================================================
-   8. HERO MEDIA — FIREBASE COMPATIBILITY
-   ========================================================= */
-
-(function () {
-
-    const originalHero =
-        window.renderHeroMedia;
-
-    window.renderHeroMedia =
-        function (data) {
-
-            if (
-                typeof originalHero ===
-                "function"
-            ) {
-
-                originalHero(data);
-
-                return;
-
-            }
-
-            const layer =
-                document.getElementById(
-                    "heroMediaLayer"
-                );
-
-            if (!layer || !data)
-                return;
-
-            const type =
-                String(
-                    data.type ||
-                    "image"
-                ).toLowerCase();
-
-            if (
-                type === "video"
-            ) {
-
-                const url =
-                    data.url ||
-                    data.videoUrl ||
-                    data.src ||
-                    "";
-
-                if (!url)
-                    return;
-
-                layer.innerHTML = `
-                    <video
-                        autoplay
-                        muted
-                        loop
-                        playsinline
-                        preload="metadata">
-                        <source
-                            src="${escapeHtml(url)}">
-                    </video>
-                `;
-
-                return;
-
-            }
-
-            let images = [];
-
-            if (
-                type === "slideshow" ||
-                type === "slider"
-            ) {
-
-                images =
-                    normalizeMediaImages(
-                        data.images ||
-                        data.media ||
-                        data.slides
-                    );
-
-            }
-
-            if (!images.length) {
-
-                const single =
-                    data.url ||
-                    data.image ||
-                    data.imageUrl ||
-                    "";
-
-                if (single)
-                    images = [single];
-
-            }
-
-            if (!images.length)
-                return;
-
-            heroImages = images;
-            heroIndex = 0;
-
-            layer.innerHTML = `
-                <img
-                    src="${escapeHtml(images[0])}"
-                    alt="VORNEX HERO">
-            `;
-
-            clearInterval(heroTimer);
-
-            if (images.length > 1) {
-
-                heroTimer =
-                    setInterval(() => {
-
-                        heroIndex =
-                            (
-                                heroIndex + 1
-                            ) % images.length;
-
-                        layer.innerHTML = `
-                            <img
-                                src="${escapeHtml(
-                                    images[heroIndex]
-                                )}"
-                                alt="VORNEX HERO">
-                        `;
-
-                    },4000);
-
-            }
-
-        };
-
-})();
-
-
-/* =========================================================
-   9. THEME — FORCE WORKING
-   ========================================================= */
-
-(function () {
-
-    const originalSetTheme =
-        window.setTheme;
-
-    window.setTheme = function (theme) {
-
-        const validThemes = [
-            "dark",
-            "neon",
-            "gold",
-            "emerald",
-            "violet",
-            "amber"
-        ];
-
-        if (
-            !validThemes.includes(theme)
-        ) {
-
-            theme = "dark";
-
-        }
-
-        document.body.classList.remove(
-            "theme-neon",
-            "theme-gold",
-            "theme-emerald",
-            "theme-violet",
-            "theme-amber"
-        );
-
-        if (theme !== "dark") {
-
-            document.body.classList.add(
-                "theme-" + theme
-            );
-
-        }
-
-        localStorage.setItem(
-            "vornex_theme",
-            theme
-        );
-
-        if (
-            typeof Toastify ===
-            "function"
-        ) {
-
-            toast(
-                "Theme: " +
-                theme.toUpperCase()
-            );
-
-        }
-
-    };
-
-})();
-
-
-/* =========================================================
-   10. MENU BACKDROP — TAP TO CLOSE
-   ========================================================= */
-
-document.addEventListener(
-    "click",
-    function (event) {
-
-        const overlay =
-            document.getElementById(
-                "drawerOverlay"
-            );
-
-        const drawer =
-            document.getElementById(
-                "iosMenuDrawer"
-            );
-
-        if (
-            !overlay ||
-            !drawer
-        )
-            return;
-
-        if (
-            overlay.classList.contains(
-                "active"
-            ) &&
-            event.target === overlay
-        ) {
-
-            closeMenuOnly();
-
-        }
-
-    },
-    true
-);
-
-
-/* =========================================================
-   11. PREVENT MENU TOUCH FROM SCROLLING PAGE
-   ========================================================= */
-
-document.addEventListener(
-    "touchmove",
-    function (event) {
-
-        const drawer =
-            document.getElementById(
-                "iosMenuDrawer"
-            );
-
-        if (
-            drawer &&
-            drawer.classList.contains(
-                "active"
-            )
-        ) {
-
-            const content =
-                drawer.querySelector(
-                    ".drawer-content"
-                );
-
-            if (
-                content &&
-                content.contains(
-                    event.target
-                )
-            ) {
-
-                return;
-
-            }
-
-            event.preventDefault();
-
-        }
-
-    },
-    {
-        passive:false
+        renderWishlist();
+        restoreTheme();
+    }catch(error){
+        console.error("VORNEX final sync:",error);
     }
-);
-
-
-/* =========================================================
-   12. DETAIL RIGHT SWIPE = BACK
-   ========================================================= */
-
-(function () {
-
-    let startX = 0;
-    let startY = 0;
-
-    document.addEventListener(
-        "touchstart",
-        function (event) {
-
-            const detail =
-                document.getElementById(
-                    "productDetailView"
-                );
-
-            if (
-                !detail ||
-                !detail.classList.contains(
-                    "active"
-                )
-            )
-                return;
-
-            startX =
-                event.touches[0].clientX;
-
-            startY =
-                event.touches[0].clientY;
-
-        },
-        {
-            passive:true
-        }
-    );
-
-
-    document.addEventListener(
-        "touchend",
-        function (event) {
-
-            const detail =
-                document.getElementById(
-                    "productDetailView"
-                );
-
-            if (
-                !detail ||
-                !detail.classList.contains(
-                    "active"
-                )
-            )
-                return;
-
-            const endX =
-                event.changedTouches[0].clientX;
-
-            const endY =
-                event.changedTouches[0].clientY;
-
-            const dx =
-                endX - startX;
-
-            const dy =
-                endY - startY;
-
-            if (
-                dx > 100 &&
-                Math.abs(dx) >
-                Math.abs(dy)
-            ) {
-
-                closeProductDetail();
-
-            }
-
-        },
-        {
-            passive:true
-        }
-    );
-
-})();
-
-
-/* =========================================================
-   13. X BUTTON = ONLY ONE STEP BACK
-   ========================================================= */
-
-(function () {
-
-    const originalClose =
-        window.closeModalStepBack;
-
-    window.closeModalStepBack =
-        function (id) {
-
-            const modal =
-                document.getElementById(id);
-
-            if (!modal)
-                return;
-
-            modal.classList.remove(
-                "active"
-            );
-
-            /* restore body */
-
-            if (
-                !document.querySelector(
-                    ".custom-modal.active"
-                ) &&
-                !document.getElementById(
-                    "productDetailView"
-                )?.classList.contains(
-                    "active"
-                )
-            ) {
-
-                document.body.style.overflow =
-                    "";
-
-            }
-
-        };
-
-})();
-
-
-/* =========================================================
-   14. PRODUCT CARD — LIKE ANIMATION STATE
-   ========================================================= */
-
-(function () {
-
-    const originalToggle =
-        window.toggleWishlist;
-
-    window.toggleWishlist =
-        function (id) {
-
-            if (
-                typeof originalToggle ===
-                "function"
-            ) {
-
-                originalToggle(id);
-
-            }
-
-            setTimeout(() => {
-
-                const button =
-                    document.querySelector(
-                        `.wishlist-btn[onclick*="${id}"]`
-                    );
-
-                if (button) {
-
-                    const liked =
-                        wishlist.some(
-                            p => p.id === id
-                        );
-
-                    button.classList.toggle(
-                        "active",
-                        liked
-                    );
-
-                    const icon =
-                        button.querySelector(
-                            "i"
-                        );
-
-                    if (icon) {
-
-                        icon.className =
-                            liked
-                                ? "fa-solid fa-heart"
-                                : "fa-regular fa-heart";
-
-                    }
-
-                }
-
-                if (
-                    currentProduct &&
-                    currentProduct.id === id
-                ) {
-
-                    updateDetailHeart();
-
-                }
-
-            },50);
-
-        };
-
-})();
-
-
-/* =========================================================
-   15. KEEP CART / WISHLIST SYNCHRONIZED
-   ========================================================= */
-
-window.addEventListener(
-    "storage",
-    function () {
-
-        try {
-
-            cart =
-                JSON.parse(
-                    localStorage.getItem(
-                        "vornex_cart"
-                    )
-                ) || [];
-
-            wishlist =
-                JSON.parse(
-                    localStorage.getItem(
-                        "vornex_wishlist"
-                    )
-                ) || [];
-
-            renderCart();
-            renderWishlist();
-            updateBadges();
-
-        } catch (error) {
-
-            console.error(
-                "VORNEX storage sync:",
-                error
-            );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   16. FINAL INITIAL SYNC
-   ========================================================= */
-
-setTimeout(
-    function () {
-
-        try {
-
-            updateBadges();
-
-            renderCart();
-
-            renderWishlist();
-
-            restoreTheme();
-
-        } catch (error) {
-
-            console.error(
-                "VORNEX final sync:",
-                error
-            );
-
-        }
-
-    },
-    800
-);
-  
+},800);
 </script>
 
 </body>
