@@ -4233,8 +4233,46 @@ function openModal(id){
 
 function closeModalStepBack(id){
 
-    document.getElementById(id)
-        .classList.remove("active");
+    const modal = document.getElementById(id);
+
+    if(!modal) return;
+
+    /* Current interface close */
+    modal.classList.remove("active");
+
+    /*
+     * If this interface was opened from the 3-line menu,
+     * bring the menu back instead of going directly to Home.
+     */
+    const menuBackIds = [
+        "loginModal",
+        "accountModal",
+        "ordersModal",
+        "wishlistModal",
+        "couponsModal",
+        "trackingModal",
+        "policyModal",
+        "infoModal"
+    ];
+
+    if(menuBackIds.includes(id)){
+
+        const drawer =
+            document.getElementById("iosMenuDrawer");
+
+        const overlay =
+            document.getElementById("drawerOverlay");
+
+        if(drawer){
+            drawer.classList.add("active");
+        }
+
+        if(overlay){
+            overlay.classList.add("active");
+        }
+
+        document.body.classList.add("menu-open");
+    }
 
 }
 
